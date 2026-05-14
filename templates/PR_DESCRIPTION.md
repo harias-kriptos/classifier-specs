@@ -25,7 +25,7 @@ Plantilla para la **descripción del Pull/Merge Request** cuando se abre tras im
 ## Spec implementada
 
 - **Archivo:** `specs/{NNN}-{slug}.md`
-- **Ticket Jira:** {KT-XXXXX}
+- **Ticket Jira:** {KR-XXXXX}
 - **Brainstorm:** {link al archivo en classifier-specs/brainstorms/ — opcional}
 
 ## Acceptance Criteria cubiertos
@@ -40,7 +40,7 @@ Plantilla para la **descripción del Pull/Merge Request** cuando se abre tras im
 Cada AC tiene su par de commits RED → GREEN. Verificable con `git log --oneline`:
 
 ```
-chore: spec for {feature} ({KT-XXXXX})
+chore: spec for {feature} ({KR-XXXXX})
 chore: {AC01 behavior} (failing)
 feat: {AC01 behavior} (passing)
 chore: {AC02 behavior} (failing)
@@ -83,12 +83,12 @@ refactor: {what} (opcional)
 ## Bloqueantes residuales para producción
 
 - {ej. Q1 (auth) — no se cierra acá, requiere ticket aparte antes de deploy a prod}
-- {O: "Ninguno — mergear a develop habilita deploy automático"}
+- {O: "Ninguno — mergear a `main` habilita el flujo de deploy controlado por CI."}
 
 ## Checklist (autor)
 
 - [ ] El PR linkea a la spec (`specs/{NNN}-*.md`).
-- [ ] El PR linkea al ticket Jira (`{KT-XXXXX}`).
+- [ ] El PR linkea al ticket Jira (`{KR-XXXXX}`).
 - [ ] Conventional commits en toda la historia del branch.
 - [ ] CI verde en este commit (no en commits anteriores).
 - [ ] Si hubo cambios en `pyproject.toml` (deps), `pip-audit` corrió limpio.

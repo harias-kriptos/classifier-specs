@@ -75,4 +75,4 @@ Review ejecutado: **{YYYY-MM-DD}** · Rol: **Reviewer** · Modelo: **Sonnet 4.6*
 ## Notas para el agente que lo aplica
 
 - Si el review encontró BLOCKED en cualquier sección, **no usar este template** — usar el reporte de review pre-humano (`PR_REVIEW_REPORT.md`). Este template es solo para cuando todo está verde.
-- "Bloqueantes residuales para producción" no impide el merge a develop/main si la rama base es de desarrollo, solo es nota para el deploy operativo.
+- "Bloqueantes residuales para producción" no impide el merge a `main`; solo es nota para el deploy operativo (cuándo se promociona la build a entornos productivos).

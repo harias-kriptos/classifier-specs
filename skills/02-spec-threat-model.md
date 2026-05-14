@@ -19,7 +19,7 @@ Esta skill está diseñada para **roles técnicos**: Architect, Tech Lead, Senio
 La skill puede recibir uno o varios de estos. **Es flexible — combina lo que tengas.**
 
 1. **Brainstorm output (Skill 01)** — el caso ideal. Lo lee de:
-   - `brainstorms/KT-XXXXX-*.md` en este repo.
+   - `brainstorms/KR-XXXXX-*.md` en este repo.
    - Comentario del ticket Jira (si hay Atlassian connector).
    - Pegado directamente en el chat.
 
@@ -36,7 +36,7 @@ La skill puede recibir uno o varios de estos. **Es flexible — combina lo que t
 ### Reconciliación de inputs múltiples
 
 Cuando hay varias fuentes:
-1. El agente **lista los inputs detectados** ("Estoy leyendo: brainstorm `brainstorms/KT-16612.md`, épica `KT-16500`, draft markdown pegado en este chat").
+1. El agente **lista los inputs detectados** ("Estoy leyendo: brainstorm `brainstorms/KR-16612.md`, épica `KR-16500`, draft markdown pegado en este chat").
 2. **Identifica solapamientos y contradicciones** explícitamente.
 3. **Pide al usuario que confirme cuál es la fuente de verdad** cuando hay conflicto. No promediar, no fusionar silenciosamente.
 4. Recién después genera la spec.
@@ -73,8 +73,8 @@ Produce these artifacts:
 
 ## Minimal invocation
 
-> "Skill 02 sobre KT-16612"
-> "Spec a partir del brainstorm `brainstorms/KT-16612-tree-url-generator.md` y la épica `KT-16500`"
+> "Skill 02 sobre KR-16612"
+> "Spec a partir del brainstorm `brainstorms/KR-16612-tree-url-generator.md` y la épica `KR-16500`"
 
 ---
 
@@ -104,14 +104,63 @@ Produce these artifacts:
 
 ---
 
-## Required output structure
+## Output format — artifacts markdown editables
 
-1. **Context updates** (si Step 2 detectó gaps) — lista de archivos nuevos o modificados en `classifier-specs/context/` o `classifier-specs/stacks/`, con el contenido completo a commitear.
-2. **Spec markdown** ready to be saved as `specs/NNN-<slug>.md` in the product repo.
-3. **Threat model markdown** (only if applicable) ready to be saved as `docs/security/<slug>-threat-model.md`.
-4. **Commit plan** — qué commitear en qué orden, en qué repo.
-5. **Persistencia ejecutada / sugerida** — ver sección abajo.
-6. **Siguiente paso:** Skill 03 — Plan.
+**Mientras no haya GitHub connector con escritura**, todos los documentos que esta skill produce se entregan como **artifacts markdown editables en el chat** (no como bloques de código inline en la respuesta del agente). Razones:
+
+- Se descargan con un click (botón Download del artifact).
+- Se editan in-place con el usuario antes de commitear.
+- No se pierden en el scroll de la conversación.
+- El usuario los pega/sube manualmente a cada repo según la tabla de abajo.
+
+**Regla operativa para el agente:** crear un artifact por cada documento listado en la tabla "Required outputs". Nombrar cada artifact con el path final del archivo (ej. el artifact se llama `specs/001-tree-url-generator.md`) para que el usuario sepa exactamente dónde guardarlo. El cuerpo del artifact es markdown puro, listo para commitear sin edición.
+
+Lo único que va inline en la respuesta del chat son: el listado de outputs, el commit plan, las instrucciones de persistencia y el "siguiente paso".
+
+---
+
+## Required outputs
+
+Cada fila = un artifact independiente en el chat.
+
+| # | Artifact (nombre exacto) | Repo destino | Cuándo se genera |
+|---|---|---|---|
+| 1 | `specs/NNN-<slug>.md` | **producto** (ej. `kriptos-io/s3-tree-uploader`) | Siempre. Sigue `templates/SPEC_TEMPLATE.md` (11 secciones, ninguna skipeable). |
+| 2 | `docs/security/<slug>-threat-model.md` | **producto** | Solo si los inputs identificaron threat surface (Skill 01 §5). |
+| 3 | `context/classifier-v2/<archivo>.md` (uno por gap detectado) | **classifier-specs** (este repo) | Solo si Step 2 (Detect missing context) encontró gaps de dominio. |
+| 4 | `stacks/<stack>/rules-<addendum>.md` | **classifier-specs** | Solo si Step 2 encontró gaps de stack que ameritan addendum (no editar `rules.md` mainstream sin discusión). |
+
+**Inline en la respuesta del chat (NO como artifact)** — el agente lista al final:
+
+- **Commit plan** — secuencia de commits para cada repo (producto + classifier-specs si aplica), con mensajes exactos.
+- **Persistencia ejecutada / sugerida** — qué se actualizó en Jira/Confluence (si hay connector) o qué textos pegar manual.
+- **Siguiente paso:** Skill 03 — Plan.
+
+---
+
+## Rutas y persistencia — referencia rápida
+
+**Repo del producto** (ej. `kriptos-io/s3-tree-uploader`):
+
+- Branch nuevo: `KR-XXXX-<slug>` desde `main`.
+- `specs/NNN-<slug>.md` — artifact #1.
+- `docs/security/<slug>-threat-model.md` — artifact #2 si aplica.
+- Commits: `chore: spec for <slug> (KR-XXXX)` (un solo commit con spec + threat-model, o dos separados si preferís).
+- PR opcional pero recomendado para el primer ticket: target `main`, draft hasta tener implementación.
+
+**Repo de specs (classifier-specs)** — solo si hubo gaps de contexto:
+
+- Branch nuevo: `update-context-for-KR-XXXX` desde `main`.
+- `context/classifier-v2/<archivo>.md` — artifacts #3.
+- `stacks/<stack>/rules-<addendum>.md` — artifacts #4.
+- Commit: `docs: context updates needed by KR-XXXX`.
+- PR separado del repo del producto (las dos cosas no comparten history).
+
+**Jira (KR-XXXX):**
+
+- Comentario con: link al PR del producto, link al PR de classifier-specs (si hubo), resumen 1-2 líneas.
+- Transition: `Ready for Spec` → `Spec ready`.
+- Si no hay Atlassian connector con escritura: entregar el texto exacto del comentario y los pasos manuales.
 
 ---
 

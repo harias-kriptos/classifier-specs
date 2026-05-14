@@ -39,5 +39,5 @@ Listar al menos dos alternativas reales que se evaluaron y por qué no se eligie
 ## Referencias
 
 - Spec(s) afectada(s): `specs/NNN-*.md`
-- Issue / Jira: KT-XXXXX
+- Issue / Jira: KR-XXXXX
 - Discusión: <link>

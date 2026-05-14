@@ -54,7 +54,7 @@ Refinamiento ejecutado: **{YYYY-MM-DD}** · Rol: **Product Manager** · Modelo: 
 - **Acciones:**
   - {ej. Descripción del ticket actualizada con Resumen + AC}
   - {ej. Página Confluence creada en `<link>`}
-  - {ej. Copia en `classifier-specs/brainstorms/KT-XXXXX-<slug>.md`}
+  - {ej. Copia en `classifier-specs/brainstorms/KR-XXXXX-<slug>.md`}
 
 ### 8. Siguiente paso
 
@@ -62,7 +62,7 @@ Refinamiento ejecutado: **{YYYY-MM-DD}** · Rol: **Product Manager** · Modelo: 
 
 Para invocar Skill 02 en una conversación nueva:
 
-> "Ejecutá Skill 02 sobre el brainstorm de {KT-XXXXX}. Repo del producto: {kriptos-io/...}"
+> "Ejecutá Skill 02 sobre el brainstorm de {KR-XXXXX}. Repo del producto: {kriptos-io/...}"
 
 La skill leerá este comentario y el archivo en `classifier-specs/brainstorms/` automáticamente.
 ```

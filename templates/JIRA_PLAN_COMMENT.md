@@ -16,7 +16,7 @@ Plan generado: **{YYYY-MM-DD}** · Rol: **Tech Lead** · Modelo: **Sonnet 4.6**
 ### Spec base
 
 - **Archivo:** `specs/{NNN}-{slug}.md` en `{repo del producto}`
-- **PR de la spec:** {link al MR/PR — opcional si se merged a develop sin PR separado}
+- **PR de la spec:** {link al PR — opcional si la spec fue mergeada a `main` sin PR separado}
 
 ### Resumen del plan
 

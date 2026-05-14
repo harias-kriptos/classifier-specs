@@ -120,8 +120,8 @@ Reglas adicionales que enforcamos:
 
 ## CI
 
-- Workflow `ci-dev.yml` corre en push a `develop` y PR a cualquier rama.
-- Workflow `ci-prod.yml` corre solo en PR a `main`.
+- Workflow `ci.yml` corre en push a cualquier rama y PR a `main`.
+- Workflow `ci-prod.yml` corre solo en PR a `main` con gates más estrictos (coverage, Snyk, SonarCloud quality gate verde obligatorio para merge).
 
 Jobs mínimos:
 

@@ -48,8 +48,8 @@ Plantilla para la **descripción** de un Epic en Jira. La usa Skill 01 en Caso A
 
 {Lista enlazada de Stories/Tasks que componen el Epic. Se va completando a medida que se refinan.}
 
-- KT-XXXXX — {título corto}
-- KT-XXXXX — {título corto}
+- KR-XXXXX — {título corto}
+- KR-XXXXX — {título corto}
 - {...}
 
 ## Referencias

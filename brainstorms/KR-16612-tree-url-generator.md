@@ -1,4 +1,4 @@
-# Brainstorm output — Ticket KT-16612 (`tree-url-generator`)
+# Brainstorm output — Ticket KR-16612 (`tree-url-generator`)
 
 > Generado por Skill 01 (Brainstorm) en Claude Web con Opus 4.7.
 > Rol activado: Product Manager.
@@ -88,6 +88,6 @@ Salidas esperadas de Skill 02:
 
 - `specs/001-tree-url-generator.md` siguiendo `templates/SPEC_TEMPLATE.md` (las 11 secciones completas, incluyendo plan de tests mapeado 1:1 a los nombres listados arriba, rollout checks en §11 para WAF + IAM + bucket policy, y commit plan TDD).
 - `docs/security/tree-url-generator-threat-model.md` con la tabla STRIDE expandida y mitigaciones citadas a nivel de línea de código / test.
-- Plan de commits: `chore: spec for tree-url-generator (KT-16612)` → secuencia de `chore: <behavior> (failing)` / `feat: <behavior> (passing)` por cada AC.
+- Plan de commits: `chore: spec for tree-url-generator (KR-16612)` → secuencia de `chore: <behavior> (failing)` / `feat: <behavior> (passing)` por cada AC.
 
 Repositorio del producto: `kriptos-io/s3-tree-uploader`.

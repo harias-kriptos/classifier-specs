@@ -45,7 +45,7 @@ Templates que la skill puede entregar al final (según el caso de persistencia):
 
 ## Formatos de input aceptados
 
-1. **Referencia a ticket Jira** (`KT-XXXXX`): si hay Atlassian connector, leer Jira directamente. Si no, pedir body.
+1. **Referencia a ticket Jira** (`KR-XXXXX`): si hay Atlassian connector, leer Jira directamente. Si no, pedir body.
 2. **Idea cruda en lenguaje natural**: ej. *"Queremos que el cliente pueda exportar sus reportes en PDF"*.
 3. **Link a página Confluence**: leer la página y usarla como punto de partida.
 4. **Body de ticket pegado en chat**.
@@ -67,7 +67,7 @@ Al final de esta skill el usuario debe tener:
 
 ## Minimal invocation
 
-> "Brainstorm KT-16612"
+> "Brainstorm KR-16612"
 > "Brainstorm idea: queremos que el cliente exporte sus reportes en PDF"
 > "Brainstorm sobre el ticket: [body pegado]"
 > "Brainstorm sobre esta página Confluence: [link]"
@@ -136,7 +136,7 @@ El agente determina el caso aplicable en el paso 3 del Procedure, y al final eje
 ```
 ¿De dónde viene la idea?
 
-  ──► Ya hay ticket Jira (KT-XXXXX):
+  ──► Ya hay ticket Jira (KR-XXXXX):
         ¿El ticket tiene épica padre o documentación contextual?
           ├─ Sí, claramente               →  CASO C
           └─ No / no refinado             →  CASO B
@@ -171,7 +171,7 @@ El agente NO crea épica automáticamente. Mantiene foco en el ticket. Pregunta:
 - Opción 2: lo mismo que opción 1 + crear/actualizar Epic (usando `JIRA_EPIC.md`) o página Confluence (usando `CONFLUENCE_INITIATIVE.md`) si el user da link.
 - Opción 3: igual que Caso C.
 
-**Siempre** además: copia en `brainstorms/KT-XXXXX-<slug>.md`.
+**Siempre** además: copia en `brainstorms/KR-XXXXX-<slug>.md`.
 
 ### Caso C — Ticket Jira con épica / contexto claro
 
@@ -180,7 +180,7 @@ El agente sugiere ejecutar:
 1. Actualizar **descripción del ticket** usando `templates/JIRA_STORY.md` (resumen + AC refinados + edge cases + threat + links).
 2. Agregar **comentario nuevo** con el log completo usando `templates/JIRA_BRAINSTORM_COMMENT.md`.
 3. **Transition status** del ticket: `Backlog` → `Ready for Spec` (o el equivalente).
-4. **Copia** en `brainstorms/KT-XXXXX-<slug>.md`.
+4. **Copia** en `brainstorms/KR-XXXXX-<slug>.md`.
 
 ### Caso D — Página Confluence existente
 

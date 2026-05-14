@@ -14,7 +14,8 @@ Este repo es la **maquinaria** del framework de IA de Kriptos: skills, roles, te
 | `templates/` | SPEC_TEMPLATE, ADR_TEMPLATE | Cuando cambia la estructura de specs |
 | `stacks/python-lambda/` | Reglas, settings, bootstrap | Cuando cambian convenciones del stack |
 | `context/classifier-v2/` | Contexto del producto | Cuando cambia el producto |
-| `demo/` | Outputs de demos ejecutadas | Después de cada demo |
+| `brainstorms/` | Outputs reales de Skill 01 (uno por ticket o iniciativa) | Después de cada brainstorm |
+| `docs/pilots/` | Resúmenes ejecutivos de iniciativas piloto del framework | Cuando una iniciativa cierra una fase |
 
 ---
 
@@ -51,7 +52,7 @@ Este repo es la **maquinaria** del framework de IA de Kriptos: skills, roles, te
 2. Mirá `docs/references/flow-5-steps.png` — el flujo visual.
 3. Leé `skills/01-brainstorm.md` y `skills/02-spec-threat-model.md` — las dos primeras skills del flujo.
 4. Leé `CLAUDE_PROJECT.md` — cómo se configura Claude Web para que use este repo.
-5. Mirá `demo/ticket-1-tree-url-generator/README.md` — el caso piloto que valida todo.
+5. Mirá `brainstorms/KR-16612-tree-url-generator.md` — primer output real del flujo y `docs/pilots/KR-16612-overview.md` — el contexto de iniciativa.
 
 ---
 

@@ -128,7 +128,7 @@ Plantilla para la **página Confluence** que documenta una iniciativa estratégi
 
 > Se actualiza conforme los Epics y Stories se crean.
 
-- **Epic:** {KT-XXXXX} — {título}
+- **Epic:** {KR-XXXXX} — {título}
 - **Stories en flight:** {lista}
 
 ---

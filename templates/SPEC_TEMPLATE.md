@@ -1,6 +1,6 @@
 # Spec NNN: <feature slug>
 
-> Ticket: KT-XXXXX
+> Ticket: KR-XXXXX
 > Author: <name>
 > Status: draft | accepted | implemented | superseded
 > Created: YYYY-MM-DD
@@ -104,8 +104,8 @@ Things not yet decided. If empty, double-check — there is almost always someth
 
 ## 11. Rollout
 
-- [ ] Branch: `KT-XXXXX-<slug>`
-- [ ] Spec committed: `chore: spec for <feature> (KT-XXXXX)`
+- [ ] Branch: `KR-XXXXX-<slug>`
+- [ ] Spec committed: `chore: spec for <feature> (KR-XXXXX)`
 - [ ] Failing test: `chore: <behavior> (failing)`
 - [ ] Passing impl: `feat: <behavior> (passing)`
 - [ ] Refactor (if any): `refactor: <what>`

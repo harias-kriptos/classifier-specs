@@ -2,7 +2,7 @@
 
 Framework de spec-driven development con agentes IA para el equipo de Kriptos. Esta carpeta es la maquinaria (skills, roles, templates, contexto del producto). Los repos de cada Lambda son los clientes que la usan.
 
-> **Estado:** en construcción. Stack inicial: Python (Lambda). Primer brainstorm real ejecutado sobre KT-16612 — ver `brainstorms/`.
+> **Estado:** en construcción. Stack inicial: Python (Lambda). Primer brainstorm real ejecutado sobre KR-16612 — ver `brainstorms/`.
 
 ---
 
@@ -33,11 +33,11 @@ classifier-specs/
 ├── context/
 │   └── classifier-v2/              contexto del producto (ecosystem, tickets, decisiones)
 ├── brainstorms/                    outputs reales de Skill 01 (uno por ticket / iniciativa)
-│   └── KT-16612-tree-url-generator.md  primer brainstorm ejecutado en Claude Web
+│   └── KR-16612-tree-url-generator.md  primer brainstorm ejecutado en Claude Web
 ├── docs/
 │   ├── references/                 PDFs e imágenes (flujo 5 pasos, guía TDD+IA, etc.)
 │   └── pilots/                     resúmenes de pilotos del framework
-│       └── KT-16612-overview.md
+│       └── KR-16612-overview.md
 └── kriptos-rust-template/          template para repos Rust (base estructural; piezas se traducen a Python)
 ```
 
@@ -59,7 +59,7 @@ Detalle visual: `docs/references/flow-5-steps.png`.
 
 ## Cómo arranco una feature nueva (flujo objetivo)
 
-1. **Jira** — el ticket `KT-XXXXX` ya existe.
+1. **Jira** — el ticket `KR-XXXXX` ya existe.
 2. **Claude Web** — invoco Skill 01 (`/brainstorm`) sobre el ticket. Salgo con un resumen estructurado.
 3. **Claude Web** — invoco Skill 02 (`/spec`) con el resumen del Paso 2. Salgo con `specs/NNN-*.md` y (si aplica) `docs/security/<slug>-threat-model.md`.
 4. **Repo del producto** — committeo la spec en una branch de Jira y abro PR (opcional, sólo spec).
@@ -68,7 +68,7 @@ Detalle visual: `docs/references/flow-5-steps.png`.
 7. **Claude Code + CI** — invoco Skill 05 (`/review`) que valida coverage, Sonar, Snyk, evals si aplica.
 8. **PR humano** — abro el PR final con todo verde.
 
-Para la demo de esta noche: **solo Pasos 1-2** sobre Ticket 1. Pasos 3-5 son bonus.
+Primer caso piloto del framework: **KR-16612 — `tree-url-generator`**. Esta noche se ejecutan Pasos 1-2 (brainstorm + spec). Pasos 3-5 vienen después.
 
 ---
 
@@ -78,9 +78,9 @@ Para la demo de esta noche: **solo Pasos 1-2** sobre Ticket 1. Pasos 3-5 son bon
 2. Pegar la sección "Descripción del proyecto" de `CLAUDE_PROJECT.md` en la descripción.
 3. Pegar la sección "Instrucciones del proyecto" en las instrucciones del Proyecto.
 4. Conectar al menos uno de estos MCPs para que el Proyecto lea las skills:
-   - **Filesystem MCP** apuntando a este repo (más simple para la demo).
+   - **Filesystem MCP** apuntando a este repo (más simple para empezar).
    - **GitHub MCP** apuntando a `kriptos/classifier-specs` (si se sube a GitHub).
-5. Opcional: conectar Jira MCP para leer tickets `KT-XXXXX` directamente.
+5. Opcional: conectar Jira MCP para leer tickets `KR-XXXXX` directamente.
 
 Detalle paso a paso: ver Paso 3 del plan de implementación.
 

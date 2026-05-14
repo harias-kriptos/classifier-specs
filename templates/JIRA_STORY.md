@@ -41,7 +41,7 @@ Plantilla para la **descripción** de un Story o Task técnico en Jira. La usan 
 ## Referencias
 
 - **Brainstorm:** {link al archivo en classifier-specs/brainstorms/ o al comentario Jira con el output completo}
-- **Épica:** {KT-XXXXX o "n/a"}
+- **Épica:** {KR-XXXXX o "n/a"}
 - **Confluence:** {link o "n/a"}
 - **Spec técnica:** {link al PR o archivo en el repo del producto — agregado por Skill 02}
 - **MR/PR de implementación:** {link — agregado por Skill 04}

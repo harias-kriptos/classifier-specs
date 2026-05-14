@@ -53,8 +53,8 @@ Archivos relevantes:
 
 ---
 
-## Para la demo
+## Primer caso piloto del framework
 
-**Caso piloto:** Ticket 1 — `tree-url-generator`.
+**Ticket:** KR-16612 — `tree-url-generator`.
 
 Por qué: autocontenido (sin cajas negras), 5 AC bien definidos, threat surface real (API pública con firma S3), pequeño pero no trivial. Si funciona acá, el patrón replica para todos los demás Lambdas.

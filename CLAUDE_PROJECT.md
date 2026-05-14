@@ -11,7 +11,7 @@ Descripción e instrucciones para el Proyecto de Claude Web que ejecuta el pipel
 ```text
 AI-assisted delivery refinement for Kriptos Classifier.
 
-Transforms raw tickets (Jira KT-XXXXX) into structured delivery artifacts:
+Transforms raw tickets (Jira KR-XXXXX) into structured delivery artifacts:
 brainstorm → spec + threat model → plan + tasks. Persists outputs as
 markdown in the product repository, never as silos.
 
