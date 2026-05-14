@@ -1,113 +1,224 @@
 # Skill 01: Brainstorm
 
-Use this skill when a raw ticket (or rough idea) needs to be refined before writing a spec. This is **the first step** of the pipeline. Output is a conversation, not files.
+Primera etapa del pipeline. Toma una idea cruda o un ticket existente y lo desafía hasta que sea escribible como spec. Output: conversación que termina en un resumen estructurado y persistencia en el destino correcto (Jira / Confluence / repo).
 
-**Recommended model:** Opus 4.7 (this step decides scope; depth beats speed).
+**Recommended model:** Opus 4.7 (decide scope; depth beats speed).
 
 **Role:** Product Manager — see `roles/product-manager.md`
 
 ---
 
-## Context loading
+## Audiencia
 
-Before starting, read:
+Esta skill está diseñada para que la use **gente no técnica** o **técnica** indistintamente:
 
+- CEO / liderazgo trayendo una idea estratégica
+- Product Manager refinando una iniciativa
+- Comercial trayendo un pedido de cliente
+- Tech Lead validando que un ticket Jira esté listo para implementación
+
+No requiere vocabulario técnico para invocarla.
+
+---
+
+## Context loading (automático)
+
+**El agente debe cargar todo esto por sí solo desde Project Files. No pedir al usuario que lo pegue.**
+
+Siempre:
 1. `roles/product-manager.md`
-2. `context/classifier-v2/ecosystem.md` — what the classifier is, the moving parts
-3. The ticket body or the ticket reference the user provided
-4. If the ticket mentions a specific component (a Lambda, EMR job, S3 path), read the closest match under `context/classifier-v2/`
+2. `context/classifier-v2/ecosystem.md`
+
+Cuando aplique:
+3. Si el ticket menciona un componente específico, leer el archivo más cercano bajo `context/classifier-v2/`.
+4. Si el usuario referencia decisiones previas, consultar `context/classifier-v2/current-decisions.md`.
+
+Templates que la skill puede entregar al final (según el caso de persistencia):
+- `templates/JIRA_STORY.md`
+- `templates/JIRA_EPIC.md`
+- `templates/JIRA_BRAINSTORM_COMMENT.md`
+- `templates/CONFLUENCE_INITIATIVE.md`
+
+**Si un archivo referenciado no existe**, decir explícitamente — no inventar.
+
+---
+
+## Formatos de input aceptados
+
+1. **Referencia a ticket Jira** (`KT-XXXXX`): si hay Atlassian connector, leer Jira directamente. Si no, pedir body.
+2. **Idea cruda en lenguaje natural**: ej. *"Queremos que el cliente pueda exportar sus reportes en PDF"*.
+3. **Link a página Confluence**: leer la página y usarla como punto de partida.
+4. **Body de ticket pegado en chat**.
 
 ---
 
 ## Objective
 
-Take a raw ticket and **challenge it** until the spec is writable. The agent does NOT write the idea — the user brings it. The agent refines.
+Tomar una idea o ticket y **desafiarlo** hasta que la spec sea escribible. El agente NO escribe la idea — la trae el usuario. El agente refina.
 
-By the end of this skill, the user should have:
-- All open questions resolved or explicitly deferred
-- Acceptance criteria that are testable (each AC maps to at least one test)
-- Edge cases identified
-- Out-of-scope marked
-- Threat surface identified (auth, network, untrusted input, secrets)
+Al final de esta skill el usuario debe tener:
+- Open questions resueltas o explícitamente diferidas
+- Acceptance criteria testables (cada uno mapea a al menos un test)
+- Edge cases identificados
+- Out-of-scope marcado
+- Threat surface identificada (auth, network, untrusted input, secrets, PII)
 
 ---
 
 ## Minimal invocation
 
-> "Brainstorm sobre el Ticket 1 (`tree-url-generator`)"
-> "Refina esta idea: [descripción]"
+> "Brainstorm KT-16612"
+> "Brainstorm idea: queremos que el cliente exporte sus reportes en PDF"
+> "Brainstorm sobre el ticket: [body pegado]"
+> "Brainstorm sobre esta página Confluence: [link]"
 
-That's enough. Ask for the ticket body if it's a reference and you can't read it.
+**No es necesario** explicarle al agente qué archivos leer ni qué rol activar — eso ya está en esta skill.
 
 ---
 
 ## Procedure
 
-1. Read the ticket. If the user pasted only a reference, ask for the full body or its closest equivalent in the repo.
-2. Restate the ticket in 2-3 sentences to confirm understanding before refining.
-3. Challenge the ticket along these dimensions, **one at a time** (do not dump all questions at once):
+1. **Detectar el formato de input** y leerlo (Jira / texto / Confluence).
+2. **Restatement**: en 2-3 frases, el agente reformula qué entendió. El usuario confirma o corrige.
+3. **Pregunta de destino (al inicio, no al final)**: identificar el caso de persistencia A/B/C/D ANTES de empezar a refinar. Determina qué template se usa al final.
+4. **Desafiar el ticket** en 6 dimensiones, **una a la vez** (no dumpear todas las preguntas juntas):
 
    **A. Scope clarity**
-   - What does this ship that wasn't there before?
-   - Is this one behavior or several? Should it be split?
-   - What's explicitly NOT in scope?
+   - ¿Qué entrega esto que antes no existía?
+   - ¿Es un behavior o varios? ¿Debe partirse?
+   - ¿Qué NO está en scope?
 
    **B. Acceptance criteria**
-   - For each AC: is it testable? How would you verify it failed?
-   - Is there an AC for the happy path AND for at least one failure?
+   - Para cada AC: ¿es testable? ¿cómo verificarías que falló?
+   - ¿Hay AC para el happy path Y para al menos un failure?
 
    **C. Edge cases**
-   - What inputs break this? (empty, oversized, malformed, unicode, race conditions)
-   - What external state could cause failure? (network down, S3 unavailable, IAM role missing)
+   - ¿Qué inputs rompen esto? (vacío, oversized, malformado, unicode, race conditions)
+   - ¿Qué estado externo puede causar falla? (red caída, S3 unavailable, IAM faltante)
 
    **D. Integration**
-   - What does this depend on that someone else owns?
-   - What depends on this? (downstream consumers)
+   - ¿De qué depende esto que otra persona/equipo posee?
+   - ¿Qué depende de esto? (downstream consumers)
 
    **E. Threat surface**
-   - Untrusted input? Path traversal risk?
-   - Secrets needed? Where do they live?
-   - Public API? Auth / rate limiting?
-   - Persisted data? PII risk?
+   - ¿Input no confiable? ¿Path traversal?
+   - ¿Secretos necesarios? ¿Dónde viven?
+   - ¿API pública? ¿Auth / rate limiting?
+   - ¿Datos persistidos? ¿PII?
 
    **F. Observability**
-   - What logs are required? What fields?
-   - What metric tells you it's working in prod?
+   - ¿Qué logs son requeridos? ¿Qué campos?
+   - ¿Qué métrica indica que está funcionando en prod?
 
-4. Ask the user to commit each answer. The agent does NOT decide — the user does.
-5. Stop when the four-item exit checklist is true (below).
+5. Pedirle al usuario que comprometa cada respuesta. El agente no decide — el usuario sí.
+6. **Parar** cuando el exit checklist sea verdadero (abajo).
+
+**Máximo 3 preguntas por respuesta.** Context window pequeño es mejor.
 
 ---
 
 ## Exit checklist
 
-Stop when ALL are true:
-- [ ] Every AC is testable (user agrees)
-- [ ] Edge cases listed (at least 3-5)
-- [ ] Open questions resolved OR explicitly deferred
-- [ ] Threat surface identified (or "no surface" stated explicitly)
-
-When the checklist is true, hand off to Skill 02 with the refined notes.
+Parar cuando TODAS sean verdaderas:
+- [ ] Cada AC es testable (el usuario confirma)
+- [ ] Edge cases listados (al menos 3-5)
+- [ ] Open questions resueltas o explícitamente deferidas
+- [ ] Threat surface identificada (o "ninguna" stated explícitamente)
 
 ---
 
-## Required output structure
+## Persistencia (CRÍTICO — antes de cerrar la conversación)
 
-At the end of the brainstorm, produce a short markdown summary the user can paste into Skill 02. Sections:
+El agente determina el caso aplicable en el paso 3 del Procedure, y al final ejecuta la persistencia correspondiente. **En todos los casos el agente pregunta antes de escribir externamente — no decide solo.**
 
-1. **Resumen del ticket** (2-3 frases)
-2. **Acceptance criteria refinados** (lista, cada uno testable)
+### Árbol de decisión
+
+```
+¿De dónde viene la idea?
+
+  ──► Ya hay ticket Jira (KT-XXXXX):
+        ¿El ticket tiene épica padre o documentación contextual?
+          ├─ Sí, claramente               →  CASO C
+          └─ No / no refinado             →  CASO B
+
+  ──► Ya hay página Confluence draft:    →  CASO D
+
+  ──► Idea cruda, sin destino:           →  CASO A
+```
+
+### Caso A — Idea cruda sin destino
+
+El agente pregunta:
+
+> *"¿Dónde guardo el output? Recomiendo Confluence. ¿Me podés pasar el link del espacio o página padre de Confluence donde crear la nueva página? Si no querés Confluence, opciones alternativas: crear Epic Jira directo, o guardar solo en classifier-specs/brainstorms."*
+
+- Si el usuario pasa link Confluence → crear página nueva usando `templates/CONFLUENCE_INITIATIVE.md`.
+- Si elige Epic Jira → crear Epic usando `templates/JIRA_EPIC.md`. Pedir board.
+- Si elige solo repo → guardar en `brainstorms/<slug>.md`.
+
+**Siempre** además: copia en `brainstorms/<slug>.md` para trazabilidad.
+
+### Caso B — Ticket Jira existe pero sin contexto / no refinado
+
+El agente NO crea épica automáticamente. Mantiene foco en el ticket. Pregunta:
+
+> *"Este ticket no tiene épica padre clara ni doc de contexto. ¿Cómo procedemos?*
+> *1. Solo editar este ticket con el resumen (no toco épica).*
+> *2. Crear/editar la épica padre + editar este ticket. Para esto necesito link de Confluence o board Jira para la épica.*
+> *3. Procedemos sin contexto adicional (queda como Caso C)."*
+
+- Opción 1: solo `JIRA_STORY.md` + `JIRA_BRAINSTORM_COMMENT.md` en el ticket.
+- Opción 2: lo mismo que opción 1 + crear/actualizar Epic (usando `JIRA_EPIC.md`) o página Confluence (usando `CONFLUENCE_INITIATIVE.md`) si el user da link.
+- Opción 3: igual que Caso C.
+
+**Siempre** además: copia en `brainstorms/KT-XXXXX-<slug>.md`.
+
+### Caso C — Ticket Jira con épica / contexto claro
+
+El agente sugiere ejecutar:
+
+1. Actualizar **descripción del ticket** usando `templates/JIRA_STORY.md` (resumen + AC refinados + edge cases + threat + links).
+2. Agregar **comentario nuevo** con el log completo usando `templates/JIRA_BRAINSTORM_COMMENT.md`.
+3. **Transition status** del ticket: `Backlog` → `Ready for Spec` (o el equivalente).
+4. **Copia** en `brainstorms/KT-XXXXX-<slug>.md`.
+
+### Caso D — Página Confluence existente
+
+El agente sugiere ejecutar:
+
+1. Actualizar la **página Confluence** usando `templates/CONFLUENCE_INITIATIVE.md` (refinamiento del contenido existente).
+2. Preguntar: *"¿Creamos un Epic Jira con link a esta página?"* — si sí, usar `templates/JIRA_EPIC.md`.
+3. **Copia** en `brainstorms/<slug>.md`.
+
+### Reglas generales de persistencia
+
+- Si el Project tiene Atlassian connector con permiso de escritura, ofrecer ejecutar con confirmación del usuario.
+- Si no hay connector con escritura, entregar los textos exactos listos para pegar + los links donde pegarlos.
+- El agente nunca escribe en Jira/Confluence sin confirmación explícita del usuario.
+- La copia en `brainstorms/` se commitea localmente con `chore: brainstorm for <ref>`.
+
+---
+
+## Required output structure (resumen markdown final)
+
+Al final del brainstorm, el agente entrega un resumen markdown con estas secciones (el mismo que se persiste como comentario Jira si aplica):
+
+1. **Resumen del ticket / idea** (2-3 frases)
+2. **Acceptance criteria refinados** (lista testable)
 3. **Edge cases identificados**
 4. **Out of scope** (explícito)
-5. **Threat surface** (o "ninguna" si aplica)
-6. **Open questions deferidas** (con quién resuelve cada una)
-7. **Siguiente paso:** Skill 02 — Spec + Threat Model
+5. **Threat surface** (o "ninguna")
+6. **Open questions deferidas** (con dueño y bloqueante)
+7. **Persistencia aplicada** (caso + acciones ejecutadas + textos listos para pegar)
+8. **Siguiente paso:** Skill 02 — Spec + Threat Model
 
 ---
 
 ## Operating rules
 
-- Maximum 3 questions per response. Do not dump all questions at once — context window stays small.
-- If the user pushes to skip ahead to writing code, push back once with the reason (no spec = no contract = bad code), then defer to them.
-- Outputs in Spanish.
-- Never write the spec in this skill — only the summary above. Spec writing is Skill 02.
+- Máximo 3 preguntas por respuesta. Context window chico.
+- Si el usuario empuja a saltarse al código, push back una vez explicando por qué (sin spec = sin contrato = mal código), después defer.
+- Outputs en español. Identificadores y commits en inglés.
+- **Nunca pedir al usuario que pegue archivos que ya están en Project Files.** Leerlos solo.
+- **Nunca escribir en Jira / Confluence sin confirmación explícita.**
+- Nunca escribir la spec en esta skill — esa es Skill 02.

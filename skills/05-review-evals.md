@@ -82,37 +82,21 @@ Report if any of these happened during implementation:
 
 ## Output
 
-A review report (markdown), ready to paste into the PR description or `demo/.../05-review.md`:
+Dos artefactos según el resultado:
 
-```markdown
-## Review report — Spec NNN: <slug>
+### Si READY
 
-### Spec compliance
-- [x] AC01: test_<...> — pass
-- [x] AC02: test_<...> — pass
-...
+1. **Comentario en el PR** con el review report — usar `templates/PR_REVIEW_REPORT.md`. Marca todos los checkboxes como `[x]` y recomendación = READY.
+2. **Comentario en Jira** — usar `templates/JIRA_MERGE_COMMENT.md`. Lista quality gates verdes, AC cubiertos, bloqueantes residuales para producción.
+3. **Transition Jira:** `In Review` → `Ready to merge` (con confirmación del usuario).
+4. Cambiar el PR de draft a "Ready for review" si estaba en draft.
 
-### TDD trace
-- [x] All `feat:` commits have a preceding `chore: (failing)`.
+### Si BLOCKED
 
-### Quality gates
-- [x] pytest: <N> tests, <coverage>%
-- [x] ruff: clean
-- [x] mypy: clean
-- [x] vulnerabilities: <N> low, 0 high
-
-### Threat model
-- [x] All STRIDE mitigations verified
-- [ ] OR: <list unverified>
-
-### Evals
-- [ ] N/A
-- [ ] OR: baseline <metric>=<value> → current <value>
-
-### Recommendation
-- READY for human review
-- OR: BLOCKED — <reason>
-```
+1. **Comentario en el PR** con el review report — usar `templates/PR_REVIEW_REPORT.md`. Recomendación = BLOCKED, con la lista concreta de qué falló y cómo arreglarlo.
+2. **NO** actualizar Jira (el ticket queda en `In Review`).
+3. **NO** sacar el PR de draft.
+4. Indicar al usuario: invocar Skill 04 para corregir los items listados.
 
 ---
 
@@ -122,4 +106,5 @@ A review report (markdown), ready to paste into the PR description or `demo/.../
 - If something is borderline (coverage 79.5%), report it as is and let the human decide.
 - The PR is not "done" until READY is the recommendation. BLOCKED means back to Skill 04.
 
-**Siguiente paso:** human review + merge.
+**Siguiente paso si READY:** human review + merge.
+**Siguiente paso si BLOCKED:** Skill 04 para resolver los items listados.

@@ -80,6 +80,14 @@ When `todo.md` is fully checked:
 1. Run `pytest --cov=src --cov-report=term`.
 2. Run `ruff check && mypy src`.
 3. Report: tests passed, coverage %, lint clean, ready for Skill 05.
-4. **Siguiente paso:** Skill 05 — Review + evals.
 
-If coverage < 80%, add missing tests and re-run before declaring done.
+### PR creation
+
+Cuando el branch está listo:
+
+- **Descripción del PR:** usar `templates/PR_DESCRIPTION.md` como plantilla. Completar todos los checkboxes y placeholders antes de pedir review humano.
+- **Transition Jira:** mover el ticket de `Spec ready` → `In Review` (o equivalente del workflow). Si hay Atlassian connector con escritura, ejecutar con confirmación; sino, entregar al usuario los pasos manuales.
+
+**Siguiente paso:** Skill 05 — Review + evals.
+
+If coverage < 80%, add missing tests and re-run before declaring done. **No abrir PR sin coverage gate verde.**

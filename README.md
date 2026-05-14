@@ -2,7 +2,7 @@
 
 Framework de spec-driven development con agentes IA para el equipo de Kriptos. Esta carpeta es la maquinaria (skills, roles, templates, contexto del producto). Los repos de cada Lambda son los clientes que la usan.
 
-> **Estado:** demo en construcción (2026-05-13). Stack inicial: Python (Lambda).
+> **Estado:** en construcción. Stack inicial: Python (Lambda). Primer brainstorm real ejecutado sobre KT-16612 — ver `brainstorms/`.
 
 ---
 
@@ -13,18 +13,31 @@ classifier-specs/
 ├── CLAUDE.md                       contrato para Claude Code (cuando alguien abre este repo)
 ├── CLAUDE_PROJECT.md               instrucciones para pegar en un Proyecto de Claude Web
 ├── skills/                         las 5 skills del flujo (Brainstorm → Review)
-├── roles/                          roles del pipeline (PM, Architect, Dev, Reviewer)
+├── roles/                          roles del pipeline (PM, Architect, Tech Lead, Dev, Reviewer)
 ├── .claude/
 │   └── commands/                   comandos invocables desde Claude Code (/brainstorm /spec ...)
-├── templates/                      SPEC_TEMPLATE.md, ADR_TEMPLATE.md
+├── templates/                      plantillas para outputs del pipeline
+│   ├── SPEC_TEMPLATE.md                spec técnica (Skill 02, va al repo del producto)
+│   ├── ADR_TEMPLATE.md                 decisión arquitectónica
+│   ├── JIRA_STORY.md                   descripción de Story/Task (Skill 01 caso C)
+│   ├── JIRA_EPIC.md                    descripción de Epic (Skill 01 casos A/D)
+│   ├── JIRA_BUG.md                     descripción de Bug formal
+│   ├── JIRA_BRAINSTORM_COMMENT.md      comentario con output completo de Skill 01
+│   ├── JIRA_PLAN_COMMENT.md            comentario con output de Skill 03
+│   ├── JIRA_MERGE_COMMENT.md           comentario final pre-merge (Skill 05 READY)
+│   ├── CONFLUENCE_INITIATIVE.md        página estratégica de iniciativa
+│   ├── PR_DESCRIPTION.md               descripción del PR de implementación (Skill 04)
+│   └── PR_REVIEW_REPORT.md             review report pre-humano (Skill 05)
 ├── stacks/
 │   └── python-lambda/              reglas + bootstrap + settings.json para Python Lambdas
 ├── context/
 │   └── classifier-v2/              contexto del producto (ecosystem, tickets, decisiones)
-├── demo/
-│   └── ticket-1-tree-url-generator/   outputs de la demo piloto
+├── brainstorms/                    outputs reales de Skill 01 (uno por ticket / iniciativa)
+│   └── KT-16612-tree-url-generator.md  primer brainstorm ejecutado en Claude Web
 ├── docs/
-│   └── references/                 PDFs e imágenes de referencia (flujo 5 pasos, guía TDD+IA, etc.)
+│   ├── references/                 PDFs e imágenes (flujo 5 pasos, guía TDD+IA, etc.)
+│   └── pilots/                     resúmenes de pilotos del framework
+│       └── KT-16612-overview.md
 └── kriptos-rust-template/          template para repos Rust (base estructural; piezas se traducen a Python)
 ```
 

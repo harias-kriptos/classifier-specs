@@ -57,12 +57,21 @@ Always read, in this order:
   2. The role referenced in that skill (roles/*.md)
   3. context/classifier-v2/ecosystem.md (product context, always)
   4. The specific ticket or spec the user is working on
-  5. Stack rules (stacks/python-lambda/rules.md) — only when relevant
+  5. Stack rules (stacks/<stack>/rules.md) — only when relevant
 
 Do not load everything upfront. Pull files as the skill instructs.
 Keep context usage under 20% of the window — this is a hard guideline from
 the team. If you find yourself loading more, split the task into smaller
 sub-tasks first.
+
+**Do not ask the user to paste content from files that are already in
+Project Files.** Read those files yourself (skills, roles, templates,
+context, stacks). The user only pastes content from sources you cannot
+reach: a Jira ticket body when no Atlassian connector is configured, a
+brainstorm output not yet committed to the repo, or freshly typed input.
+
+If a file the skill needs does not exist in the Project, say so
+explicitly — do not invent its content.
 
 --- OPERATING RULES ---
 
@@ -77,18 +86,71 @@ sub-tasks first.
 - When the user asks you to skip a step, push back once explaining why, then
   defer to them.
 
+--- PERSISTENCE ---
+
+Cada skill termina sugiriendo dónde se persiste su output. El destino depende
+del CASO de origen, definido en Skill 01 y heredado por Skills 02-05.
+
+CASOS DE ORIGEN:
+
+  CASO A — Idea cruda sin Jira ni Confluence
+          → Skill 01 pide link de Confluence al usuario y guarda ahí.
+          → Opcional: crear Epic Jira con link a la página.
+
+  CASO B — Ticket Jira existe pero sin épica padre ni refinamiento previo
+          → Skill 01 NO pierde foco del ticket. El usuario elige:
+              1. La épica existe en otro lado: pegar y continuar como Caso C.
+              2. Refinar épica + ticket en simultáneo: editar ambos al final.
+              3. Solo el ticket: editar solo el ticket al final.
+
+  CASO C — Ticket Jira con épica/contexto claro
+          → Actualizar descripción del ticket + comentario + transition.
+
+  CASO D — Confluence draft existente
+          → Actualizar la página + opcional crear Epic Jira.
+
+PERSISTENCIA POR SKILL:
+
+  Skill 01 (Brainstorm)
+    → Jira/Confluence según caso (ver tabla arriba).
+    → Siempre: copia en `brainstorms/<ref>.md` de este repo.
+
+  Skill 02 (Spec + threat model)
+    → `specs/NNN-*.md` y `docs/security/*.md` en el repo del producto.
+    → Jira: comentario con link al PR + transition a "Spec ready".
+    → Si hubo gaps de contexto: PR separado en classifier-specs con context updates.
+
+  Skill 03 (Plan)
+    → `todo.md` en el repo del producto.
+    → Comentario en Jira con link.
+
+  Skill 04 (TDD)
+    → Branch + commits en el repo del producto.
+    → Transition de Jira a "In Review" cuando se abre el PR.
+
+  Skill 05 (Review)
+    → Comentarios en el PR.
+    → Transition de Jira a "Ready to merge".
+
+REGLAS COMUNES:
+
+  - El agente SIEMPRE pregunta antes de escribir en Jira/Confluence.
+  - Si no hay connector con permiso de escritura: entregar textos exactos para pegar.
+  - El agente identifica el CASO al comienzo de Skill 01, no al final.
+
 --- TOOL USAGE ---
 
-This project may be configured with one or more MCPs:
+This Project has the skills, roles, templates, and product context attached
+as Project Files. Read them by name (e.g. `skills/01-brainstorm.md`,
+`roles/product-manager.md`, `templates/SPEC_TEMPLATE.md`,
+`context/classifier-v2/ecosystem.md`, `stacks/python-lambda/rules.md`).
 
-- Filesystem MCP (read this repo) — preferred for the demo
-- GitHub MCP (read this repo from kriptos/classifier-specs)
-- Atlassian / Jira MCP — to read ticket KT-XXXXX
-- Confluence MCP — if architecture docs live there
+When the user references a ticket (e.g. "Ticket 1"), they will paste the
+ticket body in the conversation — use that as input. Do not assume access
+to Jira unless an Atlassian connector is configured.
 
-If a needed MCP is unavailable, say so explicitly. Do not invent file
-contents. If the user pastes a ticket body directly, use that and skip
-the Jira read.
+If a Project File is missing or you cannot read it, say so explicitly and
+ask the user to upload it. Do not invent file contents.
 
 --- OUTPUT RULES ---
 

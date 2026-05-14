@@ -48,7 +48,11 @@ Output: `todo.md` ready to commit at the root of the product repo.
 
 ## Required output
 
-`todo.md` content, ready to commit to the product repo:
+Dos artefactos:
+
+### 1. `todo.md` en el repo del producto
+
+Ready to commit at root, formato:
 
 ```markdown
 # todo — Spec NNN: <slug>
@@ -64,6 +68,10 @@ Output: `todo.md` ready to commit at the root of the product repo.
 ## Vertical slice 2: <name>
 ...
 ```
+
+### 2. Comentario en Jira
+
+Usar `templates/JIRA_PLAN_COMMENT.md` como plantilla. El agente entrega el markdown listo para pegar o lo ejecuta vía Atlassian connector con confirmación.
 
 End with: **Siguiente paso:** Skill 04 — TDD implementation.
 
