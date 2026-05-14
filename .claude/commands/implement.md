@@ -1,0 +1,19 @@
+Ejecutá Skill 04 (TDD Implementation) dentro del repo del producto. Tarea(s) objetivo: $ARGUMENTS
+
+Pre-requisitos:
+- Estás en el repo del producto (no en classifier-specs).
+- `specs/NNN-<slug>.md` existe y está commiteado.
+- `todo.md` existe en la raíz.
+
+Pasos:
+1. Leé `skills/04-tdd-implementation.md` (desde el repo classifier-specs si es accesible, sino pegá el contenido).
+2. Leé `roles/developer.md`.
+3. Leé la spec y `todo.md` del repo del producto.
+4. Para cada tarea unchecked en `todo.md`:
+   a. RED — escribí test, corré pytest, commit `chore: <behavior> (failing)`.
+   b. GREEN — implementación mínima, corré pytest + ruff + mypy, commit `feat: <behavior> (passing)`.
+   c. REFACTOR (opcional) — cleanup, pytest verde, commit `refactor: <what>`.
+   d. Marcá la tarea `[x]` en `todo.md`.
+5. Si 3 intentos fallan en una tarea, parar y reportar BLOCKED.
+
+Limits of autonomy: respetá los listados en `skills/04-tdd-implementation.md`. No pushees a main, no instales deps, no toques workflows.

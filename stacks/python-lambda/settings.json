@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "_comment": "Plantilla de .claude/settings.json para repos Lambda Python del Classifier. Copiar al repo del producto y ajustar paths si es necesario.",
+
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git restore:*)",
+      "Bash(git stash:*)",
+
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pip install:*)",
+      "Bash(pip freeze:*)",
+      "Bash(pip-audit:*)",
+
+      "Bash(pytest:*)",
+      "Bash(ruff:*)",
+      "Bash(mypy:*)",
+      "Bash(coverage:*)",
+      "Bash(pre-commit:*)",
+
+      "Bash(make:*)",
+      "Bash(./scripts/*)",
+      "Bash(bash scripts/*)",
+
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(ls:*)",
+      "Bash(echo:*)",
+      "Bash(jq:*)",
+      "Bash(wc:*)",
+      "Bash(file:*)",
+      "Bash(diff:*)",
+
+      "Read(./**)",
+      "Edit(./src/**)",
+      "Edit(./tests/**)",
+      "Edit(./evals/**)",
+      "Edit(./specs/**)",
+      "Edit(./docs/**)",
+      "Edit(./scripts/**)",
+      "Edit(./.claude/**)",
+      "Edit(./pyproject.toml)",
+      "Edit(./handler.py)",
+      "Edit(./README.md)",
+      "Edit(./CHANGELOG.md)",
+      "Edit(./todo.md)"
+    ],
+    "ask": [
+      "Bash(pip install:*)",
+      "Bash(git push:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(gh pr:*)",
+      "Edit(./Dockerfile)",
+      "Edit(./.github/**)",
+      "Edit(./sonar-project.properties)",
+      "Edit(./.python-version)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push --force-with-lease:*)",
+      "Bash(curl * | sh)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | sh)",
+      "Bash(wget * | bash)",
+      "Bash(sudo:*)",
+      "Bash(chmod 777:*)",
+      "Bash(dd:*)",
+      "Bash(mkfs:*)",
+      "Bash(eval:*)",
+
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/credentials)",
+      "Read(~/.aws/config)",
+      "Read(~/.kube/config)",
+      "Read(~/.netrc)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.docker/config.json)",
+      "Read(./.env)",
+      "Read(./.env.local)",
+      "Read(./.env.*.local)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/id_rsa*)",
+      "Read(**/id_ed25519*)",
+
+      "Edit(./.env)",
+      "Edit(./.git/**)",
+
+      "WebFetch(domain:*)"
+    ]
+  },
+
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": false,
+    "allowUnsandboxedCommands": false,
+    "filesystem": {
+      "allowWrite": [
+        "./",
+        "./.pytest_cache",
+        "./.ruff_cache",
+        "./.mypy_cache",
+        "/tmp"
+      ],
+      "denyRead": [
+        "~/.ssh",
+        "~/.aws",
+        "~/.kube",
+        "~/.gnupg",
+        "~/.netrc",
+        "~/Library/Keychains",
+        "~/Library/Application Support/com.apple.TCC",
+        "./.env",
+        "./.env.local"
+      ],
+      "allowRead": [".", "~/.pyenv"]
+    },
+    "network": {
+      "allowManagedDomainsOnly": true,
+      "allowedDomains": [
+        "pypi.org",
+        "files.pythonhosted.org",
+        "github.com",
+        "api.github.com",
+        "objects.githubusercontent.com",
+        "raw.githubusercontent.com",
+        "registry.npmjs.org"
+      ],
+      "deniedDomains": [
+        "169.254.169.254",
+        "metadata.google.internal",
+        "instance-data.ec2.internal"
+      ]
+    },
+    "excludedCommands": [
+      "docker *",
+      "docker-compose *",
+      "kubectl *",
+      "sam *",
+      "aws *"
+    ]
+  },
+
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-main-branch.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-secrets.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-dangerous-commands.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-python.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/enforce-tdd-trace.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+
+  "env": {
+    "CLAUDE_TDD_STRICT": "true",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "AWS_PROFILE": "__BLOCKED__",
+    "AWS_ACCESS_KEY_ID": "__BLOCKED__",
+    "AWS_SECRET_ACCESS_KEY": "__BLOCKED__"
+  }
+}
