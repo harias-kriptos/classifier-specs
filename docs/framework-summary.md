@@ -375,6 +375,72 @@ Más allá del tiempo, el framework cambia **cómo se trabaja**:
 
 ---
 
+## 13. Cómo se extiende el framework (no es estático)
+
+El framework está pensado para **crecer con el producto**. Tres operaciones de mantenimiento, todas con proceso documentado en `framework-maintenance.md`.
+
+### 13.1 Agregar contexto del producto al `classifier-specs`
+
+Cuando aparece un componente nuevo o una decisión técnica vigente cambia:
+
+| Tipo de contexto | Ubicación |
+|---|---|
+| Componente nuevo (Lambda, agent module) | `context/classifier-v2/components/{phase-1, phase-2, agent}/<componente>.md` |
+| Convención cross-cutting | `context/classifier-v2/ecosystem.md` § Convenciones cruzadas |
+| Decisión técnica vigente | `context/classifier-v2/current-decisions.md` |
+| Regla de stack | `stacks/<stack>/rules.md` |
+| Stack nuevo | `stacks/<stack>/` (rules + settings + bootstrap) |
+
+**Workflow:**
+
+```
+detectar gap → branch → agregar archivo en carpeta correcta → actualizar índices
+(ecosystem.md, components/README.md, current-decisions.md) → PR → merge
+→ GitHub connector resincroniza Project Files (automático).
+```
+
+**Las skills leen on-demand** — no hay que tocar la skill cuando se agrega contexto. La regla `< 20% context budget` asegura que solo se carga lo necesario para el ticket.
+
+### 13.2 Provisionar un repo nuevo del producto
+
+Cuando arranca una Lambda nueva (`gse-cycle-init`, `tree-uncompressor`, etc.):
+
+| Opción | Cuándo |
+|---|---|
+| **Manual** (`cp -r` desde repo de referencia) | Hoy. Toma ~10 min. |
+| **GitHub Template Repository** (`kriptos-python-template`) | Próximo paso. Un comando: `gh repo create --template`. |
+| **Skill `repo-provisioning`** automática | Futuro. Recibe ticket + stack y deja el repo listo. |
+
+Lo que se copia: `.claude/`, `.github/`, `specs/`, `docs/`, `CLAUDE.md`, `pyproject.toml`, `sonar-project.properties`, hooks Python. Lo que se edita: `CLAUDE.md` (descripción), `pyproject.toml` (nombre package), `sonar-project.properties` (key).
+
+### 13.3 Propagar mejoras del harness a repos existentes
+
+Cuando se mejora un hook, una regla de stack o un workflow CI:
+
+```
+1. Aplicar el cambio en kriptos-python-template + 1 repo piloto.
+2. Probar 1 sprint en el piloto.
+3. Si OK → versionar (semver en CHANGELOG: harness-py-1.2.0) → propagar a todos los repos.
+4. Cada repo: branch KR-XXXX-update-harness → apply → PR → merge.
+```
+
+**Regla:** nunca propagar sin haber probado en piloto. Nunca propagar breaking changes sin migración documentada.
+
+### 13.4 Quién hace qué
+
+| Rol | Responsabilidad |
+|---|---|
+| Tech Lead del framework | Aprueba cambios estructurales (skills, roles, templates, stacks). |
+| Architect | Identifica gaps de contexto durante Skill 02, propone agregarlos. |
+| Cualquier dev | Puede agregar contexto vía PR al `classifier-specs`. |
+| CI / Reviewer | Verifica que cambios al harness no rompan CI de repos del producto. |
+
+**Mensaje clave:** *el framework no es propiedad de una persona — cualquier dev puede mejorarlo abriendo PR, con review obligatorio del Tech Lead.*
+
+Detalle completo: [`docs/framework-maintenance.md`](framework-maintenance.md).
+
+---
+
 ## Referencias
 
 - Detalle completo de cada skill: `framework-overview.md`
