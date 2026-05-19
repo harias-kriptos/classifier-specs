@@ -43,6 +43,74 @@ classifier-specs/
 
 ---
 
+## Por qué cada carpeta existe
+
+El repo mezcla **4 funciones distintas**, cada una en su carpeta. Entender esto es clave para saber dónde va una cosa nueva.
+
+```
+1. MAQUINARIA del framework    → skills/, roles/, templates/, stacks/, .claude/
+2. CONOCIMIENTO del producto   → context/classifier-v2/
+3. EVIDENCIA de uso            → brainstorms/, docs/pilots/
+4. DOCUMENTACIÓN para humanos  → docs/, README.md, CLAUDE*.md
+```
+
+### 1. Maquinaria del framework
+
+| Carpeta | Por qué existe | Quién la lee |
+|---|---|---|
+| `skills/` | Define **qué hace cada paso del pipeline**. Una skill = un paso (Brainstorm, Spec, Plan, TDD, Review). | El agente IA al invocar la skill ("Brainstorm KR-XXXX"). |
+| `roles/` | Define **cómo se comporta el agente** según el paso. Distintos mindsets: PM hace preguntas, Architect escribe contrato, Reviewer audita. | El agente IA al activar una skill. |
+| `templates/` | **Plantillas de outputs estándar** — SPEC, threat model, PR description, comentarios Jira. Asegura outputs comparables entre tickets. | El agente al producir un output que se persiste. |
+| `stacks/python-lambda/` | **Reglas duras (MUST/NEVER)** del stack tecnológico. Lo que NO cambia entre tickets pero SÍ entre stacks. Cuando agreguemos otro stack: `stacks/rust-emr/`, `stacks/typescript-react/`. | Skills 02-05 cuando el ticket toca código del stack. |
+| `.claude/commands/` | **Atajos invocables desde Claude Code (CLI).** `/plan`, `/implement`, `/review`. | Claude Code en el repo (no Web). |
+
+### 2. Conocimiento del producto
+
+| Carpeta | Por qué existe |
+|---|---|
+| `context/classifier-v2/` | El agente necesita saber **qué es el Classifier** para no inventar. Sin esto alucina: inventa buckets que no existen, decisiones que nunca tomamos. |
+| `context/classifier-v2/components/` | Specs detalladas **por componente** (phase-1, phase-2, agent). La skill carga solo el componente del ticket, no todo. Mantiene context budget < 20%. |
+| `context/classifier-v2/historical/` | Referencia histórica (master-doc v1, diagramas viejos). **No se carga en skills.** Solo para humanos que quieren entender la evolución. |
+
+**Por qué está separado de `skills/`:** las skills son la maquinaria (cómo se hacen las cosas) y `context/` es el dominio (sobre qué cosas). Si los mezclás, el framework se vuelve específico del Classifier y no se puede reusar para otro producto.
+
+### 3. Evidencia de uso
+
+| Carpeta | Por qué existe |
+|---|---|
+| `brainstorms/` | Guardar el output de Skill 01 **por ticket** para trazabilidad. Si mañana alguien pregunta "¿cómo decidimos AC06 de KR-16612?", la conversación queda acá. |
+| `docs/pilots/` | Resumen ejecutivo **por iniciativa piloto** del framework. Sirve como evidencia + lessons learned. Audiencia: leadership o devs nuevos onboardeándose. |
+
+**Por qué dos carpetas y no una:** `brainstorms/` es output crudo del agente (denso, técnico). `pilots/` es contexto ejecutivo de la iniciativa (qué intentamos, qué aprendimos). Son audiencias distintas.
+
+### 4. Documentación para humanos
+
+| Carpeta / Archivo | Por qué existe |
+|---|---|
+| `docs/framework-overview.md` | **Detalle denso** de cada skill y del flujo. Documento de referencia. |
+| `docs/framework-summary.md` | **Versión ejecutiva** del overview. Foco en ahorros, costos, optimizaciones. |
+| `docs/framework-maintenance.md` | **Cómo se mantiene** y se extiende el repo (agregar contexto, provisionar repos). |
+| `docs/presentation-deck.md` | **Deck listo para PPT** con 11 slides. |
+| `docs/references/` | PDFs, imágenes, notas de reunión. Material que viene de afuera. |
+| `README.md` | Entry point del repo. Lo primero que lee alguien que llega al repo en GitHub. |
+| `CLAUDE.md` | **Contrato para Claude Code** cuando alguien abre este repo (vs el repo del producto). Le dice qué carpeta puede editar y qué no. |
+| `CLAUDE_PROJECT.md` | **Instrucciones para Claude Web Project.** Se pega esto al crear el Project en claude.ai. |
+
+### Regla mental para saber dónde va una cosa nueva
+
+```
+¿Es una skill nueva o cambio a existente?      → skills/
+¿Es un rol nuevo (Designer, DBA, etc.)?        → roles/
+¿Es un template de output nuevo?               → templates/
+¿Es un stack nuevo (Rust, TS, Java)?           → stacks/<stack>/
+¿Es info del Classifier (componente/decisión)? → context/classifier-v2/
+¿Es output de un ticket ejecutado?             → brainstorms/ o docs/pilots/
+¿Es doc para humanos sobre el framework?       → docs/
+¿Es material externo (PDF, imagen)?            → docs/references/
+```
+
+---
+
 ## Flujo de 5 pasos
 
 ```

@@ -1,7 +1,7 @@
 # Deck — `classifier-specs` para el equipo de Kriptos
 
-> 10 slides. ~15-20 minutos de presentación.
-> 8 sobre cómo funciona el repo y cómo lo vamos a usar todos.
+> 11 slides. ~15-20 minutos de presentación.
+> 9 sobre cómo funciona el repo y cómo lo vamos a usar todos.
 > 2 sobre el caso real (Ticket KR-16612).
 >
 > Cada slide tiene **Contenido** (lo que va en la slide) y **Decir** (lo que decís de viva voz).
@@ -66,7 +66,54 @@ classifier-specs/
 
 ---
 
-## Slide 3 — Los 5 skills en una vista
+## Slide 3 — Por qué cada carpeta existe
+
+### Contenido
+
+El repo mezcla **4 funciones distintas**, cada una en su carpeta:
+
+```
+1. MAQUINARIA del framework    → skills/, roles/, templates/, stacks/, .claude/
+2. CONOCIMIENTO del producto   → context/classifier-v2/
+3. EVIDENCIA de uso            → brainstorms/, docs/pilots/
+4. DOCUMENTACIÓN para humanos  → docs/, README.md, CLAUDE*.md
+```
+
+| Carpeta | Por qué existe |
+|---|---|
+| `skills/` | Define **qué hace cada paso del pipeline**. Una skill = un paso. Lee el agente cuando vos invocás "Brainstorm KR-XXXX". |
+| `roles/` | Define **cómo se comporta el agente** según el paso (PM, Architect, Tech Lead, Developer, Reviewer). Distintos mindsets. |
+| `templates/` | **Plantillas de outputs estándar** — SPEC, threat model, PR description, Jira comments. Asegura outputs comparables entre tickets. |
+| `stacks/python-lambda/` | **Reglas duras (MUST/NEVER)** del stack. Lo que NO cambia entre tickets pero SÍ entre stacks. |
+| `.claude/commands/` | Atajos invocables desde Claude Code (`/plan`, `/implement`, `/review`). |
+| `context/classifier-v2/` | **Conocimiento del producto** — qué es el Classifier, qué Lambdas existen, qué decisiones técnicas tomamos. Sin esto, el agente alucina. |
+| `context/classifier-v2/components/` | Specs detalladas **por componente** (phase-1, phase-2, agent). El agente carga solo lo del ticket, no todo. |
+| `context/classifier-v2/historical/` | Referencia v1 (master-doc, diagramas viejos). **No se carga en skills.** Solo para humanos. |
+| `brainstorms/` | Output de Skill 01 **por ticket** para trazabilidad. Si mañana preguntan "¿cómo decidimos AC06?", está acá. |
+| `docs/pilots/` | **Resumen ejecutivo por iniciativa piloto** (lessons learned). Audiencia: leadership / nuevos devs. |
+| `docs/` | Documentación para **humanos** sobre el framework (overview, summary, maintenance, deck). |
+| `docs/references/` | Material externo (PDFs, imágenes, notas de reunión). Inmutable. |
+
+### Regla mental para saber dónde va una cosa nueva
+
+```
+¿Es una skill nueva o cambio a existente?      → skills/
+¿Es un rol nuevo (Designer, DBA, etc.)?        → roles/
+¿Es un template de output nuevo?               → templates/
+¿Es un stack nuevo (Rust, TS, Java)?           → stacks/<stack>/
+¿Es info del Classifier (componente/decisión)? → context/classifier-v2/
+¿Es output de un ticket ejecutado?             → brainstorms/ o docs/pilots/
+¿Es doc para humanos sobre el framework?       → docs/
+¿Es material externo (PDF, imagen)?            → docs/references/
+```
+
+### Decir
+
+*"Esta separación es clave para que el framework escale. La **maquinaria** (skills/roles/templates) define cómo trabaja el agente; el **conocimiento** (context/) le dice sobre qué trabaja; la **evidencia** (brainstorms/pilots) muestra qué se hizo; la **documentación** (docs/) es para nosotros. Si las mezclamos, el framework se vuelve específico del Classifier y no se puede reusar para otro producto."*
+
+---
+
+## Slide 4 — Los 5 skills en una vista
 
 ### Contenido
 
@@ -86,7 +133,7 @@ classifier-specs/
 
 ---
 
-## Slide 4 — Cómo va a funcionar: end-to-end de un ticket
+## Slide 5 — Cómo va a funcionar: end-to-end de un ticket
 
 ### Contenido
 
@@ -128,7 +175,7 @@ Human review + merge a main
 
 ---
 
-## Slide 5 — Cómo vamos a documentar specs y agregar contexto
+## Slide 6 — Cómo vamos a documentar specs y agregar contexto
 
 ### Contenido
 
@@ -165,7 +212,7 @@ Detalle: `docs/framework-maintenance.md`.
 
 ---
 
-## Slide 6 — Cómo arranca el equipo a usarlo
+## Slide 7 — Cómo arranca el equipo a usarlo
 
 ### Contenido
 
@@ -191,7 +238,7 @@ Detalle: `docs/framework-maintenance.md`.
 
 ---
 
-## Slide 7 — Provisionar repos nuevos del producto
+## Slide 8 — Provisionar repos nuevos del producto
 
 ### Contenido
 
@@ -229,7 +276,7 @@ Detalle: `docs/framework-maintenance.md` § 3.
 
 ---
 
-## Slide 8 — Qué pedimos del equipo
+## Slide 9 — Qué pedimos del equipo
 
 ### Contenido
 
@@ -252,7 +299,7 @@ Detalle: `docs/framework-maintenance.md` § 3.
 
 ---
 
-## Slide 9 — Caso real: Ticket KR-16612 `tree-url-generator`
+## Slide 10 — Caso real: Ticket KR-16612 `tree-url-generator`
 
 ### Contenido
 
@@ -280,7 +327,7 @@ Detalle: `docs/framework-maintenance.md` § 3.
 
 ---
 
-## Slide 10 — Lo que descubrió el piloto KR-16612
+## Slide 11 — Lo que descubrió el piloto KR-16612
 
 ### Contenido
 
