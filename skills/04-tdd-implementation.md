@@ -13,49 +13,116 @@ Use this skill **inside the product repository** (Claude Code, not Claude Web) o
 1. `roles/developer.md`
 2. The approved spec at `specs/NNN-<slug>.md` (in the product repo)
 3. `todo.md` at the repo root
-4. `stacks/python-lambda/rules.md` (from this repo via filesystem or pasted into the conversation)
+4. `stacks/python-lambda/rules.md` (desde classifier-specs via filesystem)
+5. `templates/TDD_TRACE_TEMPLATE.md` (estructura del trace a generar)
+6. `tdd-trace.md` en raíz del repo del producto (si no existe, crearlo desde el template; si existe, append)
 
 ---
 
 ## Objective
 
-Execute the `todo.md` task by task. Each task is a TDD cycle:
+Execute the `todo.md` task by task. Each task is a TDD cycle: RED → GREEN → REFACTOR.
 
-1. **RED** — write the failing test. Commit: `chore: <behavior> (failing)`.
-2. **GREEN** — minimal implementation. Commit: `feat: <behavior> (passing)`.
-3. **REFACTOR** (if needed) — cleanup. Commit: `refactor: <what>`.
+**Source of truth del TDD: `tdd-trace.md` en la raíz del repo del producto.** Por cada slice, el agente registra en este archivo:
 
-The commit sequence is enforced by commitlint in CI. Skipping RED breaks the build.
+1. El test que escribió (RED) + output literal del pytest fallando.
+2. La implementación mínima (GREEN) + output del pytest pasando + ruff + mypy clean.
+3. El refactor (si aplica) + output verde.
+
+**Commits son opcionales.** El dev decide cómo separa: 1 commit por slice, 1 commit por par RED/GREEN, o un único squash al final. Lo que importa es que `tdd-trace.md` quede completo y honesto — eso es lo que Skill 05 audita.
+
+**Por qué `tdd-trace.md` y no git history:**
+- Lo escribe el agente mientras ejecuta, no se reconstruye después.
+- Captura el output literal del pytest (failing vs passing).
+- Es legible por humanos en una pasada.
+- No depende de la disciplina del dev en separar commits.
 
 ---
 
 ## Procedure per task
 
-1. Read the next unchecked task in `todo.md`.
+**Antes de empezar:** si `tdd-trace.md` no existe en raíz del repo del producto, crearlo copiando `templates/TDD_TRACE_TEMPLATE.md` y llenando el bloque "Resumen" (ticket, spec, modelo, started timestamp).
 
-2. **Si la tarea es Slice 0 — Scaffold** (única excepción al TDD strict):
+Por cada slice del `todo.md`:
+
+1. Leer la próxima tarea unchecked en `todo.md`.
+
+2. **Append a `tdd-trace.md`** un header de slice nuevo:
+   ```
+   ## Slice N: <behavior>
+   **Started:** <timestamp>
+   ```
+
+3. **Si la tarea es Slice 0 — Scaffold** (única excepción al TDD strict):
    - No hay RED. Setup de proyecto no es behavior testable.
-   - Ejecutar los sub-pasos del Slice 0 tal como están en el `todo.md` (crear `pyproject.toml`, layout `src/`, `handler.py` stub, `tests/__init__.py`).
-   - Correr `pytest` final — debe retornar exit 0 (incluso con 0 tests).
-   - **Commit único:** `chore: scaffold python lambda project`.
-   - Marcar Slice 0 como `[x]` y pasar a Slice 1.
-   - Si algo falla en el scaffold → BLOCKED. No improvisar.
+   - Ejecutar los sub-pasos del Slice 0 (crear `pyproject.toml`, layout `src/`, `handler.py` stub, `tests/__init__.py`).
+   - Correr `pytest` final — debe retornar exit 0.
+   - **Append a `tdd-trace.md`:**
+     ```
+     ### Setup
+     - Listed files created
+     ### Verification
+     - pytest output (exit 0)
+     ### Slice complete: <timestamp> (<duration>)
+     ```
+   - Marcar Slice 0 como `[x]` en `todo.md`.
+   - (Opcional) commit: `chore: scaffold python lambda project`.
+   - Si algo falla → BLOCKED.
 
-3. **Para las Slices 1+ (TDD strict):**
-   - RED:
-     - Write the test in `tests/test_<module>.py`.
-     - Run `pytest` — confirm it FAILS for the expected reason.
-     - Commit: `chore: <behavior> (failing)`.
-   - GREEN:
-     - Implement the minimum code in `src/<module>.py` to make the test pass.
-     - Run `pytest` — confirm GREEN.
-     - Run `ruff check && mypy src` — fix any issues.
-     - Commit: `feat: <behavior> (passing)`.
-   - REFACTOR (only if there's cleanup):
-     - Improve code quality without changing tests.
-     - Run `pytest` again — must stay green.
-     - Commit: `refactor: <what>`.
-   - Mark task `[x]` in `todo.md`.
+4. **Para Slices 1+ (TDD strict):**
+
+   **RED:**
+   - Escribir el test en `tests/test_<module>.py`.
+   - Correr `pytest --tb=short`.
+   - Confirmar que FALLA por la razón esperada.
+   - **Append a `tdd-trace.md`:**
+     ```
+     ### RED
+     - **Test added:** `tests/<file>::<test_name>`
+     - **pytest output (failing as expected):**
+     ```
+     <output literal del pytest>
+     ```
+     - **✅ El test falla por la razón correcta.**
+     ```
+   - (Opcional) commit: `chore: <behavior> (failing)`.
+
+   **GREEN:**
+   - Implementar el mínimo código en `src/<module>.py` para que pase.
+   - Correr `pytest`, confirmar GREEN.
+   - Correr `ruff check && mypy --strict src` — fix any issues.
+   - **Append a `tdd-trace.md`:**
+     ```
+     ### GREEN
+     - **Implementation:** `src/<path>`
+     - **pytest output:** <X passed in Y.YYs>
+     - **ruff check:** clean
+     - **mypy --strict src:** clean
+     ```
+   - (Opcional) commit: `feat: <behavior> (passing)`.
+
+   **REFACTOR (solo si hay cleanup):**
+   - Mejorar calidad sin cambiar tests.
+   - Correr `pytest` — debe seguir verde.
+   - **Append a `tdd-trace.md`:**
+     ```
+     ### REFACTOR
+     - **Cleanup:** <descripción>
+     - **pytest output (still passing):** <output>
+     ```
+   - (Opcional) commit: `refactor: <what>`.
+
+   **Si no hay refactor:** append `### REFACTOR\nskipped`.
+
+5. **Append a `tdd-trace.md`:**
+   ```
+   **Slice complete:** <timestamp> (<duration>)
+   ---
+   ```
+
+6. Marcar la tarea `[x]` en `todo.md`.
+
+**Después de la última slice:** append el bloque "Resumen final" del template — coverage, gates, slices ejecutadas, duration total.
 
 ---
 

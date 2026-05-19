@@ -164,6 +164,41 @@ Detalle paso a paso: ver Paso 3 del plan de implementación.
 
 ---
 
+## Instalar los comandos globalmente (una vez por dev)
+
+Los comandos `/brainstorm`, `/spec`, `/plan`, `/implement`, `/review` se instalan **globalmente** en tu Claude Code — quedan disponibles en cualquier repo donde abras el cliente, sin que tengas que tocar ese repo.
+
+```bash
+git clone git@github.com:harias-kriptos/classifier-specs.git ~/classifier-specs
+cd ~/classifier-specs && ./install.sh
+```
+
+Eso crea symlinks en `~/.claude/commands/` apuntando a los archivos del repo. Cuando hagas `git pull`, los comandos quedan actualizados solos.
+
+| Comando | Cuándo usarlo |
+|---|---|
+| `/brainstorm <ticket>` | Skill 01 — refina una idea o ticket Jira |
+| `/spec <ref>` | Skill 02 — genera spec + threat model |
+| `/plan` | Skill 03 — descompone la spec en `todo.md` TDD-ready |
+| `/implement` | Skill 04 — ejecuta el loop TDD escribiendo `tdd-trace.md` |
+| `/review` | Skill 05 — valida gates y emite READY/BLOCKED |
+
+**Importante:** los comandos leen las skills desde **este repo clonado localmente** (`~/classifier-specs`). Si el dev hace `git pull` periódicamente, recibe automáticamente las mejoras del framework sin tocar los repos del producto.
+
+---
+
+## TDD trace — source of truth del Skill 04
+
+Cuando Skill 04 corre el loop RED → GREEN → REFACTOR, va escribiendo `tdd-trace.md` en la raíz del repo del producto. Cada slice del `todo.md` queda registrada con:
+
+- El test que se escribió (RED) + output literal del pytest fallando.
+- La implementación mínima (GREEN) + output del pytest pasando + ruff + mypy clean.
+- El refactor (si aplica) o "skipped".
+
+**`tdd-trace.md` es lo que Skill 05 audita** para confirmar que el ciclo se respetó. Los commits son **opcionales** — el dev decide squash, por slice, o granular. Ver `templates/TDD_TRACE_TEMPLATE.md` para el formato.
+
+---
+
 ## Convenciones cruzadas
 
 - **Specs intra-repo**: cada spec vive en el repo del producto bajo `specs/NNN-<slug>.md`.

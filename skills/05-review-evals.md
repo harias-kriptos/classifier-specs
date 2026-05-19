@@ -12,9 +12,10 @@ Use this skill after Skill 04 finishes and before opening the human PR. Runs ins
 
 1. `roles/reviewer.md`
 2. The approved spec `specs/NNN-<slug>.md`
-3. The current branch diff (`git diff origin/main...HEAD`)
-4. `todo.md` (all tasks should be checked)
-5. `stacks/python-lambda/rules.md`
+3. **`tdd-trace.md`** en raíz del repo del producto — **source of truth del TDD**.
+4. The current branch diff (`git diff origin/main...HEAD`) — informativo, no source of truth.
+5. `todo.md` (todas las tareas deben estar `[x]`)
+6. `stacks/python-lambda/rules.md`
 
 ---
 
@@ -36,15 +37,23 @@ Report any AC without a corresponding test.
 
 ### 2. TDD trace
 
-Check the commit log for the expected sequence per task:
+**Source of truth: `tdd-trace.md`** en raíz del repo del producto. Skill 04 lo escribe mientras ejecuta. Si no existe, el flujo se rompió y es BLOCKED automático.
 
-```
-chore: <behavior> (failing)
-feat: <behavior> (passing)
-refactor: <what>  (optional)
-```
+Para cada slice listada en `todo.md`, verificar en `tdd-trace.md`:
 
-If a `feat:` commit has no preceding `chore: (failing)` for the same behavior, that's a violation. Report.
+- ¿Tiene sección `## Slice N: <behavior>`?
+- ¿Tiene `### RED` con output literal del pytest fallando?
+- ¿Tiene `### GREEN` con output literal del pytest pasando + ruff clean + mypy clean?
+- ¿Tiene `### REFACTOR` (aunque sea "skipped")?
+- ¿Tiene `**Slice complete:** <timestamp>`?
+
+**Slice 0 (Scaffold)** es la única excepción: no tiene RED, solo `### Setup` y `### Verification`.
+
+Si alguna slice del `todo.md` está marcada `[x]` pero falta su entrada en `tdd-trace.md` → **BLOCKED**.
+
+Si una entrada tiene `### GREEN` sin `### RED` previo → **BLOCKED** (excepto Slice 0).
+
+**Commits son informativos, no source of truth.** El dev puede haber hecho squash, commits por slice, o no commitear hasta el final — eso es decisión del dev. Lo que importa es que `tdd-trace.md` esté completo y honesto.
 
 ### 3. Quality gates
 
@@ -72,11 +81,12 @@ If `evals/` exists and the spec changed LLM behavior, classifier output, or any 
 
 ### 6. Limits of autonomy check
 
-Report if any of these happened during implementation:
-- Edits to `.github/workflows/`
-- New dependencies added without justification in `pyproject.toml`
-- Use of `# type: ignore` or `# noqa` (acceptable with comment justifying it)
-- Tests edited to pass (compare commit history)
+Reportar si alguno de estos ocurrió durante implementación:
+- Edits a `.github/workflows/` o branch protection.
+- Nuevas dependencias agregadas sin justificación en `pyproject.toml`.
+- `# type: ignore` o `# noqa` **sin comentario inline justificando**.
+- Tests editados para hacerlos pasar (cruzar contra `tdd-trace.md` — si una slice tenía un test escrito en RED y después aparece modificado en GREEN sin que el behavior haya cambiado, es violación).
+- Uso de `--no-verify`, `--force`, `--force-with-lease` en git.
 
 ---
 

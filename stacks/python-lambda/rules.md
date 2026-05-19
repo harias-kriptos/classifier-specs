@@ -14,7 +14,7 @@ Reglas duras (`MUST` / `NEVER`) y convenciones para repos de Lambdas Python del 
 - **MUST** incluir `enterprise_id`, `station_id`, y un ID de correlación (`tree_id` / `cycle_id` / `request_id`) en cada log.
 - **MUST** escribir tests con `pytest`. **MUST** mockear AWS con `moto`, nunca con mocks manuales.
 - **MUST** alcanzar coverage ≥ 80% por módulo de `src/`.
-- **MUST** seguir convención de commits: `chore: <behavior> (failing)` → `feat: <behavior> (passing)` → `refactor: <what>`.
+- **MUST** mantener `tdd-trace.md` en raíz del repo actualizado por Skill 04. Es el source of truth del TDD que Skill 05 audita. Los commits son opcionales (squash, por slice, o granular — decisión del dev).
 
 ## NEVER
 
@@ -49,6 +49,8 @@ Reglas duras (`MUST` / `NEVER`) y convenciones para repos de Lambdas Python del 
 ├── .gitignore
 ├── README.md
 ├── CLAUDE.md               # contrato para Claude Code en este repo
+├── todo.md                 # plan TDD generado por Skill 03
+├── tdd-trace.md            # source of truth del TDD (Skill 04 lo escribe, Skill 05 lo lee)
 ├── specs/                  # specs/NNN-*.md
 ├── docs/
 │   ├── architecture/       # ADRs si aplican
