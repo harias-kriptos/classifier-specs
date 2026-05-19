@@ -28,21 +28,90 @@ Output: `todo.md` ready to commit at the root of the product repo.
 ## Procedure
 
 1. Read the spec. Restate the goal in one sentence to confirm understanding.
-2. Identify the **vertical slices** — minimum behaviors that can be tested independently. Example for `tree-url-generator`:
-   - Slice 1: body validation rejects malformed inputs
-   - Slice 2: ID sanitization rejects path traversal
-   - Slice 3: UUID generation produces unique tree_id
-   - Slice 4: pre-signed URL is signed with all required headers
-   - Slice 5: 200 response has the documented structure
-3. For each slice, write a task block:
+
+2. **Bootstrap detection.** Check the state of the product repo:
+   - ¿Existe `pyproject.toml`?
+   - ¿Existe `src/{domain,application,adapters}/__init__.py`?
+   - ¿Existe `handler.py` (aunque sea stub)?
+   - ¿Existe `tests/__init__.py`?
+
+   Si **falta cualquiera** → agregar **Slice 0 — Scaffold** al `todo.md` (formato definido abajo). Slice 0 es la **única excepción** al TDD strict: es un único commit `chore: scaffold python lambda project` sin test previo, porque setup de proyecto no es behavior testable.
+
+   Si **todo está presente** → no agregar Slice 0. Arrancar directo en Slice 1.
+
+3. Identify the **vertical slices** desde la spec — minimum behaviors que pueden ser tested independientemente. Ejemplo para `tree-url-generator`:
+   - Slice 1: AC06 fail-fast on missing env var (la más fundamental)
+   - Slice 2: body validation rejects malformed inputs
+   - Slice 3: ID sanitization rejects path traversal
+   - Slice 4: UUID generation produces unique tree_id
+   - Slice 5: pre-signed URL is signed with all required headers
+   - Slice 6: 200 response has the documented structure
+   - Slice 7+: error paths (AC04 sub-cases)
+
+4. Para cada slice, escribir un task block:
    ```
    - [ ] <slice description>
      - [ ] RED: write test `test_<behavior>` asserting <what>
      - [ ] GREEN: minimal implementation in `src/<module>.py`
      - [ ] REFACTOR: <cleanup if any, or "skip">
    ```
-4. Order tasks by dependency (no task should depend on a later task).
-5. If a task exceeds ~30 minutes of estimated work, split it.
+
+5. Order tasks by dependency (no task should depend on a later task).
+6. If a task exceeds ~30 minutes of estimated work, split it.
+
+---
+
+## Slice 0 — Scaffold (solo si el repo lo necesita)
+
+Cuando Bootstrap detection encuentra que falta scaffold, agendar **al inicio del `todo.md`** este bloque:
+
+```markdown
+## Slice 0: Project scaffold (no-TDD, single commit)
+
+> Setup de proyecto. No es behavior testable, por eso no tiene RED.
+> Commit único: `chore: scaffold python lambda project`
+
+- [ ] Crear `pyproject.toml` con deps mínimas (ver `stacks/python-lambda/rules.md` § pyproject.toml mínimo):
+  - `aws-lambda-powertools[tracer]>=2`
+  - `boto3>=1.34`
+  - `pydantic>=2`
+  - Dev: `pytest>=8`, `pytest-cov>=4`, `moto[s3]>=5`, `ruff>=0.5`, `mypy>=1.10`
+  - Config de ruff (line-length 100, target py311), mypy strict, pytest con coverage fail-under 80.
+- [ ] Crear layout hexagonal:
+  - `src/domain/__init__.py`
+  - `src/application/__init__.py`
+  - `src/application/ports/__init__.py`
+  - `src/application/usecases/__init__.py`
+  - `src/adapters/__init__.py`
+- [ ] Crear `handler.py` con stub:
+  ```python
+  def handler(event: dict, context: object) -> dict:
+      """Lambda entrypoint. Wired in Slice 1+."""
+      raise NotImplementedError
+  ```
+- [ ] Crear `tests/__init__.py` (vacío).
+- [ ] Confirmar `.python-version` apunta a 3.11.x. Si no existe, crearlo.
+- [ ] Ejecutar `pytest` — debe correr (0 tests, exit 0) o reportar BLOCKED.
+- [ ] Commit: `chore: scaffold python lambda project`
+```
+
+**Notas para Skill 04 cuando ejecute Slice 0:**
+
+- No hay `chore: (failing)` previo — el hook `enforce-tdd-trace` debe permitir explícitamente Slice 0. El mensaje del commit `chore: scaffold ...` (no `feat:`) lo identifica como excepción.
+- Después de Slice 0, las Slices 1+ siguen TDD estricto.
+- Si Slice 0 falla (no se puede instalar deps, conflicto de paths) → BLOCKED, antes de tocar tests.
+
+---
+
+## Dependencias entre Skills 03 y 04
+
+Skill 03 produce un `todo.md` **ejecutable end-to-end por Skill 04 sin pasos humanos intermedios**:
+
+- Si el repo está vacío → Slice 0 + Slices TDD.
+- Si el repo ya tiene scaffold → solo Slices TDD.
+- Si la spec requiere infra adicional (ej. nueva entrada en `pyproject.toml` por una dep externa) → agendar como sub-tarea dentro de la slice que la necesita, no como Slice 0 extra.
+
+El plan **no asume conocimiento del estado del repo** — lo verifica al inicio.
 
 ---
 

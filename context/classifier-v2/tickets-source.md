@@ -6,16 +6,17 @@ La lista canónica de tickets de implementación vive en el repo de specs del cl
 
 ## Ubicación
 
-**Repositorio local del usuario:** `/Users/harias25/kriptos-classifier-v2-spec/`
+Los tickets y specs detalladas ahora viven dentro de este repo (copia consolidada). El repo original `/Users/harias25/kriptos-classifier-v2-spec/` se conserva como referencia histórica.
 
-Archivos relevantes:
+Archivos relevantes (todos en `context/classifier-v2/`):
 
-- `v2/tickets-implementacion.md` — **fuente principal de tickets** (uno por Lambda / EMR job, con AC y lógica).
-- `v2/tareas-por-fase.md` — tareas imperativas por fase × área.
-- `v2/plan-trabajo.md` — vista cruzada por área × fase con HUs candidatas.
-- `v2/orquestacion-backend.md` — tickets para DevOps (infra).
-- `v2/epicas-jira.md` — épicas del proyecto en Jira.
-- `v2/new-backend/phase1/`, `v2/new-backend/phase2/` — specs detalladas por componente.
+- `tickets-implementacion.md` — **fuente principal de tickets** (uno por Lambda / EMR job, con AC y lógica).
+- `tareas-por-fase.md` — tareas imperativas por fase × área.
+- `plan-trabajo.md` — vista cruzada por área × fase con HUs candidatas.
+- `orquestacion-backend.md` — tickets para DevOps (infra).
+- `epicas-jira.md` — épicas del proyecto en Jira.
+- `components/phase-1/`, `components/phase-2/`, `components/agent/` — specs detalladas por componente. Ver `components/README.md` para índice.
+- `historical/` — `master-doc.md` y `architecture-diagrams.md` de v1.
 
 ---
 

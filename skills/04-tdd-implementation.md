@@ -32,20 +32,30 @@ The commit sequence is enforced by commitlint in CI. Skipping RED breaks the bui
 ## Procedure per task
 
 1. Read the next unchecked task in `todo.md`.
-2. RED:
-   - Write the test in `tests/test_<module>.py`.
-   - Run `pytest` — confirm it FAILS for the expected reason.
-   - Commit: `chore: <behavior> (failing)`.
-3. GREEN:
-   - Implement the minimum code in `src/<module>.py` to make the test pass.
-   - Run `pytest` — confirm GREEN.
-   - Run `ruff check && mypy src` — fix any issues.
-   - Commit: `feat: <behavior> (passing)`.
-4. REFACTOR (only if there's cleanup):
-   - Improve code quality without changing tests.
-   - Run `pytest` again — must stay green.
-   - Commit: `refactor: <what>`.
-5. Mark task `[x]` in `todo.md`.
+
+2. **Si la tarea es Slice 0 — Scaffold** (única excepción al TDD strict):
+   - No hay RED. Setup de proyecto no es behavior testable.
+   - Ejecutar los sub-pasos del Slice 0 tal como están en el `todo.md` (crear `pyproject.toml`, layout `src/`, `handler.py` stub, `tests/__init__.py`).
+   - Correr `pytest` final — debe retornar exit 0 (incluso con 0 tests).
+   - **Commit único:** `chore: scaffold python lambda project`.
+   - Marcar Slice 0 como `[x]` y pasar a Slice 1.
+   - Si algo falla en el scaffold → BLOCKED. No improvisar.
+
+3. **Para las Slices 1+ (TDD strict):**
+   - RED:
+     - Write the test in `tests/test_<module>.py`.
+     - Run `pytest` — confirm it FAILS for the expected reason.
+     - Commit: `chore: <behavior> (failing)`.
+   - GREEN:
+     - Implement the minimum code in `src/<module>.py` to make the test pass.
+     - Run `pytest` — confirm GREEN.
+     - Run `ruff check && mypy src` — fix any issues.
+     - Commit: `feat: <behavior> (passing)`.
+   - REFACTOR (only if there's cleanup):
+     - Improve code quality without changing tests.
+     - Run `pytest` again — must stay green.
+     - Commit: `refactor: <what>`.
+   - Mark task `[x]` in `todo.md`.
 
 ---
 
