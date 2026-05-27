@@ -135,8 +135,8 @@ footer { text-align: center; padding: 24px; color: var(--text-soft); font-size: 
 </div>
 <div class="kpi info">
 <div class="label">DevOps tickets nuevos (RFC)</div>
-<div class="value">14</div>
-<div class="sub">63 SP (1 superseded de los 15 originales)</div>
+<div class="value">15</div>
+<div class="sub">65 SP (incluye KT-17034 follow-up repo joyas-priorizer)</div>
 </div>
 <div class="kpi danger">
 <div class="label">DevOps Bloqueado</div>
@@ -181,8 +181,8 @@ flowchart LR
 </section>
 
 <section>
-<h2>📐 Arquitectura técnica detallada <span class="badge">con tickets</span></h2>
-<p>El mismo flujo, ahora con todos los componentes AWS, los tickets Jira y la DDB compartida en el centro.</p>
+<h2>📐 Arquitectura técnica detallada <span class="badge">con tickets</span> <a href="architecture-complete.drawio" download style="margin-left:auto; font-size:13px; padding:6px 14px; background:var(--success); color:white; border-radius:6px; text-decoration:none; font-weight:600;">⬇ Bajar .drawio (estilo AWS icons para Miro)</a></h2>
+<p>El mismo flujo, ahora con todos los componentes AWS, los tickets Jira y la DDB compartida en el centro. El archivo <code>.drawio</code> usa íconos AWS oficiales (mismo estilo que tu Miro) — todo en una sola página con backgrounds de fase como segmentación visual. Se abre en <a href="https://app.diagrams.net" target="_blank">app.diagrams.net</a> o en VS Code con la extensión "Draw.io Integration". Para Miro: importar como SVG/PNG o copiar/pegar los nodos.</p>
 
 <div class="legend">
 <span class="legend-item"><span class="legend-color" style="background:#c3e6cb;border:1px solid #0f5132"></span>Deployed</span>
@@ -345,7 +345,7 @@ flowchart TB
 <td><div class="lambda-name">crown-candidates-indexer</div><div class="ticket-desc">Lee candidatos del bucket crown_jewels, los bulk-indexa en OpenSearch y crea/actualiza STATION + CYCLE en la DDB compartida.</div></td>
 <td><span class="status rfc">📋 RFC</span></td>
 <td><span class="sp">5</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17012">KT-17012</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17010">KT-17010</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17011">KT-17011</a></td>
+<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17012">KT-17012</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17010">KT-17010</a></td>
 <td>S3 → SQS → bulk index OS + STATION en DDB</td>
 </tr>
 <tr>
@@ -353,7 +353,7 @@ flowchart TB
 <td><div class="lambda-name">phase1-enterprise-barrier</div><div class="ticket-desc">State lambda que cuenta stations completadas vía DDB Stream y transiciona el CYCLE a <code>stations_complete</code> cuando llega al expected (KEM).</div></td>
 <td><span class="status rfc">📋 RFC</span></td>
 <td><span class="sp">3</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17013">KT-17013</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17011">KT-17011</a></td>
+<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17013">KT-17013</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a></td>
 <td>State lambda — Pipe sobre DDB Stream, filter <code>STATION#</code></td>
 </tr>
 <tr>
@@ -386,7 +386,7 @@ flowchart TB
 <td><div class="lambda-name">gse-cycle-init</div><div class="ticket-desc">Consume el manifest validado y transiciona el CYCLE existente a <code>phase2_collecting</code>, materializa REQUESTs por STATION y notifica al Signal Handler.</div></td>
 <td><span class="status rfc">📋 RFC</span></td>
 <td><span class="sp">5</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17018">KT-17018</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17011">KT-17011</a></td>
+<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17018">KT-17018</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a></td>
 <td>Transición CYCLE → <code>phase2_collecting</code> (no crea CYCLE nuevo). Multi-trigger por <code>process_type</code>.</td>
 </tr>
 <tr>
@@ -434,7 +434,7 @@ flowchart TB
 </section>
 
 <section>
-<h2>⚙️ DevOps Tickets (infra) <span class="badge">5 existentes + 14 nuevos efectivos</span></h2>
+<h2>⚙️ DevOps Tickets (infra) <span class="badge">6 existentes + 14 nuevos efectivos</span> <a href="devops-reunion.html" style="margin-left:auto; font-size:13px; padding:6px 14px; background:var(--primary); color:white; border-radius:6px; text-decoration:none; font-weight:600;">📋 Brief reunión DevOps →</a></h2>
 
 <h3>Existentes <span class="phase-tag f1">FASE 1</span></h3>
 <table>
@@ -477,8 +477,19 @@ flowchart TB
 <td>Cristian Armas</td>
 <td>Bloquea todas las alarmas del backend</td>
 </tr>
+<tr>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17034">KT-17034</a></td>
+<td><div>Crear repo <code>kriptos-io/joyas-priorizer</code> (follow-up KT-16728)</div><div class="ticket-desc">Follow-up de KT-16728: la infra AWS está deployada (EMR + buckets) pero el repo de código nunca se creó. Bloquea a KT-16616 (dev WIP).</div></td>
+<td><span class="status rfc">📋 RFC</span></td>
+<td>(sin asignar)</td>
+<td>Mini ticket de 4h — repo + pipeline EMR Serverless</td>
+</tr>
 </tbody>
 </table>
+
+<div class="info-box">
+<strong>✅ Creación de repos GitHub: cubierta por DevOps.</strong> Verificado 2026-05-23: <strong>cada DevOps ticket nuevo de Lambda (KT-17012/13/14/15/18/19/20/21/22/23) ya incluye la creación del repo <code>kriptos-io/&lt;nombre&gt;</code> en su AC01</strong> (mismo patrón que <code>kriptos-io/s3-tree-uploader</code>). Estado actual en GitHub: <strong>4 repos existen</strong> (s3-tree-uploader, tree-uncompressor, emr-job-trigger, unlockstack) y <strong>11 faltan</strong> (joyas-priorizer + 10 nuevos). Los 11 están cubiertos por DevOps tickets — Haroldo NO crea repos manualmente.
+</div>
 
 <h3>Nuevos — Shared State (consolidado) <span class="phase-tag" style="background:#fce4ec;color:#ad1457">SHARED</span></h3>
 <table>
@@ -517,11 +528,11 @@ flowchart TB
 <td class="dependency-list">KT-17024, 17026, 17027, GraphQL Plataforma Web</td>
 </tr>
 <tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17011">KT-17011</a></td>
-<td><div>Secret <code>kem-api-key</code> (SNS topic eliminado post-decisiones — UI hace polling GraphQL)</div><div class="ticket-desc">Secret manager con API key para consultar KEM (verdad absoluta de stations_expected). El SNS topic original se eliminó porque la UI usa subscription GraphQL.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">1</span></td>
-<td class="dependency-list">KT-17024, 17028</td>
+<td class="ticket-id"><s><a href="https://kriptosteam.atlassian.net/browse/KT-17011">KT-17011</a></s></td>
+<td><div><s>Secret <code>kem-api-key</code></s></div><div class="ticket-desc">Cancelado 2026-05-26 — redundante. El IAM grant ya está en el AC de cada Lambda que lo consume (KT-17078, KT-17082).</div></td>
+<td><span class="status cancelled">⛔ Cancelled</span></td>
+<td><span class="sp">—</span></td>
+<td class="dependency-list">—</td>
 </tr>
 <tr>
 <td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17012">KT-17012</a></td>
@@ -706,7 +717,7 @@ Sync con Nelson Garzón (<a href="https://kriptosteam.atlassian.net/browse/KT-16
 Sync con Plataforma Web para schema GraphQL + canal de notificación (bloquea KT-17013, 17014, 17026).</li>
 
 <li><strong>Sprint 1 (DevOps) — Infra crítica</strong>
-<a href="https://kriptosteam.atlassian.net/browse/KT-17009" style="color:var(--primary)">KT-17009</a> (DDB consolidada — <strong>bloquea las 10 Lambdas nuevas</strong>) → <a href="https://kriptosteam.atlassian.net/browse/KT-17010" style="color:var(--primary)">KT-17010</a> (OpenSearch) → <a href="https://kriptosteam.atlassian.net/browse/KT-17011" style="color:var(--primary)">KT-17011</a> (Secret KEM solo, SNS eliminado).
+<a href="https://kriptosteam.atlassian.net/browse/KT-17009" style="color:var(--primary)">KT-17009</a> (DDB consolidada — <strong>bloquea las 10 Lambdas nuevas</strong>) → <a href="https://kriptosteam.atlassian.net/browse/KT-17010" style="color:var(--primary)">KT-17010</a> (OpenSearch índice nuevo en cluster existente).
 También priorizar <a href="https://kriptosteam.atlassian.net/browse/KT-16729" style="color:var(--primary)">KT-16729</a> (monitoring base) — bloquea todas las alarmas.</li>
 
 <li><strong>Sprint 1 (Dev) — Brainstorm individual + Skill 02 por código</strong>
@@ -747,6 +758,21 @@ Resto de Lambdas Fase 2 (KT-17029-17033) en paralelo o orden según capacidad.</
 <div class="info-box">
 <strong>⛔ KT-17016 SUPERSEDED</strong> — el ticket original para `gse-cycles-samples` queda obsoleto (consolidado en KT-17009). Cuando DevOps lo vea en el board, transicionarlo a "Closed - Cancelled".
 </div>
+</section>
+
+<section>
+<h2>✅ Decisiones cerradas (2026-05-26)</h2>
+<table>
+<thead><tr><th>Decisión</th><th>Resolución</th><th>Afecta</th></tr></thead>
+<tbody>
+<tr><td><strong>AppSync</strong></td><td>Reusar el de Plataforma Web (no crear dedicado)</td><td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17080">KT-17080</a></td></tr>
+<tr><td><strong>OpenSearch</strong></td><td>Reusar cluster existente con índice nuevo <code>crown_jewel_candidates</code> (no Serverless dedicado)</td><td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17010">KT-17010</a></td></tr>
+<tr><td><strong>Secret <code>kem-api-key</code></strong></td><td>Existe — <a href="https://kriptosteam.atlassian.net/browse/KT-17011">KT-17011</a> cancelado (redundante: el IAM grant ya está en el AC de KT-17078 y KT-17082)</td><td class="dependency-list">—</td></tr>
+<tr><td><strong>Naming buckets</strong></td><td>No requiere convención global — infra dividida dev/prod ya cubre el caso</td><td class="dependency-list">N/A</td></tr>
+<tr><td><strong>Canales del Equipo IA</strong></td><td>Backend solo emite eventos estándar (DDB updates + S3 PutObject). El Equipo IA suscribe sus propios consumers por su lado (no necesitamos canal dedicado).</td><td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17082">KT-17082</a> · <a href="https://kriptosteam.atlassian.net/browse/KT-17083">KT-17083</a> · <a href="https://kriptosteam.atlassian.net/browse/KT-17087">KT-17087</a></td></tr>
+<tr><td><strong>Formato keywords</strong></td><td>Cerrado — Haroldo ya pasó el formato JSONL + <code>normalize_category.py</code></td><td class="dependency-list">—</td></tr>
+</tbody>
+</table>
 </section>
 
 <section>

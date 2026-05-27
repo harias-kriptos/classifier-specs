@@ -15,8 +15,35 @@
 | [KT-16725](https://kriptosteam.atlassian.net/browse/KT-16725) | 🟡 In Progress | Cristian Armas | tree-url-generator (Lambda + API GW + bucket `compressed_trees`) | Lambda KT-16612 ya está deployed — el ticket sigue abierto, probable cleanup/hardening pendiente. |
 | [KT-16726](https://kriptosteam.atlassian.net/browse/KT-16726) | 🔴 **BLOCKED** | Fabian Buitron | tree-uncompressor (Lambda + bucket `decompressed_trees` + DLQ) **+** emr-job-trigger (Lambda + EMR Serverless + EventBridge) | **Bloquea KT-16613 y KT-16614** (los dos en In Progress en sprint vivo). Urgente destrabar. |
 | [KT-16727](https://kriptosteam.atlassian.net/browse/KT-16727) | ❌ Cancelled | Fabian Buitron | emr-job-trigger standalone | Consolidado en KT-16726. Ignorar. |
-| [KT-16728](https://kriptosteam.atlassian.net/browse/KT-16728) | ✅ **DONE** | Cristian Armas | joyas-priorizer (EMR Serverless app + buckets `keywords` y `crown_jewels`) | **Bucket creado se llama `crown_jewels` (NO `crown_jewel_candidates`)**. Ver §1.1 + sección "Decisión pendiente" abajo. |
+| [KT-16728](https://kriptosteam.atlassian.net/browse/KT-16728) | ✅ **DONE** (parcial) | Cristian Armas | joyas-priorizer (EMR Serverless app + buckets `keywords` y `crown_jewels`) | Infra AWS completa. **Pero el repo `kriptos-io/joyas-priorizer` NO se creó** (era parte del AC01 del ticket). Follow-up: [KT-17034](https://kriptosteam.atlassian.net/browse/KT-17034). Ver §1.1 + sección "Decisión pendiente" abajo. |
 | [KT-16729](https://kriptosteam.atlassian.net/browse/KT-16729) | 📋 RFC | Cristian Armas | Monitoring base (SNS `kriptos-backend-alerts` + subs) | Pendiente de aprobación. |
+| [KT-17034](https://kriptosteam.atlassian.net/browse/KT-17034) | 📋 RFC | (sin asignar) | **Crear repo `kriptos-io/joyas-priorizer`** | Follow-up de KT-16728 — la infra AWS está deployada pero el repo de código no se creó. Bloquea a KT-16616. |
+
+## ✅ Creación de repos de GitHub: responsabilidad DevOps
+
+Verificado 2026-05-23: **cada DevOps ticket de Lambda nuevo (KT-17012/13/14/15/18/19/20/21/22/23) ya incluye la creación del repo `kriptos-io/<nombre>` en su AC01** (mismo patrón que `kriptos-io/s3-tree-uploader`).
+
+| Repo en `kriptos-io/` | Estado GitHub | DevOps ticket que lo crea |
+|---|---|---|
+| `s3-tree-uploader` | ✅ existe | KT-16725 (done en su parte de repo) |
+| `tree-uncompressor` | ✅ existe | KT-16726 (BLOCKED) |
+| `emr-job-trigger` | ✅ existe | KT-16726 (BLOCKED) |
+| `joyas-priorizer` | ❌ falta | **KT-17034** (follow-up de KT-16728) |
+| `crown-candidates-indexer` | ❌ falta | KT-17012 AC01 |
+| `phase1-enterprise-barrier` | ❌ falta | KT-17013 AC01 |
+| `validation-mutation-handler` | ❌ falta | KT-17014 AC01 |
+| `validation-confirm` | ❌ falta | KT-17015 AC01 |
+| `gse-cycle-init` | ❌ falta | KT-17018 AC01 |
+| `gse-sample-reception-notifier` | ❌ falta | KT-17019 AC01 |
+| `gse-sample-anonymizer-notifier` | ❌ falta | KT-17020 AC01 |
+| `gse-request-complete` | ❌ falta | KT-17021 AC01 |
+| `gse-station-status` | ❌ falta | KT-17022 AC01 |
+| `gse-enterprise-status` | ❌ falta | KT-17023 AC01 |
+| `unlockstack` (workflows) | ✅ existe | — (shared infra) |
+
+**Resumen:** 4 repos existen (los de Fase 1 base + workflows reusables), 11 repos faltan. Los 11 están cubiertos por DevOps tickets (10 en AC01 de los nuevos + 1 en KT-17034 nuevo).
+
+---
 
 ## Decisión pendiente: bucket de candidatos
 
@@ -220,7 +247,7 @@ Sugerencia: 1 ticket DevOps por **Lambda de código** (cubre ECR + Lambda functi
 |---|---|---|
 | [KT-17009](https://kriptosteam.atlassian.net/browse/KT-17009) | **DDB `classifier-cycles-state` + Stream** (consolidada Fase 1 + Fase 2 — absorbe lo de KT-17016) | Los 15 DevOps de Lambdas (KT-17012 a KT-17023) |
 | [KT-17010](https://kriptosteam.atlassian.net/browse/KT-17010) | Índice OpenSearch `crown_jewel_candidates` + mappings | KT-17012, KT-17014, KT-17015, GraphQL Plataforma Web |
-| [KT-17011](https://kriptosteam.atlassian.net/browse/KT-17011) | Secret `kem-api-key` (SNS topic **dropped** post-decisiones 2026-05-23 — UI hace polling via GraphQL, no push) | KT-17012, KT-17018 |
+| ~~[KT-17011](https://kriptosteam.atlassian.net/browse/KT-17011)~~ | ⛔ **CANCELLED 2026-05-26** — Secret existe ya; el IAM grant está bakeado en AC de KT-17078 y KT-17082. | — |
 | [KT-17012](https://kriptosteam.atlassian.net/browse/KT-17012) | `lambda-crown-candidates-indexer` (N1) + SQS + EventBridge rule sobre `crown_jewels` | KT-17013 |
 | [KT-17013](https://kriptosteam.atlassian.net/browse/KT-17013) | `lambda-phase1-enterprise-barrier` (N2) + EventBridge Pipe sobre DDB Stream | Plataforma Web (consume notify) |
 | [KT-17014](https://kriptosteam.atlassian.net/browse/KT-17014) | `lambda-validation-mutation-handler` (N3) + invocación desde GraphQL Plataforma Web | Plataforma Web |
@@ -260,7 +287,7 @@ Sugerencia: 1 ticket DevOps por **Lambda de código** (cubre ECR + Lambda functi
 **Sprint 2 (Fase 1.5 — bloqueante de validación humana):**
 4. [KT-17009](https://kriptosteam.atlassian.net/browse/KT-17009) (DDB `crown-validation-state` + Stream) — primero, bloquea las 4 Lambdas.
 5. [KT-17010](https://kriptosteam.atlassian.net/browse/KT-17010) (índice OpenSearch — coordinar con Plataforma Web).
-6. [KT-17011](https://kriptosteam.atlassian.net/browse/KT-17011) (Secret KEM + SNS stub).
+6. ~~KT-17011~~ Cancelado — el grant IAM al Secret existente está bakeado en KT-17078 y KT-17082.
 7. [KT-17012](https://kriptosteam.atlassian.net/browse/KT-17012) y [KT-17013](https://kriptosteam.atlassian.net/browse/KT-17013) en paralelo (N1 indexer + N2 barrier).
 8. [KT-17015](https://kriptosteam.atlassian.net/browse/KT-17015) (validation-confirm + bucket validated + SQS FIFO + API GW).
 9. [KT-17014](https://kriptosteam.atlassian.net/browse/KT-17014) (validation-mutation-handler — depende del schema GraphQL de Plataforma Web).

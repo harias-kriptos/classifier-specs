@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventario DevOps — Backend Classifier v2</title>
+<style>
+:root {
+  --primary: #1a73e8;
+  --success: #0f9d58;
+  --warning: #f9ab00;
+  --danger: #d93025;
+  --info: #1967d2;
+  --bg: #f8f9fa;
+  --card: #ffffff;
+  --border: #dadce0;
+  --text: #202124;
+  --soft: #5f6368;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  padding: 24px;
+}
+.container { max-width: 1500px; margin: 0 auto; }
+
+header { background: var(--card); border-radius: 12px; padding: 28px 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 20px; border-left: 6px solid var(--primary); }
+header .breadcrumb { font-size: 12px; color: var(--soft); margin-bottom: 6px; }
+header .breadcrumb a { color: var(--primary); text-decoration: none; }
+header h1 { font-size: 24px; margin-bottom: 6px; }
+header .subtitle { color: var(--soft); font-size: 13.5px; }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.kpi { background: var(--card); border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border-top: 3px solid var(--primary); }
+.kpi .label { font-size: 11px; color: var(--soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.kpi .value { font-size: 26px; font-weight: 700; color: var(--text); }
+.kpi .sub { font-size: 12px; color: var(--soft); margin-top: 2px; }
+.kpi.shared { border-top-color: #9c27b0; }
+.kpi.fase1 { border-top-color: #1976d2; }
+.kpi.fase1val { border-top-color: #e65100; }
+.kpi.fase2 { border-top-color: #2e7d32; }
+
+section { background: var(--card); border-radius: 12px; padding: 24px 28px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+section h2 { font-size: 19px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 10px; }
+section h2 .tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; color: #fff; }
+section h2 .tag.shared { background: #9c27b0; }
+section h2 .tag.fase1 { background: #1976d2; }
+section h2 .tag.fase1val { background: #e65100; }
+section h2 .tag.fase2 { background: #2e7d32; }
+section h2 .count { font-size: 12px; color: var(--soft); font-weight: 400; margin-left: auto; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead { background: #f1f3f4; }
+th { padding: 10px 12px; text-align: left; font-weight: 600; color: var(--text); border-bottom: 2px solid var(--border); white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid #eaecef; vertical-align: top; }
+tr:hover td { background: #fafbfc; }
+
+.ticket-id { font-family: "SF Mono", Monaco, Consolas, monospace; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.ticket-id a { color: var(--primary); text-decoration: none; }
+.ticket-id a:hover { text-decoration: underline; }
+
+.type-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.3px; white-space: nowrap; }
+.type-tag.repo { background: #e3f2fd; color: #1565c0; }
+.type-tag.infra { background: #fff3e0; color: #e65100; }
+.type-tag.shared { background: #f3e5f5; color: #6a1b9a; }
+.type-tag.storage { background: #e8f5e9; color: #1b5e20; }
+.type-tag.cleanup { background: #ffebee; color: #b71c1c; }
+
+.status { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+.status.done { background: #c3e6cb; color: #0f5132; }
+.status.wip { background: #fff3cd; color: #856404; }
+.status.blocked { background: #f8d7da; color: #721c24; }
+.status.rfc { background: #cce5ff; color: #004085; }
+.status.cancelled { background: #f5f5f5; color: #999; }
+.status.partial { background: #ffe0b2; color: #ef6c00; }
+
+.lang { font-family: "SF Mono", Monaco, Consolas, monospace; font-size: 11px; color: var(--soft); }
+.sp { display: inline-block; min-width: 24px; padding: 2px 6px; background: #f1f3f4; border-radius: 4px; font-size: 11px; font-weight: 600; text-align: center; color: var(--soft); }
+.recurso { font-size: 12.5px; }
+.recurso code { font-family: "SF Mono", Monaco, Consolas, monospace; font-size: 11.5px; background: #f1f3f4; padding: 1px 5px; border-radius: 3px; }
+.depends { font-size: 11px; color: var(--soft); }
+.depends a { color: var(--primary); text-decoration: none; }
+
+.dont-do { background: #fff8e1; border-left: 4px solid var(--warning); padding: 14px 18px; border-radius: 4px; margin: 14px 0; font-size: 13px; }
+.dont-do strong { color: #b8860b; }
+.dont-do ul { margin: 8px 0 0 18px; }
+.dont-do li { margin: 4px 0; }
+
+.conv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.conv-card { background: #fafbfc; border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; font-size: 12.5px; }
+.conv-card .title { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.conv-card .val { color: var(--soft); font-family: "SF Mono", Monaco, Consolas, monospace; font-size: 11.5px; }
+
+footer { text-align: center; padding: 20px; color: var(--soft); font-size: 11px; }
+
+@media print {
+  body { padding: 0; background: white; }
+  section, header, .kpi { box-shadow: none; page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+<div class="breadcrumb">← <a href="dashboard.html">Volver al dashboard</a> · <a href="architecture-complete.drawio" download>⬇ Bajar arquitectura.drawio</a></div>
+<h1>Inventario DevOps — Backend Classifier v2</h1>
+<div class="subtitle">Tickets de infra + repos a crear. <strong>Todos los repos son Python 3.11 + AWS Lambda Container Image + ECR</strong>. Convención: cada repo se separa del ticket de infra (AC cortos).</div>
+</header>
+
+<!-- KPIs -->
+<div class="kpis">
+<div class="kpi shared"><div class="label">Compartido</div><div class="value">3</div><div class="sub">DDB · OS índice · SNS alertas</div></div>
+<div class="kpi fase1"><div class="label">Fase 1 — Scan & Match</div><div class="value">7</div><div class="sub">4 existentes + 3 nuevos (KT-17076, 77, 34)</div></div>
+<div class="kpi fase1val"><div class="label">Fase 1 — Validación</div><div class="value">8</div><div class="sub">4 REPO + 4 INFRA</div></div>
+<div class="kpi fase2"><div class="label">Fase 2 — GSE</div><div class="value">13</div><div class="sub">1 storage + 6 REPO + 6 INFRA</div></div>
+</div>
+
+<!-- COMPARTIDO -->
+<section>
+<h2><span class="tag shared">SHARED</span> Infra compartida<span class="count">3 tickets · prerrequisito de todo lo demás</span></h2>
+<table>
+<thead><tr><th>Ticket</th><th>Tipo</th><th>Recurso</th><th>SP</th><th>Estimado</th><th>Status</th><th>Bloquea a</th></tr></thead>
+<tbody>
+<tr>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a></td>
+<td><span class="type-tag shared">SHARED</span></td>
+<td class="recurso"><strong>DynamoDB <code>classifier-cycles-state</code></strong> + Stream NEW_AND_OLD_IMAGES + TTL en attr <code>ttl</code>. PK <code>enterprise_id</code>, SK multi-prefix <code>CYCLE#/STATION#/REQUEST#</code>. PAY_PER_REQUEST.</td>
+<td><span class="sp">3</span></td>
+<td>1d</td>
+<td><span class="status rfc">RFC</span></td>
+<td class="depends">Las 10 Lambdas INFRA nuevas</td>
+</tr>
+<tr>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17010">KT-17010</a></td>
+<td><span class="type-tag shared">SHARED</span></td>
+<td class="recurso"><strong>Índice <code>crown_jewel_candidates</code> en OpenSearch existente</strong> de Plataforma Web (sin domain dedicado) + mappings + IAM SigV4 + AppSync data source HTTP.</td>
+<td><span class="sp">5</span></td>
+<td>2d</td>
+<td><span class="status rfc">RFC</span></td>
+<td class="depends">KT-17078, KT-17080, KT-17081</td>
+</tr>
+<tr>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16729">KT-16729</a></td>
+<td><span class="type-tag shared">SHARED</span></td>
+<td class="recurso"><strong>SNS <code>kriptos-backend-alerts</code></strong> + suscripciones (email + Slack). Consumido por todas las alarmas CloudWatch.</td>
+<td><span class="sp">–</span></td>
+<td>–</td>
+<td><span class="status rfc">RFC</span></td>
+<td class="depends">Todas las alarmas</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<!-- FASE 1 SCAN & MATCH -->
+<section>
+<h2><span class="tag fase1">FASE 1</span> Scan & Match<span class="count">7 tickets · 4 existentes + 3 nuevos</span></h2>
+<table>
+<thead><tr><th>Ticket</th><th>Tipo</th><th>Recurso / Repo</th><th>Lenguaje</th><th>SP</th><th>Estimado</th><th>Status</th><th>Owner</th></tr></thead>
+<tbody>
+<tr>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16725">KT-16725</a></td>
+<td><span class="type-tag infra">INFRA</span></td>
+<td class="recurso"><code>tree-url-generator</code> Lambda + API GW <code>/v2/tree/init</code> + bucket <code>compressed-trees-dev</code></td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">–</span></td>
+<td>–</td>
+<td><span class="status wip">In Progress</span></td>
+<td>Cristian</td>
+</tr>
+<tr>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16726">KT-16726</a></td>
+<td><span class="type-tag infra">INFRA</span></td>
+<td class="recurso"><strong>Repos + buckets + Lambda <code>tree-uncompressor</code></strong> (lo que Fabian completó). Listo para cerrar como Done.</td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">–</span></td>
+<td>–</td>
+<td><span class="status partial">Done parcial</span></td>
+<td>Fabian</td>
+</tr>
+<tr>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17076">KT-17076</a></td>
+<td><span class="type-tag infra">INFRA</span></td>
+<td class="recurso"><strong>NUEVO</strong> Lambda <code>emr-job-trigger</code> en AWS + 2 EventBridge Rules + Event Source Mappings + IAM (S3 + EMR PassRole)</td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">3</span></td>
+<td>6h</td>
+<td><span class="status rfc">RFC</span></td>
+<td>—</td>
+</tr>
+<tr>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17077">KT-17077</a></td>
+<td><span class="type-tag infra">INFRA</span></td>
+<td class="recurso"><strong>NUEVO</strong> 2 DLQs SQS + 2 Log Groups 30d + 2 alarmas DLQ + verificación AES-256/public-access en buckets</td>
+<td class="lang">–</td>
+<td><span class="sp">2</span></td>
+<td>4h</td>
+<td><span class="status rfc">RFC</span></td>
+<td>—</td>
+</tr>
+<tr>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16728">KT-16728</a></td>
+<td><span class="type-tag infra">INFRA</span></td>
+<td class="recurso"><code>jewels-priorizer</code> EMR Serverless application + buckets <code>keywords</code> + <code>crown_jewels</code> + IAM EMR exec role</td>
+<td class="lang">PySpark</td>
+<td><span class="sp">–</span></td>
+<td>–</td>
+<td><span class="status done">Done</span></td>
+<td>Cristian</td>
+</tr>
+<tr>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17034">KT-17034</a></td>
+<td><span class="type-tag repo">REPO</span></td>
+<td class="recurso"><code>kriptos-io/jewels-priorizer</code> ✅ existe</td>
+<td class="lang">Python (PySpark)</td>
+<td><span class="sp">2</span></td>
+<td>–</td>
+<td><span class="status done">Listo cerrar</span></td>
+<td>—</td>
+</tr>
+<tr>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16727">KT-16727</a></td>
+<td><span class="type-tag cleanup">CLEANUP</span></td>
+<td class="recurso">emr-job-trigger standalone (consolidado en KT-16726)</td>
+<td class="lang">–</td>
+<td><span class="sp">–</span></td>
+<td>–</td>
+<td><span class="status cancelled">Cancelled</span></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<!-- FASE 1 VALIDACIÓN -->
+<section>
+<h2><span class="tag fase1val">FASE 1 VAL</span> Validación humana<span class="count">8 tickets · 4 REPO + 4 INFRA</span></h2>
+<table>
+<thead><tr><th>Lambda</th><th>Ticket REPO</th><th>Ticket INFRA</th><th>Recurso INFRA</th><th>Lenguaje</th><th>SP total</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>crown-candidates-indexer</strong></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17012">KT-17012</a></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17078">KT-17078</a></td>
+<td class="recurso">Lambda 512MB/300s + SQS <code>crown-candidates-indexer-queue</code> + DLQ + EB rule sobre <code>crown_jewels</code> suffix <code>.jsonl</code> + IAM (S3+DDB+OS+Secret)</td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">5+3</span></td>
+</tr>
+<tr>
+<td><strong>phase1-enterprise-barrier</strong></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17013">KT-17013</a></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17079">KT-17079</a></td>
+<td class="recurso">Lambda 256MB/30s + EventBridge Pipe DDB Stream (filter <code>STATION#</code> + <code>scan_status=complete</code>) + DLQ Pipe + IAM (DDB+Pipe role)</td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">5+3</span></td>
+</tr>
+<tr>
+<td><strong>validation-mutation-handler</strong></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17014">KT-17014</a></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17080">KT-17080</a></td>
+<td class="recurso">Lambda 512MB/60s + resource-based policy invoke desde AppSync de Plataforma Web + IAM (OS UpdateByQuery SigV4 + DDB)</td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">5+3</span></td>
+</tr>
+<tr>
+<td><strong>validation-confirm</strong></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17015">KT-17015</a></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17081">KT-17081</a></td>
+<td class="recurso">Lambda 1024MB/300s + API GW route <code>/v2/validation/confirm</code> + bucket <code>validated_crown_jewels</code> (AES-256 + lifecycle 30d) + EB rule + SQS FIFO <code>gse-validated-cycle-queue.fifo</code> + IAM</td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">8+5</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<!-- FASE 2 -->
+<section>
+<h2><span class="tag fase2">FASE 2</span> GSE Sample Collection<span class="count">13 tickets · 1 storage + 6 REPO + 6 INFRA</span></h2>
+<table>
+<thead><tr><th>Componente</th><th>Ticket REPO</th><th>Ticket INFRA</th><th>Recurso INFRA</th><th>Lenguaje</th><th>SP total</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>Storage GSE</strong> <span class="type-tag storage">STORAGE</span></td>
+<td>—</td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17017">KT-17017</a></td>
+<td class="recurso">Buckets <code>gse-raw</code> + <code>gse-anonymized</code> (AES-256 + EB notif + lifecycle) + 2 EB rules + SQS <code>gse-sample-reception-queue</code> + SQS <code>gse-sample-anonymizer-queue</code> + DLQs</td>
+<td class="lang">–</td>
+<td><span class="sp">5</span></td>
+</tr>
+<tr>
+<td><strong>gse-cycle-init</strong></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17018">KT-17018</a></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17082">KT-17082</a></td>
+<td class="recurso">Lambda 512MB/60s + Event Source Mapping SQS FIFO + env <code>EVENT_SOURCE_ARN_TO_PROCESS_TYPE</code> + IAM (S3+DDB+Secret)</td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">5+3</span></td>
+</tr>
+<tr>
+<td><strong>gse-sample-reception-notifier</strong></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17019">KT-17019</a></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17083">KT-17083</a></td>
+<td class="recurso">Lambda 256MB/30s + Event Source Mapping SQS <code>gse-sample-reception-queue</code> + IAM (DDB)</td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">3+2</span></td>
+</tr>
+<tr>
+<td><strong>gse-sample-anonymizer-notifier</strong></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17020">KT-17020</a></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17084">KT-17084</a></td>
+<td class="recurso">Lambda 256MB/30s + Event Source Mapping SQS <code>gse-sample-anonymizer-queue</code> + IAM (DDB)</td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">3+2</span></td>
+</tr>
+<tr>
+<td><strong>gse-request-complete</strong></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17021">KT-17021</a></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17085">KT-17085</a></td>
+<td class="recurso">Lambda 256MB/30s + API GW route <code>/v2/gse/request-complete</code> + IAM (DDB TransactWrite)</td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">3+2</span></td>
+</tr>
+<tr>
+<td><strong>gse-station-status</strong></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17022">KT-17022</a></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17086">KT-17086</a></td>
+<td class="recurso">Lambda 256MB/30s + EventBridge Pipe DDB Stream (filter <code>STATION#</code> + <code>sampling_status</code> existe) + DLQ Pipe + IAM</td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">3+3</span></td>
+</tr>
+<tr>
+<td><strong>gse-enterprise-status</strong></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17023">KT-17023</a></td>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17087">KT-17087</a></td>
+<td class="recurso">Lambda 256MB/30s + EventBridge Pipe DDB Stream (filter <code>CYCLE#</code> + <code>status=phase2_collecting</code>) + DLQ Pipe + IAM (DDB)</td>
+<td class="lang">Python 3.11</td>
+<td><span class="sp">5+3</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<!-- CLEANUP -->
+<section>
+<h2>🧹 Cleanup<span class="count">1 ticket cancelled</span></h2>
+<table>
+<thead><tr><th>Ticket</th><th>Tipo</th><th>Acción</th><th>Status</th></tr></thead>
+<tbody>
+<tr>
+<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17016">KT-17016</a></td>
+<td><span class="type-tag cleanup">CANCELLED</span></td>
+<td>DDB <code>gse-cycles-samples</code> consolidada en KT-17009. Ya transicionado a Closed-Cancelled.</td>
+<td><span class="status cancelled">Done</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<!-- CONVENCIONES -->
+<section>
+<h2>📐 Convenciones (sin cambios)</h2>
+<div class="conv-grid">
+<div class="conv-card"><div class="title">Lenguaje runtime</div><div class="val">Python 3.11 + Lambda Container Image + ECR</div></div>
+<div class="conv-card"><div class="title">Pipeline CI/CD</div><div class="val">kriptos-io/unlockstack/.github/workflows/lambda-docker-automatic-release.yml</div></div>
+<div class="conv-card"><div class="title">Gates</div><div class="val">commitlint + SonarCloud + Snyk + Docker + ECR + QA gate</div></div>
+<div class="conv-card"><div class="title">Naming repo</div><div class="val">kriptos-io/{componente}</div></div>
+<div class="conv-card"><div class="title">Naming ECR + Lambda</div><div class="val">lambda-{componente}</div></div>
+<div class="conv-card"><div class="title">Naming bucket</div><div class="val">kriptos-{env}-{recurso} (confirmar)</div></div>
+<div class="conv-card"><div class="title">CloudWatch Log retention</div><div class="val">30 días</div></div>
+<div class="conv-card"><div class="title">SNS de alertas</div><div class="val">kriptos-backend-alerts (KT-16729)</div></div>
+<div class="conv-card"><div class="title">Stack patrón</div><div class="val">github.com/kriptos-io/s3-tree-uploader (deployed)</div></div>
+</div>
+</section>
+
+<footer>
+Inventario generado 2026-05-26 · classifier-specs · 31 tickets totales (3 shared + 7 fase 1 + 8 fase 1 val + 13 fase 2). Total story points ~80 SP.
+</footer>
+
+</div>
+</body>
+</html>

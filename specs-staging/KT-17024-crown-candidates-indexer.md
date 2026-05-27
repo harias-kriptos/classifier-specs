@@ -141,4 +141,4 @@ Ninguna específica.
 - PR a `main` con `Implements specs/001-crown-candidates-indexer.md`
 - Deploy via reusable workflow
 
-**Bloqueantes de deploy:** [KT-17012](https://kriptosteam.atlassian.net/browse/KT-17012) (Lambda + SQS + EventBridge) + [KT-17009](https://kriptosteam.atlassian.net/browse/KT-17009) (DDB con Stream) + [KT-17010](https://kriptosteam.atlassian.net/browse/KT-17010) (OS index) + [KT-17011](https://kriptosteam.atlassian.net/browse/KT-17011) (Secret KEM).
+**Bloqueantes de deploy:** [KT-17012](https://kriptosteam.atlassian.net/browse/KT-17012) (Repo) + [KT-17078](https://kriptosteam.atlassian.net/browse/KT-17078) (Lambda + SQS + EventBridge + IAM) + [KT-17009](https://kriptosteam.atlassian.net/browse/KT-17009) (DDB con Stream) + [KT-17010](https://kriptosteam.atlassian.net/browse/KT-17010) (OS índice nuevo en cluster existente).
