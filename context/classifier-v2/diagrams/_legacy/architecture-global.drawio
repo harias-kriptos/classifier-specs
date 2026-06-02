@@ -1,0 +1,559 @@
+<mxfile host="app.diagrams.net" modified="2026-05-28T23:00:00.000Z" agent="ClaudeCode" version="22.0.0">
+  <diagram name="Classifier v2 Global" id="arch-global">
+    <mxGraphModel dx="2400" dy="1500" grid="1" gridSize="20" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="6800" pageHeight="3200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- TITLE -->
+        <mxCell id="title" value="Classifier Backend v2 — Architecture Global" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=32;fontStyle=1;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="40" y="30" width="6720" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Las 3 fases convergen al State Machine compartido (DynamoDB classifier-cycles-state)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontColor=#475569;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="85" width="6720" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- ============ LANE 1 — ACTORS ============ -->
+        <mxCell id="bg-actors" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#64748B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="140" width="6720" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="bg-actors-title" value="1.  EXTERNAL ACTORS" style="text;html=1;strokeColor=none;fillColor=#64748B;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#ffffff;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="140" width="6720" height="36" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actor-win" value="Windows Agent&#10;[Software System]&#10;&#10;Scans documents from workstations located on the customer's local network." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#475569;strokeColor=#1E293B;fontColor=#ffffff;fontSize=14;align=center;verticalAlign=middle;strokeWidth=2;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="200" y="210" width="280" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-cloud" value="Cloud Agent&#10;[Software System]&#10;&#10;Scans Gsuite, OneDrive and SharePoint accounts via cloud APIs." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#475569;strokeColor=#1E293B;fontColor=#ffffff;fontSize=14;align=center;verticalAlign=middle;strokeWidth=2;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="540" y="210" width="280" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-client" value="Client UI (Web)&#10;[Software System]&#10;&#10;Human-in-the-loop. Approves/rejects candidates and confirms Fase 2 sampling." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#475569;strokeColor=#1E293B;fontColor=#ffffff;fontSize=14;align=center;verticalAlign=middle;strokeWidth=2;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="4400" y="210" width="280" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-kem" value="KEM API&#10;[External Service]&#10;&#10;Returns active stations per enterprise (stations_expected)." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#475569;strokeColor=#1E293B;fontColor=#ffffff;fontSize=14;align=center;verticalAlign=middle;strokeWidth=2;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="5860" y="210" width="280" height="200" as="geometry" />
+        </mxCell>
+
+        <!-- ============ LANE 2 — FASE 1 SCAN & MATCH ============ -->
+        <mxCell id="bg-f1s" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#1D4ED8;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="460" width="6720" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="bg-f1s-title" value="2.  FASE 1 — Scan &amp; Match     ·     Agent uploads tree → S3 → EMR Spark match → OpenSearch index" style="text;html=1;strokeColor=none;fillColor=#1D4ED8;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#ffffff;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="460" width="6720" height="36" as="geometry" />
+        </mxCell>
+
+        <!-- Step circles + Lambdas -->
+        <mxCell id="step-1" value="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FBBF24;strokeColor=#D97706;fontColor=#78350F;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="290" y="530" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-tree-url" value="tree-url-generator" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="270" y="600" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-tree-url-desc" value="Validates request,&#10;signs presigned S3 URL" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="200" y="720" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step-2" value="2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FBBF24;strokeColor=#D97706;fontColor=#78350F;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="850" y="530" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-s3-comp" value="compressed_trees" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
+          <mxGeometry x="830" y="600" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-s3-comp-desc" value="{ent}/{station}.jsonl.gz&#10;x-amz-meta-* propagated" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="760" y="720" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step-3" value="3" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FBBF24;strokeColor=#D97706;fontColor=#78350F;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="1410" y="530" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-tree-uncomp" value="tree-uncompressor" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="1390" y="600" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-tree-uncomp-desc" value="Stream decompress&#10;.jsonl.gz → .jsonl" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="720" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f1s-s3-decomp" value="decompressed_trees" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
+          <mxGeometry x="1950" y="600" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-s3-decomp-desc" value="NDJSON · UTF-8&#10;all metadata preserved" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="1880" y="720" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step-4" value="4" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FBBF24;strokeColor=#D97706;fontColor=#78350F;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="2530" y="530" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-emr-trigger" value="emr-job-trigger" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="2510" y="600" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-emr-trigger-desc" value="Starts EMR&#10;Serverless job" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="2440" y="720" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f1s-emr" value="EMR Serverless" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.emr;" vertex="1" parent="1">
+          <mxGeometry x="3060" y="600" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-emr-desc" value="joyas-priorizer&#10;PySpark Aho-Corasick" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="2990" y="720" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f1s-s3-crown" value="crown_jewels" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
+          <mxGeometry x="3620" y="600" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-s3-crown-desc" value="candidatos&#10;pre-validación" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="3550" y="720" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step-5" value="5" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FBBF24;strokeColor=#D97706;fontColor=#78350F;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="4210" y="530" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-indexer" value="crown-candidates-indexer" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="4190" y="600" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-indexer-desc" value="Bulk index +&#10;create CYCLE/STATION" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="4120" y="720" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f1s-opensearch" value="OpenSearch" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.opensearch_service;" vertex="1" parent="1">
+          <mxGeometry x="4760" y="600" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-opensearch-desc" value="searchable&#10;candidate index" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="4690" y="720" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step-6" value="6" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FBBF24;strokeColor=#D97706;fontColor=#78350F;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="5810" y="530" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-barrier" value="crown-enterprise-barrier" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="5790" y="600" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1s-barrier-desc" value="Waits all STATIONs&#10;→ CYCLE complete" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="5720" y="720" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Yellow note -->
+        <mxCell id="note-f1s" value="Flujo Fase 1:&#10;&#10;1. Windows Agent → POST /v2/tree/init → presigned URL&#10;2. Agent PUT .jsonl.gz a compressed_trees&#10;3. tree-uncompressor descomprime → decompressed_trees&#10;4. emr-job-trigger lanza Spark (joyas-priorizer)&#10;5. crown-candidates-indexer bulk index + crea CYCLE&#10;6. crown-enterprise-barrier espera todos los STATIONs&#10;&#10;Cloud Agent escribe directo a decompressed_trees (skip 1-3)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontColor=#5D4037;fontSize=13;align=left;verticalAlign=top;strokeWidth=2;spacingLeft=12;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="200" y="780" width="600" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ============ LANE 3 — FASE 1 VALIDACIÓN ============ -->
+        <mxCell id="bg-f1v" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#15803D;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="920" width="6720" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="bg-f1v-title" value="3.  FASE 1 — Validación humana     ·     Cliente revisa, aprueba/rechaza, confirma → manifest" style="text;html=1;strokeColor=none;fillColor=#15803D;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#ffffff;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="920" width="6720" height="36" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f1v-mutation" value="crown-validation-handler" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="4190" y="1000" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1v-mutation-desc" value="GraphQL handler&#10;approve/reject/add" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="4120" y="1120" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f1v-confirm" value="crown-validation-confirm" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="4760" y="1000" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1v-confirm-desc" value="Freeze validation&#10;→ write manifest" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="4690" y="1120" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f1v-s3-manifest" value="validated_crown_jewels" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
+          <mxGeometry x="5330" y="1000" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f1v-s3-manifest-desc" value="{ent}/{cycle}/&#10;manifest.json" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="5260" y="1120" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note-validation" value="Validación humana (human-in-the-loop):&#10;&#10;Cliente revisa candidatos en la UI:&#10;  ✓ Approve (mantiene en lista)&#10;  ✗ Reject (descarta)&#10;  + Add manual (agrega nuevos)&#10;&#10;Al confirmar:&#10;  • Materializa manifest.json con files_to_sample&#10;  • CYCLE pasa a 'confirmed'&#10;  • O 'phase2_skipped' si 0 aprobados" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontColor=#5D4037;fontSize=13;align=left;verticalAlign=top;strokeWidth=2;spacingLeft=12;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="200" y="1000" width="500" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- ============ LANE 4 — STATE MACHINE (PROMINENTE) ============ -->
+        <mxCell id="bg-sm" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=5;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1220" width="6720" height="560" as="geometry" />
+        </mxCell>
+        <mxCell id="bg-sm-title" value="★  STATE MACHINE  ★     ·     Compartido por las 3 fases     ·     Single source of truth     ·     DynamoDB conditional writes para exactly-once" style="text;html=1;strokeColor=none;fillColor=#D97706;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#ffffff;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1220" width="6720" height="44" as="geometry" />
+        </mxCell>
+
+        <mxCell id="sm-states-note" value="CYCLE state machine&#10;&#10;1. scanning&#10;       ↓ (crown-barrier)&#10;2. stations_complete&#10;       ↓ (validation-mutation)&#10;       (UI: approve/reject)&#10;       ↓ (crown-validation-confirm)&#10;3. confirmed&#10;       ↓ (gse-cycle-init)&#10;4. phase2_collecting&#10;       ↓ (gse-enterprise-status)&#10;5. complete&#10;&#10;Alternativa:&#10;3. confirmed → phase2_skipped&#10;       (si 0 aprobados)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFBEB;strokeColor=#D97706;fontColor=#78350F;fontSize=13;align=left;verticalAlign=top;strokeWidth=2;spacingLeft=12;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="200" y="1290" width="400" height="440" as="geometry" />
+        </mxCell>
+
+        <!-- DDB Big -->
+        <mxCell id="sm-ddb" value="" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#4D72F3;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;" vertex="1" parent="1">
+          <mxGeometry x="2900" y="1370" width="220" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="sm-ddb-label" value="classifier-cycles-state&#10;━━━━━━━━━━━━━━&#10;PK: enterprise_id&#10;SK: CYCLE# / STATION# / REQUEST#&#10;━━━━━━━━━━━━━━&#10;TTL: 90d after complete" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=13;fontColor=#1E40AF;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="2750" y="1610" width="520" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="sm-stream" value="DDB Stream" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#4D72F3;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;" vertex="1" parent="1">
+          <mxGeometry x="3380" y="1450" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="sm-stream-desc" value="NEW_AND_OLD_IMAGES" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#1E40AF;" vertex="1" parent="1">
+          <mxGeometry x="3300" y="1570" width="240" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="sm-pipes" value="EventBridge Pipes" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.eventbridge;" vertex="1" parent="1">
+          <mxGeometry x="3760" y="1450" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="sm-pipes-desc" value="filter:&#10;CYCLE# / STATION# / REQUEST#" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#9D174D;" vertex="1" parent="1">
+          <mxGeometry x="3640" y="1570" width="320" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="sm-idempotency-note" value="Exactly-once semantics:&#10;&#10;DDB Stream entrega registros&#10;at-least-once (puede duplicar).&#10;&#10;Garantía exactly-once con&#10;conditional DDB writes:&#10;&#10;Per-STATION barrier flag:&#10;  SET barrier_counted = true&#10;  IF barrier_counted &lt;&gt; true&#10;&#10;CYCLE counter increment:&#10;  ADD stations_completed = 1&#10;  IF status = 'scanning'&#10;&#10;Barrier condition (Fase 2):&#10;  samples_anonymized&#10;  + samples_skipped&#10;  &gt;= samples_expected&#10;&#10;Si conditional falla&#10;→ ya procesado, ignorar." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFBEB;strokeColor=#D97706;fontColor=#78350F;fontSize=13;align=left;verticalAlign=top;strokeWidth=2;spacingLeft=12;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="6200" y="1290" width="500" height="440" as="geometry" />
+        </mxCell>
+
+        <!-- ============ LANE 5 — FASE 2 GSE ============ -->
+        <mxCell id="bg-f2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#BE185D;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1800" width="6720" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="bg-f2-title" value="4.  FASE 2 — Priority Sample Collection (GSE)     ·     Signal Handler → Agent uploads → Anonymizer → LLM" style="text;html=1;strokeColor=none;fillColor=#BE185D;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#ffffff;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1800" width="6720" height="36" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step-7" value="7" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FBBF24;strokeColor=#D97706;fontColor=#78350F;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="290" y="1870" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-init" value="gse-cycle-init" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="270" y="1940" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-init-desc" value="Materialize STATIONs&#10;+ notify Signal Handler" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="200" y="2060" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step-8" value="8" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FBBF24;strokeColor=#D97706;fontColor=#78350F;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="850" y="1870" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-s3-raw" value="gse-raw" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
+          <mxGeometry x="830" y="1940" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-s3-raw-desc" value="{ent}/{station}/{cycle}/&#10;{req}/sample.json" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="760" y="2060" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f2-reception" value="gse-reception-notifier" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="1390" y="1940" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-reception-desc" value="count samples_received&#10;in DDB" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="2060" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f2-request-complete" value="gse-request-complete" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="1950" y="1940" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-request-complete-desc" value="Agent: I'm done&#10;upload counts" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="1880" y="2060" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step-9" value="9" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FBBF24;strokeColor=#D97706;fontColor=#78350F;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="2530" y="1870" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-sqs" value="reception-queue" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.simple_queue_service;" vertex="1" parent="1">
+          <mxGeometry x="2510" y="1940" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-sqs-desc" value="SQS → Anonymizer" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="2440" y="2060" width="240" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f2-s3-anon" value="gse-anonymized" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
+          <mxGeometry x="3060" y="1940" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-s3-anon-desc" value="PII removed" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="2990" y="2060" width="240" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f2-anon-notif" value="gse-anonymizer-notifier" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="3620" y="1940" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-anon-notif-desc" value="count samples_anonymized&#10;in DDB" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="3550" y="2060" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step-10" value="10" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FBBF24;strokeColor=#D97706;fontColor=#78350F;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="4210" y="1870" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-station-status" value="gse-station-status" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="4190" y="1940" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-station-status-desc" value="Barrier per STATION&#10;→ close STATION" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="4120" y="2060" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step-11" value="11" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FBBF24;strokeColor=#D97706;fontColor=#78350F;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="4780" y="1870" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-enterprise-status" value="gse-enterprise-status" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=14;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="4760" y="1940" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="f2-enterprise-status-desc" value="Close CYCLE&#10;→ notify LLM" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="4690" y="2060" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note-f2" value="Flujo Fase 2 (GSE):&#10;&#10;7. gse-cycle-init lee manifest → crea STATIONs + REQUESTs → notifica Signal Handler&#10;8. Signal Handler entrega payload a cada Agent. Agents extraen muestras → gse-raw&#10;9. SQS → Anonymizer lee gse-raw → transforma → escribe gse-anonymized&#10;10. gse-station-status cierra STATION cuando barrier met:&#10;     samples_anonymized + samples_skipped >= samples_expected&#10;11. gse-enterprise-status cierra CYCLE → notifica LLM Process Queue" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontColor=#5D4037;fontSize=13;align=left;verticalAlign=top;strokeWidth=2;spacingLeft=12;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="5400" y="1900" width="1280" height="200" as="geometry" />
+        </mxCell>
+
+        <!-- ============ LANE 6 — EXTERNAL SYSTEMS ============ -->
+        <mxCell id="bg-ext" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F4F4F5;strokeColor=#52525B;strokeWidth=2;dashed=1;dashPattern=8 4;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2260" width="6720" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="bg-ext-title" value="5.  EXTERNAL SYSTEMS (black boxes)" style="text;html=1;strokeColor=none;fillColor=#52525B;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#ffffff;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2260" width="6720" height="36" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ext-signal" value="Signal Handler&#10;[External Service]&#10;&#10;Pushes cycle payload to active Agents (Fase 2 sampling request)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#52525B;strokeColor=#27272A;fontColor=#ffffff;fontSize=13;align=center;verticalAlign=middle;dashed=1;dashPattern=8 4;strokeWidth=2;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="200" y="2330" width="280" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="ext-bedrock" value="Bedrock&#10;[AWS AI/ML]&#10;&#10;Generates 2K-5K keywords per enterprise (manual trigger)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#52525B;strokeColor=#27272A;fontColor=#ffffff;fontSize=13;align=center;verticalAlign=middle;dashed=1;dashPattern=8 4;strokeWidth=2;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="2900" y="2330" width="280" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="ext-anon" value="Anonymizer&#10;[External Service]&#10;&#10;Removes PII from raw samples. Reads gse-raw, writes gse-anonymized" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#52525B;strokeColor=#27272A;fontColor=#ffffff;fontSize=13;align=center;verticalAlign=middle;dashed=1;dashPattern=8 4;strokeWidth=2;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="2300" y="2330" width="280" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="ext-llm" value="LLM Process Queue&#10;[External Service]&#10;&#10;Reads anonymized samples, generates final classification labels" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#52525B;strokeColor=#27272A;fontColor=#ffffff;fontSize=13;align=center;verticalAlign=middle;dashed=1;dashPattern=8 4;strokeWidth=2;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="5500" y="2330" width="280" height="200" as="geometry" />
+        </mxCell>
+
+        <!-- ============ LEGEND ============ -->
+        <mxCell id="bg-legend" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2600" width="6720" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="bg-legend-title" value="LEYENDA" style="text;html=1;strokeColor=none;fillColor=#94A3B8;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#ffffff;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2600" width="6720" height="34" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg-cat-label" value="Componentes AWS (color por categoría)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="80" y="2650" width="500" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-lambda" value="AWS Lambda (Compute)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ED7100;strokeColor=none;fontColor=#ffffff;fontSize=13;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="2690" width="260" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-s3" value="Amazon S3 (Storage)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7AA116;strokeColor=none;fontColor=#ffffff;fontSize=13;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="2690" width="260" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-ddb" value="DynamoDB (Database)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#4D72F3;strokeColor=none;fontColor=#ffffff;fontSize=13;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="640" y="2690" width="260" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-eb" value="EventBridge / SQS (App Integration)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E7157B;strokeColor=none;fontColor=#ffffff;fontSize=13;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="920" y="2690" width="300" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-analytics" value="EMR / OpenSearch (Analytics)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#8C4FFF;strokeColor=none;fontColor=#ffffff;fontSize=13;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="2690" width="280" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-actor" value="Actor (Software System)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#475569;strokeColor=none;fontColor=#ffffff;fontSize=13;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1540" y="2690" width="260" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-ext-syst" value="External System (black box)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#52525B;strokeColor=#27272A;fontColor=#ffffff;fontSize=13;align=center;fontStyle=1;dashed=1;dashPattern=8 4;" vertex="1" parent="1">
+          <mxGeometry x="1820" y="2690" width="260" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-note" value="Sticky note (explanation)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FBC02D;fontColor=#5D4037;fontSize=13;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="2100" y="2690" width="260" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-circle" value="1-11" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FBBF24;strokeColor=#D97706;fontColor=#78350F;fontSize=14;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="2380" y="2690" width="50" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-circle-label" value="Step number (1-11)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="2440" y="2690" width="200" height="32" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg-arrows-label" value="Tipos de flecha" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="80" y="2740" width="200" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-arr-sync" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#374151;strokeWidth=2.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="80" y="2790" as="sourcePoint" />
+            <mxPoint x="200" y="2790" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-arr-sync-l" value="invocación síncrona (HTTP / GraphQL / S3 PUT)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="210" y="2776" width="380" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-arr-async" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#6B7280;strokeWidth=2;dashed=1;dashPattern=4 4;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="640" y="2790" as="sourcePoint" />
+            <mxPoint x="760" y="2790" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-arr-async-l" value="evento async (S3 event / DDB Stream / SQS)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="770" y="2776" width="380" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-arr-ddb" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#1E40AF;strokeWidth=5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1200" y="2790" as="sourcePoint" />
+            <mxPoint x="1320" y="2790" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-arr-ddb-l" value="escritura al State Machine (conditional DDB write)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#1E40AF;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="2776" width="430" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-arr-pipes" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#E7157B;strokeWidth=3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1820" y="2790" as="sourcePoint" />
+            <mxPoint x="1940" y="2790" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-arr-pipes-l" value="EventBridge Pipes delivery (filtered Stream)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#9D174D;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1950" y="2776" width="400" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- ============ EDGES — actor connections ============ -->
+        <mxCell id="e-win-tree-url" value="POST /v2/tree/init" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="actor-win" target="f1s-tree-url">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-win-s3-comp" value="PUT presigned URL" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="actor-win" target="f1s-s3-comp">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-cloud-s3-decomp" value="PUT direct (IAM role)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="actor-cloud" target="f1s-s3-decomp">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============ EDGES — Fase 1 Scan internal ============ -->
+        <mxCell id="e-1" value="s3 event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6B7280;strokeWidth=2;dashed=1;dashPattern=4 4;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1s-s3-comp" target="f1s-tree-uncomp">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-2" value="PUT" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1s-tree-uncomp" target="f1s-s3-decomp">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-3" value="s3 event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6B7280;strokeWidth=2;dashed=1;dashPattern=4 4;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1s-s3-decomp" target="f1s-emr-trigger">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-4" value="StartJobRun" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1s-emr-trigger" target="f1s-emr">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-5" value="write matches" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1s-emr" target="f1s-s3-crown">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-6" value="s3 event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6B7280;strokeWidth=2;dashed=1;dashPattern=4 4;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1s-s3-crown" target="f1s-indexer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-7" value="bulk index" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1s-indexer" target="f1s-opensearch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Bedrock → EMR -->
+        <mxCell id="e-bedrock-emr" value="keywords.json" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6B7280;strokeWidth=2;dashed=1;dashPattern=4 4;fontSize=12;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="ext-bedrock" target="f1s-emr">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- KEM → indexer -->
+        <mxCell id="e-kem-indexer" value="stations_expected" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="actor-kem" target="f1s-indexer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============ DDB WRITES from FASE 1 ============ -->
+        <mxCell id="e-indexer-ddb" value="create CYCLE + STATION&#10;status: scanning" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E40AF;strokeWidth=5;fontSize=13;fontStyle=1;fontColor=#1E40AF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.2;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1s-indexer" target="sm-ddb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-barrier-ddb" value="status:&#10;stations_complete" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E40AF;strokeWidth=5;fontSize=13;fontStyle=1;fontColor=#1E40AF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.95;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1s-barrier" target="sm-ddb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============ EDGES — Fase 1 Validation ============ -->
+        <mxCell id="e-client-mutation" value="GraphQL mutations" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="actor-client" target="f1v-mutation">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-mutation-os" value="approve/reject/add" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1v-mutation" target="f1s-opensearch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-client-confirm" value="POST /v2/validation/confirm" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="actor-client" target="f1v-confirm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-confirm-s3" value="write manifest" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1v-confirm" target="f1v-s3-manifest">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-confirm-ddb" value="status: confirmed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E40AF;strokeWidth=5;fontSize=13;fontStyle=1;fontColor=#1E40AF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.8;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1v-confirm" target="sm-ddb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============ State Machine internal ============ -->
+        <mxCell id="e-ddb-stream" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4D72F3;strokeWidth=3;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="sm-ddb" target="sm-stream">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-stream-pipes" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E7157B;strokeWidth=3;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="sm-stream" target="sm-pipes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Pipes deliveries -->
+        <mxCell id="e-pipes-barrier" value="STATION# scan complete" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E7157B;strokeWidth=3;fontSize=12;fontColor=#9D174D;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="sm-pipes" target="f1s-barrier">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-pipes-station-status" value="STATION# barrier met" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E7157B;strokeWidth=3;fontSize=12;fontColor=#9D174D;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="sm-pipes" target="f2-station-status">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-pipes-ent-status" value="CYCLE# all stations done" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E7157B;strokeWidth=3;fontSize=12;fontColor=#9D174D;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="sm-pipes" target="f2-enterprise-status">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============ Fase 1 Valid → Fase 2 ============ -->
+        <mxCell id="e-manifest-init" value="s3 event (manifest.json)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6B7280;strokeWidth=2;dashed=1;dashPattern=4 4;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f1v-s3-manifest" target="f2-init">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============ Fase 2 internal ============ -->
+        <mxCell id="e-f2-init-signal" value="notify with payload" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f2-init" target="ext-signal">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-signal-win" value="payload" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6B7280;strokeWidth=2;dashed=1;dashPattern=4 4;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="ext-signal" target="actor-win">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-signal-cloud" value="payload" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6B7280;strokeWidth=2;dashed=1;dashPattern=4 4;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="ext-signal" target="actor-cloud">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-win-raw" value="upload samples" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="actor-win" target="f2-s3-raw">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-cloud-raw" value="upload samples" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="actor-cloud" target="f2-s3-raw">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-raw-reception" value="s3 event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6B7280;strokeWidth=2;dashed=1;dashPattern=4 4;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f2-s3-raw" target="f2-reception">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-win-requestc" value="POST /v2/gse/request-complete" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="actor-win" target="f2-request-complete">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-raw-sqs" value="s3 event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6B7280;strokeWidth=2;dashed=1;dashPattern=4 4;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f2-s3-raw" target="f2-sqs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-sqs-anon" value="message" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f2-sqs" target="ext-anon">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-anon-s3" value="write anonymized" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="ext-anon" target="f2-s3-anon">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-s3anon-notif" value="s3 event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6B7280;strokeWidth=2;dashed=1;dashPattern=4 4;fontSize=12;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f2-s3-anon" target="f2-anon-notif">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============ DDB writes from Fase 2 ============ -->
+        <mxCell id="e-f2init-ddb" value="status: phase2_collecting&#10;create STATIONs (F2)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E40AF;strokeWidth=5;fontSize=13;fontStyle=1;fontColor=#1E40AF;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.05;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f2-init" target="sm-ddb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-f2reception-ddb" value="samples_received++" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E40AF;strokeWidth=5;fontSize=13;fontStyle=1;fontColor=#1E40AF;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f2-reception" target="sm-ddb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-f2requestc-ddb" value="REQUEST: sent" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E40AF;strokeWidth=5;fontSize=13;fontStyle=1;fontColor=#1E40AF;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.45;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f2-request-complete" target="sm-ddb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-f2anonotif-ddb" value="samples_anonymized++" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E40AF;strokeWidth=5;fontSize=13;fontStyle=1;fontColor=#1E40AF;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.65;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f2-anon-notif" target="sm-ddb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-f2station-ddb" value="STATION: complete" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E40AF;strokeWidth=5;fontSize=13;fontStyle=1;fontColor=#1E40AF;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.85;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f2-station-status" target="sm-ddb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-f2enterprise-ddb" value="status: complete + TTL 90d" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E40AF;strokeWidth=5;fontSize=13;fontStyle=1;fontColor=#1E40AF;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.98;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f2-enterprise-status" target="sm-ddb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Fase 2 → LLM -->
+        <mxCell id="e-enterprise-llm" value="notify (cycle complete)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#374151;strokeWidth=2.5;fontSize=12;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="f2-enterprise-status" target="ext-llm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

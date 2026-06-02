@@ -13,7 +13,7 @@ Para cada árbol descomprimido en `decompressed_trees/{ent}/{sta}/{tree}.jsonl`,
 ## 2. Non-goals
 
 - Generación de keywords — responsabilidad del Equipo IA (LLM Bedrock + post-process).
-- Validación humana de matches — `validation-mutation-handler` (KT-17026).
+- Validación humana de matches — `crown-validation-handler` (KT-17026).
 - Búsqueda en contenido de archivos (opera solo sobre `name`, no abre archivos).
 - Filtrar patrones de un solo token o muy genéricos — responsabilidad del generador, no del matcher.
 

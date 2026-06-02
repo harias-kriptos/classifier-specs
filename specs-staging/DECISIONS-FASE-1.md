@@ -35,7 +35,7 @@
 
 **Impacto en infra:** **drop el SNS topic `phase1-ready-for-validation`**.
 - [KT-17011](https://kriptosteam.atlassian.net/browse/KT-17011) (DevOps shared) **simplifica** — queda solo el Secret KEM. No SNS topic.
-- [KT-17025](https://kriptosteam.atlassian.net/browse/KT-17025) Lambda (`phase1-enterprise-barrier`) ya no publica a SNS — solo actualiza `CYCLE.status` en DDB.
+- [KT-17025](https://kriptosteam.atlassian.net/browse/KT-17025) Lambda (`crown-enterprise-barrier`) ya no publica a SNS — solo actualiza `CYCLE.status` en DDB.
 
 ### D12 — Estados del CYCLE renombrados (más descriptivos)
 
@@ -50,7 +50,7 @@
 
 Validación está permitida en `scanning` y `stations_complete`. Confirm solo en `stations_complete`.
 
-### D13 — Invocación de validation-mutation-handler: AppSync resolver
+### D13 — Invocación de crown-validation-handler: AppSync resolver
 
 [KT-17026](https://kriptosteam.atlassian.net/browse/KT-17026) se invoca como **resolver de AWS AppSync** (no API Gateway, no Lambda direct invoke).
 

@@ -1,8 +1,8 @@
-# Spec — phase1-enterprise-barrier
+# Spec — crown-enterprise-barrier
 
 > Ticket: [KT-17025](https://kriptosteam.atlassian.net/browse/KT-17025)
 > Status: accepted (Fase 1 cerrada 2026-05-23)
-> Repo destino futuro: `kriptos-io/phase1-enterprise-barrier`
+> Repo destino futuro: `kriptos-io/crown-enterprise-barrier`
 
 ---
 
@@ -129,10 +129,10 @@ No hay surface externa — Lambda interna que solo escribe DDB.
 
 ## 12. Rollout
 
-- Branch: `KT-17025-phase1-enterprise-barrier`
+- Branch: `KT-17025-crown-enterprise-barrier`
 - Spec commit + TDD commits
 - Quality gates verdes
-- PR a `main` con `Implements specs/001-phase1-enterprise-barrier.md`
+- PR a `main` con `Implements specs/001-crown-enterprise-barrier.md`
 - Deploy via reusable workflow
 
 **Bloqueantes de deploy:** [KT-17013](https://kriptosteam.atlassian.net/browse/KT-17013) (Lambda + EventBridge Pipe + IAM) + [KT-17009](https://kriptosteam.atlassian.net/browse/KT-17009) (DDB con Stream). Ya NO depende de [KT-17011](https://kriptosteam.atlassian.net/browse/KT-17011) SNS porque se eliminó.

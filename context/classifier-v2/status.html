@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Implementation Status — Classifier v2</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --soft: #64748b;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+  --done: #16a34a;
+  --warning: #f59e0b;
+  --pending: #94a3b8;
+  --f1: #2563eb;
+  --f2: #be185d;
+  --sm: #d97706;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  padding: 40px 24px;
+}
+.container { max-width: 1280px; margin: 0 auto; }
+
+.hero {
+  text-align: center;
+  padding: 32px 24px;
+  margin-bottom: 32px;
+}
+.hero .breadcrumb { font-size: 13px; color: var(--soft); margin-bottom: 12px; }
+.hero .breadcrumb a { color: var(--primary); text-decoration: none; }
+.hero h1 {
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+}
+.hero p {
+  font-size: 18px;
+  color: var(--soft);
+  max-width: 720px;
+  margin: 0 auto;
+}
+.hero .date {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 4px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--soft);
+}
+
+/* ============ SUMMARY ============ */
+.summary {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 40px;
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+}
+.summary h2 {
+  font-size: 14px;
+  color: var(--soft);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.summary .big-num {
+  text-align: center;
+  font-size: 80px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+  letter-spacing: -2px;
+  margin-bottom: 8px;
+}
+.summary .big-num span { color: var(--soft); font-size: 48px; }
+.summary .sub-num {
+  text-align: center;
+  color: var(--soft);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+.summary .progress {
+  max-width: 700px;
+  margin: 0 auto;
+  height: 16px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+}
+.summary .progress div {
+  height: 100%;
+}
+.summary .seg-done { background: var(--done); }
+.summary .seg-wip { background: var(--warning); }
+.summary .seg-pending { background: var(--pending); }
+
+.summary .legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.legend-item .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.legend-item .num {
+  font-weight: 700;
+  color: var(--text);
+}
+.legend-item .lbl { color: var(--soft); }
+
+/* ============ CATEGORIES ============ */
+.categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.cat-card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--soft);
+}
+.cat-card.done { border-top-color: var(--done); }
+.cat-card.wip { border-top-color: var(--warning); }
+.cat-card.pending { border-top-color: var(--pending); }
+
+.cat-card .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+.cat-card .title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.cat-card .count {
+  font-size: 32px;
+  font-weight: 800;
+}
+.cat-card.done .count { color: var(--done); }
+.cat-card.wip .count { color: var(--warning); }
+.cat-card.pending .count { color: var(--pending); }
+
+.cat-card .desc {
+  font-size: 12px;
+  color: var(--soft);
+  line-height: 1.5;
+}
+
+/* ============ DETAIL TABLE ============ */
+.detail-section {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+}
+.detail-section h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.detail-section h2 .tag {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--f1);
+  color: white;
+  font-weight: 600;
+}
+.detail-section h2 .tag.f2 { background: var(--f2); }
+.detail-section h2 .tag.shared { background: var(--sm); }
+.detail-section .sub {
+  font-size: 14px;
+  color: var(--soft);
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead { background: #f8fafc; }
+th {
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--soft);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafbfc; }
+
+.lambda-name {
+  font-family: "SF Mono", Monaco, monospace;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ticket-id {
+  font-family: "SF Mono", Monaco, monospace;
+  font-size: 11px;
+  color: var(--soft);
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.status-badge.done { background: #d4f5d8; color: #14532d; }
+.status-badge.wip { background: #fef3c7; color: #78350f; }
+.status-badge.pending { background: #f1f5f9; color: #475569; }
+.status-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.status-badge.done .dot { background: var(--done); }
+.status-badge.wip .dot { background: var(--warning); }
+.status-badge.pending .dot { background: var(--pending); }
+
+/* ============ MILESTONES ============ */
+.milestones-section {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+}
+.milestones-section h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.milestones-section .sub {
+  font-size: 14px;
+  color: var(--soft);
+  margin-bottom: 20px;
+}
+.milestones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.ms-card {
+  padding: 18px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border-left: 4px solid var(--primary);
+}
+.ms-card.wip { border-left-color: var(--warning); background: #fffbeb; }
+.ms-card .num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.ms-card.wip .num { color: var(--warning); }
+.ms-card .title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.ms-card .items {
+  font-size: 12px;
+  color: var(--soft);
+  line-height: 1.6;
+}
+
+/* ============ NOTES ============ */
+.notes-box {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-left: 6px solid var(--primary);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+.notes-box strong { color: #1e3a8a; }
+.notes-box code {
+  background: white;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", Monaco, monospace;
+  font-size: 12px;
+  border: 1px solid #bfdbfe;
+}
+
+footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--soft);
+  font-size: 13px;
+}
+footer a {
+  color: var(--primary);
+  text-decoration: none;
+  margin: 0 8px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="breadcrumb">← <a href="dashboard.html">Dashboard</a> · <a href="devops-reunion.html">Vista DevOps</a></div>
+  <h1>Implementation Status</h1>
+  <p>Source of truth — qué está listo, qué está en desarrollo, qué falta</p>
+  <div class="date">Última actualización: 2026-05-28</div>
+</div>
+
+<!-- ============ SUMMARY ============ -->
+<section class="summary">
+  <h2>Avance del proyecto</h2>
+  <div class="big-num">15<span>/28</span></div>
+  <div class="sub-num">tickets en marcha · 54% activo</div>
+
+  <div class="progress">
+    <div class="seg-done" style="width:18%"></div>
+    <div class="seg-wip" style="width:36%"></div>
+    <div class="seg-pending" style="width:46%"></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <span class="dot" style="background:var(--done)"></span>
+      <span class="num">5</span><span class="lbl">listas (18%)</span>
+    </div>
+    <div class="legend-item">
+      <span class="dot" style="background:var(--warning)"></span>
+      <span class="num">10</span><span class="lbl">en desarrollo (36%)</span>
+    </div>
+    <div class="legend-item">
+      <span class="dot" style="background:var(--pending)"></span>
+      <span class="num">13</span><span class="lbl">pendientes (46%)</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CATEGORIES ============ -->
+<div class="categories">
+
+  <div class="cat-card done">
+    <div class="header">
+      <div class="title">Dev — Listos</div>
+      <div class="count">5</div>
+    </div>
+    <div class="desc">4 Lambdas Fase 1 Scan (legacy, en producción) + Documentación maestra (KT-17135)</div>
+  </div>
+
+  <div class="cat-card wip">
+    <div class="header">
+      <div class="title">Dev + Infra — En desarrollo</div>
+      <div class="count">10</div>
+    </div>
+    <div class="desc">4 Lambdas validación (finalizan mañana) + 6 ítems infra Fase 1 (DDB, ECR, S3, EMR, OpenSearch, EB Pipes)</div>
+  </div>
+
+  <div class="cat-card pending">
+    <div class="header">
+      <div class="title">Fase 2 — Pendiente</div>
+      <div class="count">13</div>
+    </div>
+    <div class="desc">6 Lambdas GSE + 6 infra Fase 2 (gse-raw, SQS, SNS, etc.) + 1 cleanup repos legacy</div>
+  </div>
+
+</div>
+
+<!-- ============ DETAIL: SCAN-MATCH MONOREPO ============ -->
+<section class="detail-section">
+  <h2><span class="tag">Monorepo 1</span> classifier-scan-match-backend</h2>
+  <div class="sub">KT-17034 · 8 Lambdas · 4 listas + 4 en desarrollo</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:50%">Lambda</th>
+        <th>Ticket</th>
+        <th>Estado</th>
+        <th>Detalle</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="lambda-name">tree-url-generator</span></td>
+        <td><span class="ticket-id">KT-17001</span></td>
+        <td><span class="status-badge done"><span class="dot"></span>Listo</span></td>
+        <td>Funcional en repo legacy</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">tree-uncompressor</span></td>
+        <td><span class="ticket-id">KT-17002</span></td>
+        <td><span class="status-badge done"><span class="dot"></span>Listo</span></td>
+        <td>Funcional en repo legacy</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">emr-job-trigger</span></td>
+        <td><span class="ticket-id">KT-17003</span></td>
+        <td><span class="status-badge done"><span class="dot"></span>Listo</span></td>
+        <td>Funcional en repo legacy</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">joyas-priorizer</span></td>
+        <td><span class="ticket-id">KT-17004</span></td>
+        <td><span class="status-badge done"><span class="dot"></span>Listo</span></td>
+        <td>EMR Spark script</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">crown-candidates-indexer</span></td>
+        <td><span class="ticket-id">KT-17005</span></td>
+        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+        <td>Finaliza 2026-05-29</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">crown-enterprise-barrier</span></td>
+        <td><span class="ticket-id">KT-17006</span></td>
+        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+        <td>Finaliza 2026-05-29</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">crown-validation-handler</span></td>
+        <td><span class="ticket-id">KT-17024</span></td>
+        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+        <td>Finaliza 2026-05-29</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">crown-validation-confirm</span></td>
+        <td><span class="ticket-id">KT-17025</span></td>
+        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+        <td>Finaliza 2026-05-29</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ DETAIL: GSE MONOREPO ============ -->
+<section class="detail-section">
+  <h2><span class="tag f2">Monorepo 2</span> classifier-gse-backend</h2>
+  <div class="sub">KT-17134 · 6 Lambdas · todas en spec</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:50%">Lambda</th>
+        <th>Ticket</th>
+        <th>Estado</th>
+        <th>Detalle</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="lambda-name">gse-cycle-init</span></td>
+        <td><span class="ticket-id">KT-17028</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>Spec</span></td>
+        <td>Materialize STATIONs + notify Signal</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">gse-sample-reception-notifier</span></td>
+        <td><span class="ticket-id">KT-17029</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>Spec</span></td>
+        <td>Count samples_received</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">gse-request-complete</span></td>
+        <td><span class="ticket-id">KT-17030</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>Spec</span></td>
+        <td>API endpoint Agent → I'm done</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">gse-sample-anonymizer-notifier</span></td>
+        <td><span class="ticket-id">KT-17031</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>Spec</span></td>
+        <td>Count samples_anonymized</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">gse-station-status</span></td>
+        <td><span class="ticket-id">KT-17032</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>Spec</span></td>
+        <td>Barrier per STATION</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">gse-enterprise-status</span></td>
+        <td><span class="ticket-id">KT-17033</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>Spec</span></td>
+        <td>Close CYCLE → notify LLM</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ INFRA ============ -->
+<section class="detail-section">
+  <h2><span class="tag shared">Infra</span> CloudFormation por fase</h2>
+  <div class="sub">Sin Terraform · todo IaC en carpeta <code style="background:#f1f5f9;padding:1px 6px;border-radius:3px;font-family:'SF Mono',monospace;font-size:12px">cloudformation/</code> de cada monorepo</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:55%">Recurso</th>
+        <th>Fase</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="lambda-name">DynamoDB classifier-cycles-state + Stream</span></td>
+        <td>Compartido</td>
+        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">ECR + IAM Lambda execution role</span></td>
+        <td>Compartido</td>
+        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">S3 buckets Fase 1 (compressed, decompressed, crown_jewels, validated)</span></td>
+        <td>Fase 1</td>
+        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">EMR Serverless app + IAM</span></td>
+        <td>Fase 1</td>
+        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">OpenSearch index crown_jewel_candidates</span></td>
+        <td>Fase 1</td>
+        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">EventBridge Pipes (DDB Stream filter)</span></td>
+        <td>Fase 1</td>
+        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">S3 buckets Fase 2 (gse-raw, gse-anonymized)</span></td>
+        <td>Fase 2</td>
+        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">SQS queues + DLQs (reception, anonymizer)</span></td>
+        <td>Fase 2</td>
+        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">SNS Signal Handler integration</span></td>
+        <td>Fase 2</td>
+        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">EventBridge Pipes Fase 2</span></td>
+        <td>Fase 2</td>
+        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">API Gateway /v2/gse/request-complete</span></td>
+        <td>Fase 2</td>
+        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">CloudWatch + SNS kriptos-backend-alerts</span></td>
+        <td>Compartido</td>
+        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">VPC + Secrets Manager (KEM API key)</span></td>
+        <td>Compartido</td>
+        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ NOTES ============ -->
+<div class="notes-box">
+  <strong>Decisión de stack:</strong> Python 3.11 · Lambda Container Image · ECR · <code>CloudFormation</code> (no Terraform) · pytest · ruff · mypy. Cada monorepo tiene su propio ECR + IAM + CloudFormation templates en carpeta <code>cloudformation/</code>.
+</div>
+
+<!-- ============ MILESTONES ============ -->
+<section class="milestones-section">
+  <h2>📅 Hitos siguientes</h2>
+  <div class="sub">Orden sugerido · cada hito desbloquea al siguiente</div>
+
+  <div class="milestones-grid">
+    <div class="ms-card wip">
+      <div class="num">Hito 1 — En curso</div>
+      <div class="title">Foundation</div>
+      <div class="items">
+        DDB + ECR + monorepo scan-match-backend. Migrar las 4 Lambdas legacy. Validar las 4 Lambdas en desarrollo.
+      </div>
+    </div>
+    <div class="ms-card">
+      <div class="num">Hito 2</div>
+      <div class="title">Fase 1 completa</div>
+      <div class="items">
+        OpenSearch + EMR + API GW + AppSync + EventBridge Pipes integrados. CYCLE puede llegar a 'confirmed'.
+      </div>
+    </div>
+    <div class="ms-card">
+      <div class="num">Hito 3</div>
+      <div class="title">Fase 2 GSE</div>
+      <div class="items">
+        Monorepo gse-backend + 6 Lambdas + Signal Handler + Anonymizer + LLM. End-to-end completo.
+      </div>
+    </div>
+    <div class="ms-card">
+      <div class="num">Hito 4</div>
+      <div class="title">Cleanup final</div>
+      <div class="items">
+        Archivar 4 repos legacy (KT-17133). Monorepos como única source of truth.
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a href="dashboard.html">← Dashboard</a>
+  <a href="devops-reunion.html">Vista DevOps</a>
+  <a href="STATUS.md">📄 STATUS.md (markdown)</a>
+  <a href="architecture-global.drawio" download>⬇ Diagrama</a>
+  <br><br>
+  classifier-specs · 2026-05-28
+</footer>
+
+</div>
+</body>
+</html>

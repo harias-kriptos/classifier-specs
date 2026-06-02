@@ -11,8 +11,8 @@
 - **Auth**: Cognito o IAM (decisión Plataforma Web).
 - **Data sources**:
   - **OpenSearch** domain — para queries de candidatos (sin Lambda intermedio).
-  - **Lambda** `lambda-validation-mutation-handler` ([KT-17026](https://kriptosteam.atlassian.net/browse/KT-17026)) — para mutations `validateCandidateGroup`, `overrideCandidate`, `addExtraPath`.
-  - **Lambda** `lambda-validation-confirm` ([KT-17027](https://kriptosteam.atlassian.net/browse/KT-17027)) — para mutation `confirmValidation`.
+  - **Lambda** `lambda-crown-validation-handler` ([KT-17026](https://kriptosteam.atlassian.net/browse/KT-17026)) — para mutations `validateCandidateGroup`, `overrideCandidate`, `addExtraPath`.
+  - **Lambda** `lambda-crown-validation-confirm` ([KT-17027](https://kriptosteam.atlassian.net/browse/KT-17027)) — para mutation `confirmValidation`.
   - **DynamoDB** `classifier-cycles-state` — para query `cycleProgress`.
 
 ---
@@ -171,7 +171,7 @@ type Query {
 type Mutation {
   """
   Bulk approve/reject sobre todos los docs que matchean el criterio.
-  Resolver: Lambda lambda-validation-mutation-handler.
+  Resolver: Lambda lambda-crown-validation-handler.
   Restricción: solo permitido si CYCLE.status ∈ {scanning, stations_complete}.
   """
   validateCandidateGroup(
@@ -184,7 +184,7 @@ type Mutation {
 
   """
   Override individual sobre la decisión grupal.
-  Resolver: Lambda lambda-validation-mutation-handler.
+  Resolver: Lambda lambda-crown-validation-handler.
   """
   overrideCandidate(
     candidate_id: ID!
@@ -194,7 +194,7 @@ type Mutation {
 
   """
   Agrega un path manual que el match automático no detectó.
-  Resolver: Lambda lambda-validation-mutation-handler.
+  Resolver: Lambda lambda-crown-validation-handler.
   Valida path contra path traversal (rechaza `..`, null bytes, no-UTF8).
   """
   addExtraPath(
@@ -207,7 +207,7 @@ type Mutation {
 
   """
   Confirmación final del cliente. Triggers Fase 2.
-  Resolver: Lambda lambda-validation-confirm.
+  Resolver: Lambda lambda-crown-validation-confirm.
   Restricción: solo permitido si CYCLE.status = stations_complete.
   Idempotente: segundo call retorna 409.
   """

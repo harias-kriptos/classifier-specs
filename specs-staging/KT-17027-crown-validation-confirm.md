@@ -1,8 +1,8 @@
-# Spec — validation-confirm
+# Spec — crown-validation-confirm
 
 > Ticket: [KT-17027](https://kriptosteam.atlassian.net/browse/KT-17027)
 > Status: accepted (Fase 1 cerrada 2026-05-23)
-> Repo destino futuro: `kriptos-io/validation-confirm`
+> Repo destino futuro: `kriptos-io/crown-validation-confirm`
 
 ---
 
@@ -176,10 +176,10 @@ Ninguna específica.
 
 ## 12. Rollout
 
-- Branch: `KT-17027-validation-confirm`
+- Branch: `KT-17027-crown-validation-confirm`
 - Spec commit + TDD commits (incluyendo perf test de 50k+ files)
 - Quality gates verdes
-- PR a `main` con `Implements specs/001-validation-confirm.md`
+- PR a `main` con `Implements specs/001-crown-validation-confirm.md`
 - Deploy via reusable workflow
 
 **Bloqueantes de deploy:** [KT-17015](https://kriptosteam.atlassian.net/browse/KT-17015) (Lambda + bucket validated + SQS FIFO + AppSync resolver) + [KT-17009](https://kriptosteam.atlassian.net/browse/KT-17009) (DDB) + [KT-17010](https://kriptosteam.atlassian.net/browse/KT-17010) (OS index) + AppSync schema configurado por Plataforma Web.

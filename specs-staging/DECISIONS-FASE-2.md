@@ -13,7 +13,7 @@
 | D17 | KT-17028 — Modelo de STATION row entre Fase 1 y Fase 2 | **UPDATE la misma STATION row, agregar atributos de Fase 2**. Mismo `SK=STATION#{sta}#{cycle}`. La STATION es la unidad atómica de trabajo a través de TODO el pipeline; no se duplica. |
 | D18 | KT-17028 — Re-consulta KEM en Fase 2 | **No re-consulta**. La info de stations viene del manifest (lo que el cliente confirmó). Si stations cambiaron entre Fase 1 y Fase 2, eso afecta al próximo cycle, no a éste. |
 | D19 | KT-17032 / KT-17009 — Counters y sub-estados | **NO tocar Fase 1**. Agregar nuevos campos a STATION/CYCLE para Fase 2:<br>• `STATION.sampling_status`: sub-estados `requested → uploading → sample_recolected → sample_anonymized`<br>• `STATION.samples_expected, samples_received, samples_anonymized, samples_skipped`: counters Fase 2<br>• `CYCLE.stations_sample_anonymized`: NEW counter para barrier Fase 2.<br>`CYCLE.stations_completed` y `STATION.scan_status` quedan intactos (Fase 1). |
-| D20 | KT-17025 / KT-17032 — Filter del Pipe (state lambdas) | **Filter por atributo** en el Pipe pattern:<br>• KT-17025 (phase1-enterprise-barrier): filter `NewImage.scan_status = "complete"`.<br>• KT-17032 (gse-station-status): filter `NewImage.sampling_status exists`.<br>Cada Lambda solo ve eventos de su fase. Menos invocaciones desperdiciadas. |
+| D20 | KT-17025 / KT-17032 — Filter del Pipe (state lambdas) | **Filter por atributo** en el Pipe pattern:<br>• KT-17025 (crown-enterprise-barrier): filter `NewImage.scan_status = "complete"`.<br>• KT-17032 (gse-station-status): filter `NewImage.sampling_status exists`.<br>Cada Lambda solo ve eventos de su fase. Menos invocaciones desperdiciadas. |
 | D21 | KT-17033 — Estrategia publish al LLM Process Queue | **Publish-first, set status después**. Si el publish falla → SQS retry del Pipe → eventual DLQ + alarma. **Contrato con Equipo IA: el LLM debe ser idempotente por `cycle_id`** (gestión de duplicados es responsabilidad de ellos, son caja negra). |
 | D22 | KT-17029 — Generación de `sample_id` | **Filename NNN** del archivo (`sample_001.json` → sample_id=`001`). Simple, sin código extra. El path S3 completo (`{ent}/{sta}/{cycle}/{request_type}/sample_NNN.json`) es la fuente de verdad para dedupe. |
 | D23 | Formato de samples en `gse-raw/` | **Samples son `.json` singular** (un sample = un archivo S3, un objeto JSON con chunk + metadata de UN file). NO son `.jsonl`. Trees/keywords/matches sí son `.jsonl` porque tienen múltiples records por archivo. |
@@ -105,7 +105,7 @@ ttl: int
 ### Filters del Pipe (state lambdas)
 
 ```
-# KT-17025 phase1-enterprise-barrier
+# KT-17025 crown-enterprise-barrier
 {
   "eventName": ["INSERT", "MODIFY"],
   "dynamodb": {"NewImage": {

@@ -126,8 +126,8 @@ No aplica.
 
 | STRIDE | Threat | Mitigación |
 |---|---|---|
-| Spoofing | Atacante PUT manifest falso en `validated_crown_jewels` | Bucket con public-access block + IAM solo permite PUT desde `validation-confirm` Lambda. |
-| Tampering | Manifest alterado entre validation-confirm y este Lambda | Manifest contiene `enterprise_id, cycle_id`; conditional UPDATE valida que el cycle existe y está en estado `confirmed`. Si manifest falso → conditional falla. |
+| Spoofing | Atacante PUT manifest falso en `validated_crown_jewels` | Bucket con public-access block + IAM solo permite PUT desde `crown-validation-confirm` Lambda. |
+| Tampering | Manifest alterado entre crown-validation-confirm y este Lambda | Manifest contiene `enterprise_id, cycle_id`; conditional UPDATE valida que el cycle existe y está en estado `confirmed`. Si manifest falso → conditional falla. |
 | DoS | N manifests del mismo enterprise → N invocaciones | SQS FIFO con `MessageGroupId=enterprise_id` serializa por enterprise. |
 | Integrity | UPDATE de STATION sobreescribe Fase 1 fields por error | Test `test_station_phase1_fields_preserved` + UpdateExpression solo SET de campos Fase 2, nunca de campos Fase 1. |
 

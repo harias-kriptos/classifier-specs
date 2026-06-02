@@ -35,9 +35,9 @@
 | Ticket | Slug | Status spec | Notas |
 |---|---|---|---|
 | [KT-17024](https://kriptosteam.atlassian.net/browse/KT-17024) | [`KT-17024-crown-candidates-indexer.md`](KT-17024-crown-candidates-indexer.md) | draft | Bulk index OS + STATION en DDB |
-| [KT-17025](https://kriptosteam.atlassian.net/browse/KT-17025) | [`KT-17025-phase1-enterprise-barrier.md`](KT-17025-phase1-enterprise-barrier.md) | draft | State lambda — exactly-once barrier |
-| [KT-17026](https://kriptosteam.atlassian.net/browse/KT-17026) | [`KT-17026-validation-mutation-handler.md`](KT-17026-validation-mutation-handler.md) | draft | GraphQL mutations — approve/reject/add |
-| [KT-17027](https://kriptosteam.atlassian.net/browse/KT-17027) | [`KT-17027-validation-confirm.md`](KT-17027-validation-confirm.md) | draft | Scroll OS + manifest + bridge a Fase 2 |
+| [KT-17025](https://kriptosteam.atlassian.net/browse/KT-17025) | [`KT-17025-crown-enterprise-barrier.md`](KT-17025-crown-enterprise-barrier.md) | draft | State lambda — exactly-once barrier |
+| [KT-17026](https://kriptosteam.atlassian.net/browse/KT-17026) | [`KT-17026-crown-validation-handler.md`](KT-17026-crown-validation-handler.md) | draft | GraphQL mutations — approve/reject/add |
+| [KT-17027](https://kriptosteam.atlassian.net/browse/KT-17027) | [`KT-17027-crown-validation-confirm.md`](KT-17027-crown-validation-confirm.md) | draft | Scroll OS + manifest + bridge a Fase 2 |
 
 ### Fase 2 — GSE
 

@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kriptos | Base Genérica para Proyectos - Guía de Implementación</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: #1a1a2e;
+            color: white;
+            padding: 30px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+        }
+
+        .sidebar-logo {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid #444;
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+        }
+
+        .sidebar nav li {
+            margin: 0;
+        }
+
+        .sidebar nav a {
+            display: block;
+            padding: 12px 20px;
+            color: #ccc;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            border-left-color: #667eea;
+        }
+
+        .sidebar nav .section-title {
+            padding: 15px 20px 8px;
+            color: #999;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 15px;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px 50px;
+            background: white;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* HEADER */
+        .section-header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #1a1a2e;
+            margin: 30px 0 20px;
+            padding-top: 20px;
+        }
+
+        h3 {
+            font-size: 18px;
+            color: #333;
+            margin: 20px 0 15px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* CONTENT */
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        /* TABLES */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        thead {
+            background: #667eea;
+            color: white;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        /* CODE */
+        pre {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+        }
+
+        /* FLOWCHART */
+        .flowchart {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .flowchart-step {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 150px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .flowchart-arrow {
+            font-size: 28px;
+            color: #667eea;
+            margin: 0 10px;
+        }
+
+        /* CHECKLIST */
+        .checklist {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checklist label {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* DIRECTORY TREE */
+        .tree {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            margin: 20px 0;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .tree-item {
+            padding: 3px 0;
+            color: #333;
+            word-break: break-word;
+        }
+
+        .tree-level-1 { padding-left: 0px; }
+        .tree-level-2 { padding-left: 20px; }
+        .tree-level-3 { padding-left: 40px; }
+        .tree-level-4 { padding-left: 60px; }
+
+        .tree-folder {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .tree-file {
+            color: #555;
+        }
+
+        .tree-badge {
+            display: inline-block;
+            margin-left: 8px;
+            font-size: 11px;
+        }
+
+        /* BUTTONS */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb {
+            margin-bottom: 20px;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 220px;
+            }
+            .main {
+                margin-left: 220px;
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 20px;
+            }
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .flowchart {
+                flex-direction: column;
+            }
+            .flowchart-arrow {
+                transform: rotate(90deg);
+            }
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 40px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .badge-new {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .badge-reuse {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        .badge-adapt {
+            background: #ffa502;
+            color: white;
+        }
+
+        .badge-phase {
+            background: #667eea;
+            color: white;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">🚀 Kriptos Base</div>
+            <nav>
+                <div class="section-title">Inicio</div>
+                <ul>
+                    <li><a href="#" onclick="showSection('intro')" class="nav-link active">Introducción</a></li>
+                    <li><a href="#" onclick="showSection('vision')" class="nav-link">Visión General</a></li>
+                </ul>
+
+                <div class="section-title">Implementación</div>
+                <ul>
+                    <li><a href="#" onclick="showSection('estructura')" class="nav-link">1. Estructura del Repo</a></li>
+                    <li><a href="#" onclick="showSection('reutilizar')" class="nav-link">2. Qué Reutilizar</a></li>
+                    <li><a href="#" onclick="showSection('adaptar')" class="nav-link">3. Qué Adaptar</a></li>
+                    <li><a href="#" onclick="showSection('crear')" class="nav-link">4. Qué Crear</a></li>
+                    <li><a href="#" onclick="showSection('provision')" class="nav-link">5. Provisión (Fase 1)</a></li>
+                </ul>
+
+                <div class="section-title">Flujos</div>
+                <ul>
+                    <li><a href="#" onclick="showSection('discovery')" class="nav-link">6. Discovery (Fase 2)</a></li>
+                    <li><a href="#" onclick="showSection('specs')" class="nav-link">7. Specs (Fase 3)</a></li>
+                    <li><a href="#" onclick="showSection('contexto')" class="nav-link">8. Contexto Vivo (Fase 4)</a></li>
+                </ul>
+
+                <div class="section-title">Configuración</div>
+                <ul>
+                    <li><a href="#" onclick="showSection('mcps')" class="nav-link">9. MCPs</a></li>
+                    <li><a href="#" onclick="showSection('comandos')" class="nav-link">10. Comandos</a></li>
+                    <li><a href="#" onclick="showSection('checklist')" class="nav-link">✓ Checklist</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main">
+
+            <!-- INTRO -->
+            <section id="intro" class="section active">
+                <div class="section-header">
+                    <h1>🚀 Kriptos Base Genérica</h1>
+                    <p class="subtitle">Guía de Implementación para Cualquier Proyecto</p>
+                </div>
+
+                <p>Este documento explica cómo armar una <strong>base genérica reutilizable</strong> que funcione para <strong>cualquier proyecto</strong> en Kriptos, no solo el clasificador.</p>
+
+                <div class="success-box">
+                    <strong>Objetivo:</strong> Una estructura de repo + workflow que hereden todos los proyectos nuevos, con skills, roles, configuración y MCPs listos para usar.
+                </div>
+
+                <h2>¿Por qué necesitamos una base genérica?</h2>
+                <p>Actualmente el equipo tiene:</p>
+                <ul style="margin: 15px 0 15px 20px;">
+                    <li><code>classifier-specs</code> — POC que funciona para el clasificador</li>
+                    <li><code>kriptos-engineering-standards</code> — Template base de Cris</li>
+                    <li>5 Skills + Roles + Templates + Reglas dispersas</li>
+                </ul>
+
+                <p>El problema: cada proyecto nuevo tiene que rearmar esto. La solución: <strong>un repo base que se copie y adapte</strong>.</p>
+
+                <h2>Resultado esperado</h2>
+                <p>Cuando un proyecto nuevo comience:</p>
+                <ol style="margin: 15px 0 15px 20px;">
+                    <li>DevOps clona el template</li>
+                    <li>Copia skills, roles, templates (reutilización directa)</li>
+                    <li>Adapta CLAUDE.md y estructura de carpetas</li>
+                    <li>Configura MCPs</li>
+                    <li>Equipo entra en Discovery (Fase 2a)</li>
+                </ol>
+
+                <div class="highlight">
+                    <strong>⏱️ Tiempo ahorrado:</strong> En lugar de 2-3 horas armando estructura, 30 minutos clonando y adaptando.
+                </div>
+
+                <button class="btn-primary" onclick="showSection('vision')">➜ Ver visión general</button>
+            </section>
+
+            <!-- VISION GENERAL -->
+            <section id="vision" class="section">
+                <div class="section-header">
+                    <h1>Visión General del Flujo</h1>
+                </div>
+
+                <h2>Las 4 Fases</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fase</th>
+                            <th>Dónde</th>
+                            <th>Quién</th>
+                            <th>Output</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-phase">1</span></td>
+                            <td><strong>Provisionar Monorepo</strong></td>
+                            <td>GitHub</td>
+                            <td>DevOps</td>
+                            <td>Repo con .claude, skills, docs/context</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-phase">2</span></td>
+                            <td><strong>Discovery + Contexto</strong></td>
+                            <td>Claude Web Project</td>
+                            <td>PM, Arquitecto, Dev</td>
+                            <td>Decisiones, arquitectura, integraciones</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-phase">3</span></td>
+                            <td><strong>Specs → TDD → Review</strong></td>
+                            <td>Claude Web + Claude Code (híbrido)</td>
+                            <td>PM, Arch, Dev + Agente</td>
+                            <td>Features megeadas</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-phase">4</span></td>
+                            <td><strong>Mantenimiento Contexto</strong></td>
+                            <td>Claude Code (cada PR)</td>
+                            <td>Agente + Dev</td>
+                            <td>docs/context siempre alimentándose</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight">
+                    <strong>⚠️ Importante:</strong> Las skills <strong>01 (Brainstorm)</strong> y <strong>02 (Spec + Threat Model)</strong> viven en <strong>Claude Web</strong>, no en Claude Code. Pero Claude Web tiene <strong>GitHub MCP</strong>, lo que le permite afectar al repo del producto (crear ramas, hacer commits con brainstorms y specs basados en templates).
+                </div>
+
+                <h2>Flujo de 5 Skills (Fase 3)</h2>
+                <div class="flowchart">
+                    <div class="flowchart-step" style="background:linear-gradient(135deg,#f6d365 0%,#fda085 100%)">1️⃣ Brainstorm<br>(PM role)<br><small>Claude Web</small></div>
+                    <div class="flowchart-arrow">→</div>
+                    <div class="flowchart-step" style="background:linear-gradient(135deg,#f6d365 0%,#fda085 100%)">2️⃣ Spec + Threat<br>(Architect)<br><small>Claude Web</small></div>
+                    <div class="flowchart-arrow">→</div>
+                    <div class="flowchart-step">3️⃣ Plan<br>(Tech Lead)<br><small>Web o Code</small></div>
+                    <div class="flowchart-arrow">→</div>
+                    <div class="flowchart-step" style="background:linear-gradient(135deg,#43cea2 0%,#185a9d 100%)">4️⃣ TDD<br>(Developer)<br><small>Claude Code</small></div>
+                    <div class="flowchart-arrow">→</div>
+                    <div class="flowchart-step" style="background:linear-gradient(135deg,#43cea2 0%,#185a9d 100%)">5️⃣ Review<br>(Reviewer)<br><small>Code + CI</small></div>
+                </div>
+
+                <div class="grid-2" style="margin-top: 20px;">
+                    <div style="background:#fff3cd; padding:15px; border-radius:8px; border-left:4px solid #fda085;">
+                        <strong>🌐 Claude Web (Skills 1-2)</strong><br>
+                        <small>Colaborativo. PM + Arquitecto + Dev definen. Claude Web tiene GitHub MCP → puede crear ramas y commits en el repo del producto usando templates.</small>
+                    </div>
+                    <div style="background:#e0f7fa; padding:15px; border-radius:8px; border-left:4px solid #43cea2;">
+                        <strong>💻 Claude Code (Skills 4-5)</strong><br>
+                        <small>Local del Dev. Implementa código, corre tests, abre PRs. Skill 3 (Plan) puede ocurrir en cualquiera de los dos.</small>
+                    </div>
+                </div>
+
+                <p style="margin-top: 20px;"><strong>Cada skill es un archivo markdown</strong> que el agente lee antes de actuar. Define:</p>
+                <ul style="margin: 15px 0 15px 20px;">
+                    <li>Qué rol actúa</li>
+                    <li>Qué inputs necesita</li>
+                    <li>Qué outputs genera</li>
+                    <li>Qué contexto leer</li>
+                </ul>
+
+                <button class="btn-primary" onclick="showSection('estructura')">➜ Ver estructura del repo</button>
+            </section>
+
+            <!-- ESTRUCTURA -->
+            <section id="estructura" class="section">
+                <div class="section-header">
+                    <h1>1. Estructura del Repo (Genérica)</h1>
+                    <p class="subtitle">Esta estructura sirve para CUALQUIER proyecto</p>
+                </div>
+
+                <div class="tree">
+                    <div class="tree-item tree-level-1"><span class="tree-folder">📁 proyecto-nuevo/</span></div>
+
+                    <div class="tree-item tree-level-2"><span class="tree-folder">📁 .claude/</span> <span class="tree-badge badge badge-new">NUEVO</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">📄 settings.json</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-folder">📁 commands/</span></div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">brainstorm.md</span></div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">spec.md</span></div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">plan.md</span></div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">implement.md</span></div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">review.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-folder">📁 worktrees/</span> <span class="tree-badge badge badge-new">NUEVO</span></div>
+
+                    <div class="tree-item tree-level-2"><span class="tree-folder">📁 docs/</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-folder">📁 context/</span> <span class="tree-badge badge badge-new">NUEVO</span></div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">README.md</span> (qué resuelve, servicios, flujos)</div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">architecture.md</span> (decisiones, integraciones)</div>
+                    <div class="tree-item tree-level-4"><span class="tree-folder">📁 services/</span> (uno por servicio)</div>
+                    <div class="tree-item tree-level-3"><span class="tree-folder">📁 adr/</span> <span class="tree-badge badge badge-new">NUEVO</span></div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">NNNN-kebab-title.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-folder">📁 implementation/</span> <span class="tree-badge badge badge-new">NUEVO</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-folder">📁 references/</span> (PDFs, imágenes, notas)</div>
+
+                    <div class="tree-item tree-level-2"><span class="tree-folder">📁 skills/</span> <span class="tree-badge badge badge-reuse">REUTILIZAR</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">01-brainstorm.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">02-spec-threat-model.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">03-plan.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">04-tdd-implementation.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">05-review-evals.md</span></div>
+
+                    <div class="tree-item tree-level-2"><span class="tree-folder">📁 roles/</span> <span class="tree-badge badge badge-reuse">REUTILIZAR</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">product-manager.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">architect.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">tech-lead.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">developer.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">reviewer.md</span></div>
+
+                    <div class="tree-item tree-level-2"><span class="tree-folder">📁 templates/</span> <span class="tree-badge badge badge-reuse">REUTILIZAR</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">SPEC_TEMPLATE.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">ADR_TEMPLATE.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">PLAN_TEMPLATE.md</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-file">THREAT_MODEL_TEMPLATE.md</span></div>
+
+                    <div class="tree-item tree-level-2"><span class="tree-folder">📁 stacks/</span> <span class="tree-badge badge badge-adapt">ADAPTAR</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-folder">📁 python-lambda/</span> (si es Lambda)</div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">rules.md</span> (convenciones de código)</div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">commits-convention.md</span></div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">pytest.ini</span></div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">ruff.toml</span></div>
+
+                    <div class="tree-item tree-level-2"><span class="tree-folder">📁 context/</span> <span class="tree-badge badge badge-reuse">REUTILIZAR estructura</span></div>
+                    <div class="tree-item tree-level-3"><span class="tree-folder">📁 [proyecto]/</span></div>
+                    <div class="tree-item tree-level-4"><span class="tree-file">ecosystem.md</span> (mapa del sistema)</div>
+
+                    <div class="tree-item tree-level-2"><span class="tree-file">CLAUDE.md</span> <span class="tree-badge badge badge-adapt">ADAPTAR</span></div>
+                    <div class="tree-item tree-level-2"><span class="tree-file">CLAUDE_PROJECT.md</span> <span class="tree-badge badge badge-new">NUEVO</span></div>
+                    <div class="tree-item tree-level-2"><span class="tree-file">README.md</span></div>
+                    <div class="tree-item tree-level-2"><span class="tree-file">.gitignore</span></div>
+                    <div class="tree-item tree-level-2"><span class="tree-file">CONTRIBUTING.md</span> <span class="tree-badge badge badge-new">NUEVO</span></div>
+                </div>
+
+                <h2>¿Qué significa cada carpeta?</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Carpeta</th>
+                            <th>Qué es</th>
+                            <th>Quién la mantiene</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>.claude/</code></td>
+                            <td>Configuración de Claude Code (settings, comandos, worktrees)</td>
+                            <td>DevOps + Tech Lead</td>
+                        </tr>
+                        <tr>
+                            <td><code>skills/</code></td>
+                            <td>Los 5 pasos del pipeline (brainstorm, spec, plan, TDD, review)</td>
+                            <td>Tech Lead (define roles, cambios raros)</td>
+                        </tr>
+                        <tr>
+                            <td><code>roles/</code></td>
+                            <td>Definición de lo que hace cada rol en cada skill</td>
+                            <td>Tech Lead (rara vez cambia)</td>
+                        </tr>
+                        <tr>
+                            <td><code>templates/</code></td>
+                            <td>Plantillas markdown para specs, plans, ADRs, threat models</td>
+                            <td>Tech Lead</td>
+                        </tr>
+                        <tr>
+                            <td><code>stacks/</code></td>
+                            <td>Reglas por tecnología (Python/Lambda, Node/Fargate, etc)</td>
+                            <td>Tech Lead</td>
+                        </tr>
+                        <tr>
+                            <td><code>context/</code></td>
+                            <td>Contexto del ECOSISTEMA (qué es el sistema, servicios, flujos)</td>
+                            <td>Arquitecto + Dev (se alimenta cada PR)</td>
+                        </tr>
+                        <tr>
+                            <td><code>docs/context/</code></td>
+                            <td>Contexto del PROYECTO NUEVO (qué resuelve, AWS, integraciones)</td>
+                            <td>PM + Arquitecto + Dev</td>
+                        </tr>
+                        <tr>
+                            <td><code>docs/adr/</code></td>
+                            <td>Decisiones arquitectónicas (por qué elegimos X)</td>
+                            <td>Arquitecto + Dev</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <button class="btn-primary" onclick="showSection('reutilizar')">➜ Qué reutilizar</button>
+            </section>
+
+            <!-- REUTILIZAR -->
+            <section id="reutilizar" class="section">
+                <div class="section-header">
+                    <h1>2. Qué REUTILIZAR Tal Cual</h1>
+                    <p class="subtitle">Copiar directo, sin cambios</p>
+                </div>
+
+                <div class="success-box">
+                    <strong>Principio:</strong> El flujo de 5 pasos, roles y templates son genéricos. No cambian por proyecto.
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Qué</th>
+                            <th>De dónde</th>
+                            <th>Por qué funciona</th>
+                            <th>Cómo copiar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>skills/01-05*.md</code></td>
+                            <td><code>classifier-specs/skills/</code></td>
+                            <td>El flujo de 5 pasos es genérico para cualquier proyecto</td>
+                            <td><pre>cp -r classifier-specs/skills/ ./</pre></td>
+                        </tr>
+                        <tr>
+                            <td><code>roles/*.md</code></td>
+                            <td><code>classifier-specs/roles/</code></td>
+                            <td>Los roles (PM, Architect, Tech Lead, Dev, Reviewer) no cambian</td>
+                            <td><pre>cp -r classifier-specs/roles/ ./</pre></td>
+                        </tr>
+                        <tr>
+                            <td><code>templates/*.md</code></td>
+                            <td><code>classifier-specs/templates/</code></td>
+                            <td>Misma estructura de SPEC, PLAN, ADR, THREAT_MODEL para todos</td>
+                            <td><pre>cp -r classifier-specs/templates/ ./</pre></td>
+                        </tr>
+                        <tr>
+                            <td><code>stacks/python-lambda/</code></td>
+                            <td><code>classifier-specs/stacks/python-lambda/</code></td>
+                            <td>Si el nuevo proyecto es Python + Lambda, funciona igual</td>
+                            <td><pre>cp -r classifier-specs/stacks/python-lambda/ ./stacks/</pre></td>
+                        </tr>
+                        <tr>
+                            <td>Convenciones de commits</td>
+                            <td>PR en <code>enhancing-agent-capabilities/29</code></td>
+                            <td>Ya validadas por el equipo</td>
+                            <td>Copiar <code>commits-convention.md</code> a <code>stacks/</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>.claude/</code> estructura base</td>
+                            <td><code>kriptos-engineering-standards</code></td>
+                            <td>Cris ya la armó</td>
+                            <td><pre>cp -r kriptos-engineering-standards/.claude/ ./</pre></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Checklist: Cómo copiar</h2>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="check1">
+                        <label for="check1">Clonar <code>classifier-specs</code> como referencia</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="check2">
+                        <label for="check2">Clonar <code>kriptos-engineering-standards</code> como base</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="check3">
+                        <label for="check3"><code>cp -r classifier-specs/skills/ ./</code></label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="check4">
+                        <label for="check4"><code>cp -r classifier-specs/roles/ ./</code></label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="check5">
+                        <label for="check5"><code>cp -r classifier-specs/templates/ ./</code></label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="check6">
+                        <label for="check6"><code>cp -r classifier-specs/stacks/python-lambda/ ./stacks/</code> (si aplica)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="check7">
+                        <label for="check7">Copiar <code>commits-convention.md</code> de PR</label>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong>💡 Tip:</strong> No toques estas carpetas después de copiar. Son la "base inmutable". Si necesitas cambios, propón un PR contra el repo base (classifier-specs o kriptos-engineering-standards) y luego lo propagas a otros proyectos.
+                </div>
+
+                <button class="btn-primary" onclick="showSection('adaptar')">➜ Qué adaptar</button>
+            </section>
+
+            <!-- ADAPTAR -->
+            <section id="adaptar" class="section">
+                <div class="section-header">
+                    <h1>3. Qué ADAPTAR (Copiar + Modificar)</h1>
+                    <p class="subtitle">Hay que cambiar referencias específicas del proyecto</p>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Qué</th>
+                            <th>De dónde</th>
+                            <th>Cómo adaptar</th>
+                            <th>Ejemplo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>CLAUDE.md</code></td>
+                            <td><code>classifier-specs/CLAUDE.md</code></td>
+                            <td>Cambiar referencias del clasificador por tu proyecto</td>
+                            <td><pre>"context/classifier-v2/"
+→
+"context/mi-proyecto/"</pre></td>
+                        </tr>
+                        <tr>
+                            <td><code>context/[proyecto]/ecosystem.md</code></td>
+                            <td>Template vacío</td>
+                            <td>Llenar con el Discovery del proyecto (Fase 2a)</td>
+                            <td>Qué servicios, flujos, integraciones, dominios</td>
+                        </tr>
+                        <tr>
+                            <td><code>docs/context/README.md</code></td>
+                            <td>Template genérico</td>
+                            <td>Explicar qué resuelve TU proyecto</td>
+                            <td>"Backend de reportes" vs "Motor de clasificación"</td>
+                        </tr>
+                        <tr>
+                            <td><code>stacks/</code></td>
+                            <td>Si es otro stack</td>
+                            <td>Crear carpeta <code>stacks/node-fargate/</code>, <code>stacks/go-ec2/</code>, etc</td>
+                            <td>Copiar estructura de <code>python-lambda</code>, adaptar reglas</td>
+                        </tr>
+                        <tr>
+                            <td>Roles específicos</td>
+                            <td>Si proyecto tiene roles nuevos</td>
+                            <td>Crear <code>roles/data-engineer.md</code> etc</td>
+                            <td>Basarse en <code>roles/developer.md</code>, adaptado al dominio</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Ejemplo: Adaptar CLAUDE.md</h2>
+                <p>Archivo original (classifier-specs):</p>
+                <pre>
+context/classifier-v2/ecosystem.md (product context, always)
+context/classifier-v2/CHANGELOG.md
+stacks/python-lambda/rules.md
+                </pre>
+
+                <p>Adaptado para nuevo proyecto (mi-backend-reportes):</p>
+                <pre>
+context/mi-backend-reportes/ecosystem.md
+context/mi-backend-reportes/CHANGELOG.md
+stacks/python-lambda/rules.md  ← sigue igual si es Lambda
+                </pre>
+
+                <h2>Carpetas que se llenan después (en Fase 2a)</h2>
+                <ul style="margin: 15px 0 15px 20px;">
+                    <li><code>docs/context/architecture.md</code> — Lo crea el Arquitecto en Discovery</li>
+                    <li><code>docs/context/services/</code> — Se llenan conforme avanzan</li>
+                    <li><code>docs/adr/</code> — Se crean cuando hay decisiones importantes</li>
+                    <li><code>context/[proyecto]/ecosystem.md</code> — Lo crea el equipo en Discovery</li>
+                </ul>
+
+                <button class="btn-primary" onclick="showSection('crear')">➜ Qué crear de cero</button>
+            </section>
+
+            <!-- CREAR -->
+            <section id="crear" class="section">
+                <div class="section-header">
+                    <h1>4. Qué CREAR de Cero</h1>
+                    <p class="subtitle">Archivos nuevos específicos para el proyecto</p>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Qué</th>
+                            <th>Dónde</th>
+                            <th>Quién</th>
+                            <th>Cuándo</th>
+                            <th>Contenido base</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>CLAUDE_PROJECT.md</code></td>
+                            <td>Raíz del repo</td>
+                            <td>DevOps</td>
+                            <td>Al provisionar el repo (Fase 1)</td>
+                            <td>Instrucciones para Claude Web Project (descubrir es colaborativo)</td>
+                        </tr>
+                        <tr>
+                            <td><code>.claude/settings.json</code></td>
+                            <td><code>.claude/</code></td>
+                            <td>DevOps</td>
+                            <td>Al provisionar (Fase 1)</td>
+                            <td>MCPs (Jira, GitHub, Confluence), hooks, permisos</td>
+                        </tr>
+                        <tr>
+                            <td><code>.claude/commands/</code></td>
+                            <td><code>.claude/commands/</code></td>
+                            <td>Tech Lead</td>
+                            <td>Antes de primer sprint (Fase 3)</td>
+                            <td>Comandos /brainstorm, /spec, /plan, /implement, /review</td>
+                        </tr>
+                        <tr>
+                            <td><code>docs/context/architecture.md</code></td>
+                            <td><code>docs/context/</code></td>
+                            <td>Arquitecto</td>
+                            <td>Durante Discovery (Fase 2a)</td>
+                            <td>Decisiones, servicios, flujos, integraciones</td>
+                        </tr>
+                        <tr>
+                            <td><code>CONTRIBUTING.md</code></td>
+                            <td>Raíz</td>
+                            <td>Tech Lead</td>
+                            <td>Paralelo a CLAUDE.md</td>
+                            <td>Cómo contribuir, código de conducta, procesos</td>
+                        </tr>
+                        <tr>
+                            <td><code>docs/adr/</code> (primeros ADRs)</td>
+                            <td><code>docs/adr/</code></td>
+                            <td>Equipo</td>
+                            <td>Si hay decisiones grandes</td>
+                            <td>Basarse en <code>templates/ADR_TEMPLATE.md</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Ejemplo: CLAUDE_PROJECT.md</h2>
+                <p>Para Claude Web (descubrimiento colaborativo):</p>
+                <pre>
+# [Mi Proyecto] - Claude Web Project
+
+## Fases del Descubrimiento
+
+### Fase 2a: Discovery
+Trabajamos colaborativamente para definir:
+- Qué resuelve este proyecto
+- Servicios de AWS a usar
+- Integraciones externas
+- Flujos principales
+- Dominios del negocio
+
+**Participantes:** PM, Arquitecto, Dev
+**Output:** docs/context/architecture.md
+
+### Fase 2b: Pasar a Código
+Tomamos lo descubierto y lo documentamos en:
+- context/[proyecto]/ecosystem.md
+- docs/context/architecture.md
+- docs/context/services/
+
+**Participantes:** Dev asistido por agente
+
+---
+
+Cuando terminen, pasen el contexto al repo.
+                </pre>
+
+                <h2>Ejemplo: .claude/settings.json</h2>
+                <pre>
+{
+  "mcps": [
+    {
+      "name": "GitHub",
+      "required": true,
+      "scope": ["read:repos", "write:pull_requests"]
+    },
+    {
+      "name": "Jira",
+      "required": true,
+      "env": {
+        "JIRA_INSTANCE": "kriptos.atlassian.net",
+        "JIRA_TOKEN": "{{ user-will-set }}"
+      }
+    },
+    {
+      "name": "Confluence",
+      "required": false,
+      "purpose": "Si architecture docs están en Confluence"
+    }
+  ],
+  "hooks": {
+    "on-pr": "Verifica: ¿Cambió arquitectura? → Actualiza docs/context/",
+    "on-context-check": "Antes de PR: ¿Se toca un servicio? → Lee docs/context/services/"
+  }
+}
+                </pre>
+
+                <button class="btn-primary" onclick="showSection('provision')">➜ Fase 1: Provisión</button>
+            </section>
+
+            <!-- PROVISION -->
+            <section id="provision" class="section">
+                <div class="section-header">
+                    <h1>5. Provisión (Fase 1)</h1>
+                    <p class="subtitle">Cómo DevOps arma un repo nuevo</p>
+                </div>
+
+                <div class="info-box">
+                    <strong>Responsable:</strong> DevOps<br>
+                    <strong>Dónde:</strong> GitHub<br>
+                    <strong>Tiempo:</strong> 30 minutos<br>
+                    <strong>Output:</strong> Repo listo para que el equipo entre en Fase 2a
+                </div>
+
+                <h2>Paso 1: Crear repo desde template</h2>
+                <pre>
+# Opción A: Clonar kriptos-engineering-standards
+git clone https://github.com/kriptos-io/kriptos-engineering-standards.git mi-proyecto-nuevo
+cd mi-proyecto-nuevo
+rm -rf .git
+git init
+git remote add origin https://github.com/kriptos-io/mi-proyecto-nuevo.git
+
+# O Opción B: GitHub crea desde template
+# (en GitHub UI: "Use this template" → kriptos-engineering-standards)
+                </pre>
+
+                <h2>Paso 2: Copiar skills, roles, templates</h2>
+                <pre>
+# Desde classifier-specs como referencia
+cp -r /ruta/classifier-specs/skills/ ./
+cp -r /ruta/classifier-specs/roles/ ./
+cp -r /ruta/classifier-specs/templates/ ./
+cp -r /ruta/classifier-specs/stacks/python-lambda/ ./stacks/
+                </pre>
+
+                <h2>Paso 3: Crear estructura de carpetas vacías</h2>
+                <pre>
+mkdir -p docs/context/services
+mkdir -p docs/adr
+mkdir -p context/mi-proyecto-nuevo
+mkdir -p .claude/commands
+mkdir -p brainstorms
+mkdir -p specs
+mkdir -p plans
+                </pre>
+
+                <h2>Paso 4: Adaptar CLAUDE.md</h2>
+                <pre>
+# Copiar desde classifier-specs
+cp /ruta/classifier-specs/CLAUDE.md ./
+
+# Editar referencias:
+# - "classifier-v2" → "mi-proyecto-nuevo"
+# - "Classifier product" → "[Tu proyecto] product"
+# - URLs y rutas específicas
+                </pre>
+
+                <h2>Paso 5: Crear CLAUDE_PROJECT.md (para Claude Web)</h2>
+                <pre>
+# Crear archivo con instrucciones para fase de descubrimiento
+cat > CLAUDE_PROJECT.md &lt;&lt; 'EOF'
+# [Mi Proyecto] - Discovery Phase
+
+Trabajamos colaborativamente para definir:
+- Qué resuelve
+- Servicios AWS
+- Integraciones
+- Flujos
+- Dominios
+
+Participantes: PM, Arquitecto, Dev
+Output: docs/context/architecture.md
+EOF
+                </pre>
+
+                <h2>Paso 6: Crear .claude/settings.json</h2>
+                <pre>
+cat > .claude/settings.json &lt;&lt; 'EOF'
+{
+  "mcps": [
+    {
+      "name": "GitHub",
+      "required": true
+    },
+    {
+      "name": "Jira",
+      "required": true,
+      "env": {
+        "JIRA_INSTANCE": "kriptos.atlassian.net"
+      }
+    }
+  ]
+}
+EOF
+                </pre>
+
+                <h2>Paso 7: Crear CONTRIBUTING.md</h2>
+                <pre>
+# Crear guía de cómo contribuir
+cat > CONTRIBUTING.md &lt;&lt; 'EOF'
+# Cómo Contribuir
+
+## Convenciones de Commits
+- feat: nueva feature
+- fix: bug fix
+- docs: cambios en documentación
+- refactor: reorganizar sin cambiar comportamiento
+
+Ver stacks/python-lambda/commits-convention.md para más detalles.
+
+## Flujo de Specs
+1. /brainstorm KT-XXXXX
+2. /spec
+3. /plan
+4. Implementar (TDD)
+5. /review
+
+## Contexto del Proyecto
+Lee docs/context/README.md antes de empezar.
+EOF
+                </pre>
+
+                <h2>Paso 8: Commit y Push</h2>
+                <pre>
+git add .
+git commit -m "chore: init repo from kriptos-engineering-standards template"
+git push -u origin main
+                </pre>
+
+                <h2>Checklist de Provisión</h2>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p1">
+                        <label for="p1">Repo creado en GitHub</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p2">
+                        <label for="p2">skills/, roles/, templates/ copiados</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p3">
+                        <label for="p3">stacks/python-lambda/ copiado (si aplica)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p4">
+                        <label for="p4">CLAUDE.md adaptado a tu proyecto</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p5">
+                        <label for="p5">CLAUDE_PROJECT.md creado</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p6">
+                        <label for="p6">.claude/settings.json creado con MCPs</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p7">
+                        <label for="p7">CONTRIBUTING.md creado</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p8">
+                        <label for="p8">Carpetas de contexto creadas (docs/context/, context/[proyecto]/)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p9">
+                        <label for="p9">Push a GitHub</label>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <strong>✓ Fase 1 completada.</strong> Repo listo. Equipo puede entrar en Fase 2a (Discovery).
+                </div>
+
+                <button class="btn-primary" onclick="showSection('discovery')">➜ Fase 2: Discovery</button>
+            </section>
+
+            <!-- DISCOVERY -->
+            <section id="discovery" class="section">
+                <div class="section-header">
+                    <h1>6. Discovery (Fase 2a + 2b)</h1>
+                    <p class="subtitle">Definir el proyecto colaborativamente</p>
+                </div>
+
+                <h2>Fase 2a: En Claude Web Project (Colaborativo)</h2>
+                <div class="info-box">
+                    <strong>Responsables:</strong> PM, Arquitecto, Dev<br>
+                    <strong>Dónde:</strong> Claude Web Project (compartido)<br>
+                    <strong>Tiempo:</strong> 1-2 reuniones<br>
+                    <strong>Output:</strong> Markdown con decisiones, arquitectura, integraciones
+                </div>
+
+                <h2>Preguntas a responder</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pregunta</th>
+                            <th>Respuesta Va A</th>
+                            <th>Quién Responde</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>¿Qué problema resuelve?</td>
+                            <td><code>docs/context/README.md</code></td>
+                            <td>PM</td>
+                        </tr>
+                        <tr>
+                            <td>¿Qué servicios AWS usamos?</td>
+                            <td><code>docs/context/architecture.md</code></td>
+                            <td>Arquitecto</td>
+                        </tr>
+                        <tr>
+                            <td>¿Cuáles son los flujos principales?</td>
+                            <td><code>docs/context/architecture.md</code></td>
+                            <td>PM + Arquitecto</td>
+                        </tr>
+                        <tr>
+                            <td>¿Qué integraciones externas?</td>
+                            <td><code>docs/context/services/</code></td>
+                            <td>Arquitecto</td>
+                        </tr>
+                        <tr>
+                            <td>¿Qué dominios del negocio?</td>
+                            <td><code>context/[proyecto]/ecosystem.md</code></td>
+                            <td>PM + Dev</td>
+                        </tr>
+                        <tr>
+                            <td>¿Hay decisiones de arquitectura importantes?</td>
+                            <td><code>docs/adr/NNNN-*.md</code></td>
+                            <td>Arquitecto + Dev</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Estructura del Claude Web Project</h2>
+                <pre>
+Claude Web Project: [Mi Proyecto]
+│
+├── Descripción general
+│   ├── Qué resuelve (PM)
+│   ├── Servicios AWS (Arch)
+│   └── Integraciones (Arch)
+│
+├── Arquitectura
+│   ├── Diagrama de flujos
+│   ├── Decisiones principales (ADRs)
+│   └── Integraciones externas
+│
+├── Dominios del Negocio
+│   ├── Entidades principales
+│   ├── Eventos clave
+│   └── Restricciones
+│
+└── Q&A (Preguntas + Respuestas)
+    ├── Performance: ¿Qué SLA?
+    ├── Seguridad: ¿Qué datos sensibles?
+    └── Escalabilidad: ¿Cuántos usuarios/reqs?
+                </pre>
+
+                <h2>Fase 2b: Pasar a Código (Claude Code)</h2>
+                <div class="info-box">
+                    <strong>Responsables:</strong> Dev asistido por agente<br>
+                    <strong>Dónde:</strong> Claude Code (Template Project)<br>
+                    <strong>Tiempo:</strong> 1-2 horas<br>
+                    <strong>Output:</strong> Markdown en docs/context/ + context/[proyecto]/
+                </div>
+
+                <h2>Proceso</h2>
+                <pre>
+1. Dev abre Claude Code con el repo
+2. Lee CLAUDE_PROJECT.md
+3. Crea rama: git checkout -b docs/initial-context
+4. Crea/edita:
+   - docs/context/README.md (qué resuelve)
+   - docs/context/architecture.md (decisiones, servicios)
+   - docs/context/services/[servicio].md (por cada servicio)
+   - context/[proyecto]/ecosystem.md (mapa del sistema)
+   - docs/adr/NNNN-*.md (decisiones importantes)
+5. Commit:
+   git commit -m "docs: initial project context from discovery"
+6. Push y merge a main
+                </pre>
+
+                <div class="success-box">
+                    <strong>✓ Fase 2 completada.</strong> Equipo tiene contexto. Pueden empezar Fase 3 (Specs).
+                </div>
+
+                <button class="btn-primary" onclick="showSection('specs')">➜ Fase 3: Specs</button>
+            </section>
+
+            <!-- SPECS -->
+            <section id="specs" class="section">
+                <div class="section-header">
+                    <h1>7. Specs → TDD → Review (Fase 3)</h1>
+                    <p class="subtitle">Flujo híbrido: Claude Web (brainstorm + spec) → Claude Code (TDD + review)</p>
+                </div>
+
+                <div class="info-box">
+                    <strong>Concepto clave:</strong> Las skills 01 y 02 (Brainstorm + Spec + Threat Model) ocurren en <strong>Claude Web</strong> de forma <strong>colaborativa</strong> (PM + Arquitecto + Dev). Claude Web tiene <strong>GitHub MCP</strong> y puede:
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Leer templates del repo (<code>templates/SPEC_TEMPLATE.md</code>, etc)</li>
+                        <li>Crear ramas (<code>spec/KT-XXXXX-titulo</code>)</li>
+                        <li>Hacer commits con brainstorms y specs basados en templates</li>
+                        <li>Abrir PRs para que Dev valide en Claude Code</li>
+                    </ul>
+                </div>
+
+                <h2>🌐 Skills 1-2: En Claude Web (Colaborativo)</h2>
+
+                <h3>Skill 01: Brainstorm</h3>
+                <div class="info-box">
+                    <strong>Quién:</strong> PM + Arquitecto + Dev (Claude Web Project compartido)<br>
+                    <strong>Dónde:</strong> Claude Web con GitHub MCP + Jira MCP<br>
+                    <strong>Input:</strong> Ticket KT-XXXXX + docs/context/<br>
+                    <strong>Output:</strong> Commit en repo del producto: <code>brainstorms/YYYY-MM-DD-KT-XXXXX-titulo.md</code>
+                </div>
+
+                <pre>
+# Flujo en Claude Web:
+
+1. PM pega el ticket KT-12345 en Claude Web Project
+2. Claude lee skills/01-brainstorm.md desde GitHub MCP
+3. Claude lee templates/BRAINSTORM_TEMPLATE.md
+4. Claude lee docs/context/ (servicios afectados)
+5. Equipo conversa con Claude → Q&A iterativo:
+   - ¿Qué problema resuelve?
+   - ¿Qué supuestos hay?
+   - ¿Qué riesgos identificamos?
+   - ¿Qué preguntas quedan abiertas?
+6. Claude crea brainstorm usando template
+7. Claude (vía GitHub MCP):
+   - Crea rama: brainstorm/KT-12345-export-reports
+   - Hace commit: "docs(brainstorm): KT-12345 - export reports"
+   - Abre PR para que Dev valide
+8. Equipo revisa el PR → mergea a main
+                </pre>
+
+                <h3>Skill 02: Spec + Threat Model</h3>
+                <div class="info-box">
+                    <strong>Quién:</strong> Arquitecto + Dev (con PM si hay dudas de producto)<br>
+                    <strong>Dónde:</strong> Misma conversación de Claude Web (continúa)<br>
+                    <strong>Input:</strong> Brainstorm anterior (ya en el repo)<br>
+                    <strong>Output:</strong> Commit en repo del producto: <code>specs/YYYY-MM-DD-KT-XXXXX-titulo.md</code>
+                </div>
+
+                <pre>
+# Flujo en Claude Web (continuando):
+
+1. Claude lee skills/02-spec-threat-model.md
+2. Claude lee templates/SPEC_TEMPLATE.md (¡ya está definido!)
+3. Claude lee templates/THREAT_MODEL_TEMPLATE.md
+4. Claude lee el brainstorm aprobado
+5. Arquitecto + Claude conversan:
+   - Diseño técnico
+   - APIs/contratos
+   - Threat model (qué puede romperse, qué datos sensibles)
+6. Claude crea spec usando template
+7. Claude (vía GitHub MCP):
+   - Crea rama: spec/KT-12345-export-reports
+   - Hace commit: "docs(spec): KT-12345 - export reports + threat model"
+   - Abre PR
+8. Arquitecto + Tech Lead revisan PR → mergean
+                </pre>
+
+                <div class="highlight">
+                    <strong>💡 Importante sobre Templates:</strong> Los archivos en <code>templates/</code> son la estructura obligatoria. Claude Web los lee y genera el output respetando ese formato. Si quieres cambiar la estructura de una spec, cambias el template — no le dices a Claude que improvise.
+                </div>
+
+                <h2>💻 Skills 3-5: En Claude Code (Local)</h2>
+
+                <h3>Skill 03: Plan</h3>
+                <pre>
+# Dev en Claude Code:
+dev@MacBook $ /plan KT-12345
+
+Claude Code:
+1. Lee skills/03-plan.md
+2. Lee specs/YYYY-MM-DD-KT-12345-*.md (ya en repo)
+3. Lee stacks/python-lambda/rules.md
+4. Lee templates/PLAN_TEMPLATE.md
+5. Crea plans/YYYY-MM-DD-KT-12345-*.md con tasks atómicas
+6. Commit + Push
+                </pre>
+
+                <h3>Skill 04: TDD Implementation</h3>
+                <pre>
+# Dev en Claude Code (con worktree opcional):
+dev@MacBook $ git checkout -b feat/KT-12345-export-reports
+
+# Claude Code asiste:
+- Lee skills/04-tdd-implementation.md
+- Lee plan/specs/brainstorm anteriores
+- Sigue stacks/[stack]/rules.md
+- Genera tests primero (TDD)
+- Implementa código
+- Cada subagente marca ✕ tareas finalizadas
+
+dev@MacBook $ pytest tests/
+dev@MacBook $ git commit (siguiendo commits-convention.md)
+dev@MacBook $ git push → abre PR
+                </pre>
+
+                <h3>Skill 05: Review + Evals</h3>
+                <pre>
+# Al abrir PR:
+
+CI corre:
+  ✓ pytest (tests pasan)
+  ✓ ruff (lint)
+  ✓ mypy (types)
+  ✓ coverage >= 80%
+  ✓ SonarCloud (cada dev con su token)
+  ✓ Snyk (vulnerabilidades)
+
+Claude Code/CI verifica:
+  ✓ ¿Se cumple la spec?
+  ✓ ¿Threat model resuelto?
+  ✓ ¿Se actualizó docs/context/ si tocó arquitectura?
+  ✓ ¿Commits siguen convención?
+
+Si todo OK → ✓ Aprobado para merge
+Si no → Feedback inline → vuelve a Skill 04
+                </pre>
+
+                <h2>📋 Ejemplo de Flujo Completo (un ticket)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Día</th>
+                            <th>Skill</th>
+                            <th>Dónde</th>
+                            <th>Quién</th>
+                            <th>Output (en repo)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Lun</td>
+                            <td>01 Brainstorm</td>
+                            <td>Claude Web</td>
+                            <td>PM + Arq + Dev</td>
+                            <td><code>brainstorms/2026-05-28-KT-1001-export.md</code></td>
+                        </tr>
+                        <tr>
+                            <td>Mar</td>
+                            <td>02 Spec + Threat</td>
+                            <td>Claude Web</td>
+                            <td>Arq + Dev</td>
+                            <td><code>specs/2026-05-29-KT-1001-export.md</code></td>
+                        </tr>
+                        <tr>
+                            <td>Mar</td>
+                            <td>03 Plan</td>
+                            <td>Claude Code</td>
+                            <td>Tech Lead + Dev</td>
+                            <td><code>plans/2026-05-29-KT-1001-export.md</code></td>
+                        </tr>
+                        <tr>
+                            <td>Mié-Jue</td>
+                            <td>04 TDD</td>
+                            <td>Claude Code</td>
+                            <td>Dev</td>
+                            <td>Branch + commits + PR</td>
+                        </tr>
+                        <tr>
+                            <td>Vie</td>
+                            <td>05 Review</td>
+                            <td>Claude Code + CI</td>
+                            <td>Reviewer + CI</td>
+                            <td>PR merged a main</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Reglas para este flujo</h2>
+                <ul style="margin: 15px 0 15px 20px;">
+                    <li>Un ticket = una rama = un PR (por skill)</li>
+                    <li>Nunca saltarse pasos (no sin brainstorm, no sin spec, etc)</li>
+                    <li>Los 5 skills son lectura OBLIGATORIA antes de cada paso</li>
+                    <li>Si el ticket toca servicios/arquitectura → actualiza <code>docs/context/</code></li>
+                    <li>PRs deben pasar CI (tests, linters, coverage 80%, SonarCloud, Snyk)</li>
+                    <li>Formato de nombre: <code>YYYY-MM-DD-KT-XXXXX-titulo.md</code></li>
+                    <li>Templates son obligatorios — no improvisar estructura</li>
+                </ul>
+
+                <div class="success-box">
+                    <strong>✓ Fase 3 completada.</strong> Feature megeada. Código + brainstorm + spec + plan + docs en el repo.
+                </div>
+
+                <button class="btn-primary" onclick="showSection('contexto')">➜ Fase 4: Contexto Vivo</button>
+            </section>
+
+            <!-- CONTEXTO -->
+            <section id="contexto" class="section">
+                <div class="section-header">
+                    <h1>8. Contexto Vivo (Fase 4)</h1>
+                    <p class="subtitle">Mantener docs/context/ siempre alimentado</p>
+                </div>
+
+                <div class="highlight">
+                    <strong>Principio:</strong> Cada PR que toque arquitectura, servicios o integraciones DEBE actualizar docs/context/
+                </div>
+
+                <h2>Regla en CLAUDE.md</h2>
+                <pre>
+--- CONTEXT MAINTENANCE ---
+
+Cada PR que toque:
+  - Servicios (nueva integración, cambio de API)
+  - Arquitectura (nuevo servicio AWS, cambio de flujo)
+  - Dominios (nuevo concepto de negocio)
+
+→ DEBE actualizar docs/context/
+
+Ejemplo:
+- PR agrega Lambda + SQS → Actualiza docs/context/architecture.md
+- PR toca API externa → Actualiza docs/context/services/api-externa.md
+- PR cambia flujo de pagos → Actualiza docs/context/ecosystem.md
+                </pre>
+
+                <h2>Hook en .claude/settings.json</h2>
+                <pre>
+{
+  "hooks": {
+    "on-pr-created": {
+      "trigger": "PR abierto",
+      "message": "¿Este PR toca arquitectura/integraciones/servicios? Si sí, actualiza docs/context/"
+    },
+    "on-pre-merge": {
+      "trigger": "Antes de merge",
+      "check": "Si cambió stacks/ o context/, verifica que docs/context/ se actualizó"
+    }
+  }
+}
+                </pre>
+
+                <h2>Checklist en PR</h2>
+                <p><strong>Plantilla de PR (en repo):</strong></p>
+                <pre>
+## Cambios
+- [ ] Feature nueva
+- [ ] Bug fix
+- [ ] Refactor
+- [ ] Docs
+
+## ¿Toca arquitectura/integraciones?
+- [ ] Sí → Actualicé docs/context/
+- [ ] No → No aplica
+
+## Testing
+- [ ] Tests nuevos o actualizados
+- [ ] Coverage &gt;= 80%
+- [ ] Lint pasando (ruff)
+
+## Checklist
+- [ ] Commits siguen convención
+- [ ] PR contra main
+- [ ] Specs/Plan existen para este ticket
+                </pre>
+
+                <h2>Ejemplo: Qué actualizar en docs/context/</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Si el PR toca...</th>
+                            <th>Actualiza...</th>
+                            <th>Qué agregar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Nueva integración con AWS Kinesis</td>
+                            <td><code>docs/context/architecture.md</code></td>
+                            <td>Nuevo bloque: "Kinesis integration: evento X → Y"</td>
+                        </tr>
+                        <tr>
+                            <td>Nuevo servicio externo (Stripe, SendGrid)</td>
+                            <td><code>docs/context/services/stripe.md</code></td>
+                            <td>API endpoints usados, formato de datos, errores</td>
+                        </tr>
+                        <tr>
+                            <td>Cambio de flujo de pago</td>
+                            <td><code>docs/context/ecosystem.md</code></td>
+                            <td>Mapa actualizado con nuevo flujo</td>
+                        </tr>
+                        <tr>
+                            <td>Nueva tabla en DB</td>
+                            <td><code>docs/context/architecture.md</code></td>
+                            <td>Schema, relaciones, índices importantes</td>
+                        </tr>
+                        <tr>
+                            <td>Nueva variable de ambiente</td>
+                            <td><code>stacks/python-lambda/.env.example</code></td>
+                            <td>Y documentar en <code>docs/context/</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Frecuencia de revisión</h2>
+                <ul style="margin: 15px 0 15px 20px;">
+                    <li><strong>Cada PR:</strong> El agente verifica que si cambió arquitectura, se actualizó docs/context/</li>
+                    <li><strong>Fin de sprint:</strong> Tech Lead revisa que docs/context/ esté actualizado</li>
+                    <li><strong>Mensual:</strong> PM + Arquitecto hacen audit de consistencia</li>
+                </ul>
+
+                <div class="success-box">
+                    <strong>✓ Fase 4 es continua.</strong> El contexto crece con el proyecto. Nunca queda stale.
+                </div>
+
+                <button class="btn-primary" onclick="showSection('mcps')">➜ Configuración: MCPs</button>
+            </section>
+
+            <!-- MCPS -->
+            <section id="mcps" class="section">
+                <div class="section-header">
+                    <h1>9. MCPs (Integraciones Externas)</h1>
+                    <p class="subtitle">Cómo conectar Jira, Confluence, GitHub</p>
+                </div>
+
+                <div class="info-box">
+                    <strong>MCP = Model Context Protocol:</strong> Protocolo para que Claude lea/escriba en sistemas externos
+                </div>
+
+                <div class="highlight">
+                    <strong>⚠️ Doble configuración:</strong> Los MCPs se configuran en <strong>DOS lugares</strong>:
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Claude Web Project</strong> (para Skills 01-02): GitHub + Jira (+ Confluence opcional)</li>
+                        <li><strong>Claude Code</strong> (para Skills 03-05): mismos MCPs, configurados localmente en cada repo</li>
+                    </ul>
+                    Sin esto, Claude Web no podría hacer commits/crear ramas con brainstorms y specs.
+                </div>
+
+                <h2>MCPs Necesarios</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>MCP</th>
+                            <th>Qué hace</th>
+                            <th>Es obligatorio</th>
+                            <th>Quién lo configura</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>GitHub</strong></td>
+                            <td>Leer repos, crear PRs, comentar issues</td>
+                            <td>✓ Sí</td>
+                            <td>DevOps</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Jira</strong></td>
+                            <td>Leer tickets KT-XXXXX, actualizar status</td>
+                            <td>✓ Sí</td>
+                            <td>DevOps</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Confluence</strong></td>
+                            <td>Leer/escribir docs de arquitectura</td>
+                            <td>✗ No (opcional)</td>
+                            <td>Arquitecto si necesita</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>1. GitHub MCP</h2>
+                <h3>Configuración en .claude/settings.json</h3>
+                <pre>
+{
+  "mcps": [
+    {
+      "name": "GitHub",
+      "required": true,
+      "auth": "oauth",
+      "scope": [
+        "repo",
+        "read:user",
+        "write:repo_hook"
+      ],
+      "settings": {
+        "owner": "kriptos-io",
+        "repo": "mi-proyecto-nuevo"
+      }
+    }
+  ]
+}
+                </pre>
+
+                <h3>Qué puede hacer el agente</h3>
+                <ul style="margin: 15px 0 15px 20px;">
+                    <li>✓ Leer archivos del repo</li>
+                    <li>✓ Ver commits, ramas, PRs</li>
+                    <li>✓ Crear PRs, comentar, sugerir cambios</li>
+                    <li>✓ Leer issues</li>
+                    <li>✗ Mergear PRs (debe hacerlo Dev)</li>
+                </ul>
+
+                <h2>2. Jira MCP</h2>
+                <h3>Configuración en .claude/settings.json</h3>
+                <pre>
+{
+  "mcps": [
+    {
+      "name": "Jira",
+      "required": true,
+      "auth": "api_token",
+      "env": {
+        "JIRA_INSTANCE": "kriptos.atlassian.net",
+        "JIRA_EMAIL": "dev@kriptos.io",
+        "JIRA_API_TOKEN": "{{ cada-dev-genera-el-suyo }}"
+      },
+      "settings": {
+        "project": "KT",
+        "board": "KT Backlog"
+      }
+    }
+  ]
+}
+                </pre>
+
+                <h3>Cómo generar token Jira (cada dev)</h3>
+                <pre>
+1. Ir a https://id.atlassian.com/manage-profile/security/api-tokens
+2. Click: "Create API token"
+3. Copiar token
+4. En Claude Code: guardar en .env local
+   JIRA_API_TOKEN=xxx
+5. En settings.json: usar {{ JIRA_API_TOKEN }}
+                </pre>
+
+                <h3>Qué puede hacer el agente</h3>
+                <ul style="margin: 15px 0 15px 20px;">
+                    <li>✓ Leer tickets KT-XXXXX</li>
+                    <li>✓ Ver descripción, comentarios, attachments</li>
+                    <li>✓ Cambiar status (In Progress, Done, etc)</li>
+                    <li>✗ Crear tickets (Dev los crea, agente solo automatiza)</li>
+                </ul>
+
+                <h2>3. Confluence MCP (Opcional)</h2>
+                <h3>Configuración</h3>
+                <pre>
+{
+  "mcps": [
+    {
+      "name": "Confluence",
+      "required": false,
+      "auth": "oauth",
+      "settings": {
+        "instance": "kriptos.atlassian.net",
+        "space": "ENG"
+      }
+    }
+  ]
+}
+                </pre>
+
+                <h3>Cuándo usarlo</h3>
+                <ul style="margin: 15px 0 15px 20px;">
+                    <li>Si Arquitectura vive en Confluence (ADRs, design docs)</li>
+                    <li>Si tienes runbooks o troubleshooting guides ahí</li>
+                    <li>Si colaboras con otros equipos que usan Confluence</li>
+                </ul>
+
+                <h2>Configuración Segura</h2>
+                <div class="highlight">
+                    <strong>⚠️ TOKENS:</strong><br>
+                    - Nunca commitear tokens en el repo<br>
+                    - Usar .env.local o .env.example<br>
+                    - Agregar a .gitignore
+                </div>
+
+                <pre>
+# .gitignore
+.env.local
+.env
+credentials.json
+                </pre>
+
+                <pre>
+# .env.example (sin valores reales)
+JIRA_API_TOKEN=your-token-here
+GITHUB_TOKEN=your-token-here
+CONFLUENCE_TOKEN=your-token-here
+                </pre>
+
+                <button class="btn-primary" onclick="showSection('comandos')">➜ Comandos disponibles</button>
+            </section>
+
+            <!-- COMANDOS -->
+            <section id="comandos" class="section">
+                <div class="section-header">
+                    <h1>10. Comandos Disponibles (.claude/commands/)</h1>
+                    <p class="subtitle">Los 5 comandos del pipeline</p>
+                </div>
+
+                <div class="info-box">
+                    <strong>Qué es un comando:</strong> Un archivo markdown en .claude/commands/ que Claude Code ejecuta cuando Dev tipea /comando. Invoca automáticamente el skill correspondiente.
+                </div>
+
+                <div class="highlight">
+                    <strong>Importante:</strong> Skills 01 y 02 NO usan comandos locales. Se invocan directamente desde Claude Web cargando el archivo del skill. Los comandos en <code>.claude/commands/</code> son para Skills 03-05 (locales en Claude Code). Aún así, los archivos de skills (<code>skills/01-*.md</code> y <code>skills/02-*.md</code>) viven en el repo para que Claude Web los lea vía GitHub MCP.
+                </div>
+
+                <h2>Los 5 Comandos</h2>
+
+                <h3>1️⃣ /brainstorm KT-XXXXX</h3>
+                <pre>
+Archivo: .claude/commands/brainstorm.md
+
+---
+name: brainstorm
+aliases: [bs, storm]
+description: Start Skill 01 (Brainstorm) for a ticket
+usage: /brainstorm KT-12345
+---
+
+# /brainstorm
+
+Invoca Skill 01 (Brainstorm) del pipeline.
+
+**Qué hace:**
+- Lee el ticket desde Jira
+- Lee roles/product-manager.md
+- Lee docs/context/
+- Crea brainstorm en brainstorms/KT-XXXXX-titulo.md
+
+**Cuándo usar:**
+Cuando comienza un ticket nuevo. Primero del pipeline.
+
+**Ejemplo:**
+  /brainstorm KT-1001
+  → Crea brainstorms/KT-1001-export-reports.md
+                </pre>
+
+                <h3>2️⃣ /spec KT-XXXXX</h3>
+                <pre>
+Archivo: .claude/commands/spec.md
+
+Invoca Skill 02 (Spec + Threat Model).
+
+**Qué hace:**
+- Lee el brainstorm anterior
+- Lee roles/architect.md
+- Lee stacks/[stack]/rules.md
+- Crea spec en specs/KT-XXXXX-titulo.md
+- Incluye threat model (seguridad, privacidad)
+
+**Cuándo usar:**
+Después del brainstorm. Segundo del pipeline.
+
+**Ejemplo:**
+  /spec KT-1001
+  → Crea specs/KT-1001-export-reports.md
+                </pre>
+
+                <h3>3️⃣ /plan KT-XXXXX</h3>
+                <pre>
+Archivo: .claude/commands/plan.md
+
+Invoca Skill 03 (Plan + Atomic Tasks).
+
+**Qué hace:**
+- Lee la spec anterior
+- Lee roles/tech-lead.md
+- Crea plan con tasks atómicas
+- Estima effort (story points)
+- Crea plan en plans/KT-XXXXX-titulo.md
+
+**Cuándo usar:**
+Después del spec. Tercero del pipeline.
+
+**Ejemplo:**
+  /plan KT-1001
+  → Crea plans/KT-1001-export-reports.md
+  → Task 1: Setup database schema
+  → Task 2: Create API endpoint
+  → Task 3: Write tests
+                </pre>
+
+                <h3>4️⃣ /implement KT-XXXXX</h3>
+                <pre>
+Archivo: .claude/commands/implement.md
+
+Invoca Skill 04 (TDD Implementation).
+
+**Qué hace:**
+- Lee el plan anterior
+- Lee roles/developer.md
+- Dev implementa siguiendo TDD
+- Escribe tests primero, luego código
+- Abre PR contra main
+
+**Cuándo usar:**
+Después del plan. Cuarto del pipeline.
+
+**Pasos:**
+  1. /implement KT-1001
+  2. Dev implementa localmente (TDD)
+  3. Dev corre tests: pytest
+  4. Dev hace commit y push
+  5. PR abierto
+                </pre>
+
+                <h3>5️⃣ /review KT-XXXXX</h3>
+                <pre>
+Archivo: .claude/commands/review.md
+
+Invoca Skill 05 (Review + Evals).
+
+**Qué hace:**
+- Lee el código en el PR
+- Verifica tests pasen
+- Verifica coverage >= 80%
+- Verifica linters (ruff)
+- Verifica: ¿Se toca arquitectura? → ¿Se actualizó docs/context/?
+- Si OK: aprueba. Si no: comentarios
+
+**Cuándo usar:**
+Cuando PR está abierto. Quinto del pipeline.
+
+**Resultado:**
+  - ✓ Si todo OK: Aprobado para merge
+  - ⚠️ Si hay feedback: Dev arregla y vuelve a push
+                </pre>
+
+                <h2>Anatomía de un Comando</h2>
+                <pre>
+---
+name: comando-name
+aliases: [alias1, alias2]
+description: Una línea de descripción
+usage: /comando ARG1 ARG2
+requires: [JIRA, GitHub]
+---
+
+# /comando
+
+Explicación de qué hace.
+
+## Uso
+
+```
+/comando KT-12345
+```
+
+## Qué pasa
+
+1. Paso 1...
+2. Paso 2...
+3. Paso 3...
+
+## Resultado
+
+Output esperado.
+                </pre>
+
+                <h2>Cómo crear un comando nuevo</h2>
+                <p>Si necesitas un comando personalizado (ej: /deploy, /migrate):</p>
+                <pre>
+1. Crear archivo: .claude/commands/mi-comando.md
+2. Definir frontmatter (name, aliases, description, etc)
+3. Documentar qué hace
+4. Dev invoca: /mi-comando
+5. Claude Code lee el archivo y ejecuta
+
+Ejemplo:
+  /deploy [staging|prod]
+  /migrate [up|down]
+  /generate-report [html|pdf]
+                </pre>
+
+                <button class="btn-primary" onclick="showSection('checklist')">➜ Checklist Final</button>
+            </section>
+
+            <!-- CHECKLIST -->
+            <section id="checklist" class="section">
+                <div class="section-header">
+                    <h1>✓ Checklist de Implementación</h1>
+                    <p class="subtitle">Todo lo que necesitas para que un proyecto nuevo funcione</p>
+                </div>
+
+                <h2>Pre-Provisión (DevOps)</h2>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch1">
+                        <label for="ch1">Repo creado en GitHub (kriptos-io/mi-proyecto-nuevo)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch2">
+                        <label for="ch2">Clonado desde kriptos-engineering-standards</label>
+                    </div>
+                </div>
+
+                <h2>Fase 1: Provisión (DevOps + Tech Lead)</h2>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch3">
+                        <label for="ch3">✓ skills/ copiado desde classifier-specs</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch4">
+                        <label for="ch4">✓ roles/ copiado desde classifier-specs</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch5">
+                        <label for="ch5">✓ templates/ copiado desde classifier-specs</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch6">
+                        <label for="ch6">✓ stacks/python-lambda/ copiado (si aplica)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch7">
+                        <label for="ch7">✓ CLAUDE.md adaptado a tu proyecto</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch8">
+                        <label for="ch8">✓ CLAUDE_PROJECT.md creado</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch9">
+                        <label for="ch9">✓ .claude/settings.json con MCPs</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch10">
+                        <label for="ch10">✓ .claude/commands/ creados (5 comandos)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch11">
+                        <label for="ch11">✓ CONTRIBUTING.md creado</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch12">
+                        <label for="ch12">✓ Carpetas creadas (docs/context/, context/[proyecto]/, etc)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch13">
+                        <label for="ch13">✓ Push a GitHub</label>
+                    </div>
+                </div>
+
+                <h2>Fase 2a: Discovery (PM + Arquitecto + Dev en Claude Web)</h2>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch14">
+                        <label for="ch14">✓ Claude Web Project creado y compartido</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch15">
+                        <label for="ch15">✓ Respondidas: qué resuelve, qué servicios AWS, flujos, integraciones</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch16">
+                        <label for="ch16">✓ Decisiones arquitectónicas documentadas (para ADRs)</label>
+                    </div>
+                </div>
+
+                <h2>Fase 2b: Pasar a Código (Dev en Claude Code)</h2>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch17">
+                        <label for="ch17">✓ docs/context/README.md (qué resuelve)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch18">
+                        <label for="ch18">✓ docs/context/architecture.md (servicios, flujos, decisiones)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch19">
+                        <label for="ch19">✓ docs/context/services/ (uno por cada integración)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch20">
+                        <label for="ch20">✓ context/[proyecto]/ecosystem.md (mapa del sistema)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch21">
+                        <label for="ch21">✓ docs/adr/ (primeros ADRs si hay decisiones grandes)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch22">
+                        <label for="ch22">✓ PR merged a main con contexto inicial</label>
+                    </div>
+                </div>
+
+                <h2>Configuración de MCPs (DevOps)</h2>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch23">
+                        <label for="ch23">✓ GitHub MCP configurado en settings.json</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch24">
+                        <label for="ch24">✓ Jira MCP configurado (proyecto KT)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch25">
+                        <label for="ch25">✓ Cada dev tiene su token Jira (.env.local)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch26">
+                        <label for="ch26">✓ Confluence MCP (si aplica)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch27">
+                        <label for="ch27">✓ .gitignore incluye .env, credentials, etc</label>
+                    </div>
+                </div>
+
+                <h2>Antes de Fase 3: Specs</h2>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch28">
+                        <label for="ch28">✓ Primer ticket asignado (KT-XXXXX)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch29">
+                        <label for="ch29">✓ Dev prueba: /brainstorm KT-XXXXX</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch30">
+                        <label for="ch30">✓ Dev prueba: /spec KT-XXXXX</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch31">
+                        <label for="ch31">✓ Dev prueba: /plan KT-XXXXX</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch32">
+                        <label for="ch32">✓ Dev implementa localmente (TDD)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch33">
+                        <label for="ch33">✓ CI pasa (tests, lint, coverage)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch34">
+                        <label for="ch34">✓ PR mergeado y validado</label>
+                    </div>
+                </div>
+
+                <h2>Fin de Ciclo (Tech Lead)</h2>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch35">
+                        <label for="ch35">✓ Revisar que docs/context/ se actualizó con cada PR</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch36">
+                        <label for="ch36">✓ Revisar que commits siguen convención</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="ch37">
+                        <label for="ch37">✓ Documentar en CHANGELOG.md qué cambió en la arquitectura</label>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <strong>🎉 Proyecto listo para desarrollo sostenible.</strong><br>
+                    Equipo puede iterar con confianza. Skills guían cada paso. Contexto se alimenta automáticamente.
+                </div>
+
+            </section>
+
+            <div class="footer">
+                <p>🚀 Kriptos Base Genérica v1.0 — Guía de Implementación</p>
+                <p>Última actualización: 28 de Mayo, 2026</p>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(s => s.classList.remove('active'));
+
+            // Show selected section
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.classList.add('active');
+            }
+
+            // Update active nav link
+            const navLinks = document.querySelectorAll('.sidebar nav a');
+            navLinks.forEach(link => link.classList.remove('active'));
+
+            const activeLink = document.querySelector(`a[onclick="showSection('${sectionId}')"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Initialize first section
+        showSection('intro');
+    </script>
+</body>
+</html>

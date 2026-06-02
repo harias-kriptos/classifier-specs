@@ -149,9 +149,9 @@ Usar la skill `repo-provisioning` de Kriptos. Deja listo: `.claude/`, `.github/w
 | Ticket | Componente | Detalle del texto | Bloqueado por | Próximo paso |
 |---|---|---|---|---|
 | [**KT-17024**](https://kriptosteam.atlassian.net/browse/KT-17024) | crown-candidates-indexer | 📋 RFC + spec lista | DevOps [KT-17012](https://kriptosteam.atlassian.net/browse/KT-17012) + [KT-17078](https://kriptosteam.atlassian.net/browse/KT-17078) → [KT-17009](https://kriptosteam.atlassian.net/browse/KT-17009) + [KT-17010](https://kriptosteam.atlassian.net/browse/KT-17010) | [**spec**](../../specs-staging/KT-17024-crown-candidates-indexer.md) lista. Próximo: Skill 03/04. |
-| [**KT-17025**](https://kriptosteam.atlassian.net/browse/KT-17025) | phase1-enterprise-barrier | 📋 RFC + spec lista | DevOps [KT-17013](https://kriptosteam.atlassian.net/browse/KT-17013) → [KT-17009](https://kriptosteam.atlassian.net/browse/KT-17009) | [**spec**](../../specs-staging/KT-17025-phase1-enterprise-barrier.md) lista. Próximo: Skill 03/04. |
-| [**KT-17026**](https://kriptosteam.atlassian.net/browse/KT-17026) | validation-mutation-handler | 📋 RFC + spec lista | DevOps [KT-17014](https://kriptosteam.atlassian.net/browse/KT-17014) + GraphQL schema (Plataforma Web) | [**spec**](../../specs-staging/KT-17026-validation-mutation-handler.md) lista. Sync Plataforma Web antes de Skill 04. |
-| [**KT-17027**](https://kriptosteam.atlassian.net/browse/KT-17027) | validation-confirm | 📋 RFC + spec lista | DevOps [KT-17015](https://kriptosteam.atlassian.net/browse/KT-17015) → [KT-17010](https://kriptosteam.atlassian.net/browse/KT-17010) | [**spec**](../../specs-staging/KT-17027-validation-confirm.md) lista. Próximo: Skill 03/04. |
+| [**KT-17025**](https://kriptosteam.atlassian.net/browse/KT-17025) | crown-enterprise-barrier | 📋 RFC + spec lista | DevOps [KT-17013](https://kriptosteam.atlassian.net/browse/KT-17013) → [KT-17009](https://kriptosteam.atlassian.net/browse/KT-17009) | [**spec**](../../specs-staging/KT-17025-crown-enterprise-barrier.md) lista. Próximo: Skill 03/04. |
+| [**KT-17026**](https://kriptosteam.atlassian.net/browse/KT-17026) | crown-validation-handler | 📋 RFC + spec lista | DevOps [KT-17014](https://kriptosteam.atlassian.net/browse/KT-17014) + GraphQL schema (Plataforma Web) | [**spec**](../../specs-staging/KT-17026-crown-validation-handler.md) lista. Sync Plataforma Web antes de Skill 04. |
+| [**KT-17027**](https://kriptosteam.atlassian.net/browse/KT-17027) | crown-validation-confirm | 📋 RFC + spec lista | DevOps [KT-17015](https://kriptosteam.atlassian.net/browse/KT-17015) → [KT-17010](https://kriptosteam.atlassian.net/browse/KT-17010) | [**spec**](../../specs-staging/KT-17027-crown-validation-confirm.md) lista. Próximo: Skill 03/04. |
 
 ### Fase 2 — Priority Sample Collection / GSE (6 lambdas — TODAS NUEVAS, sin abrir en Jira)
 
@@ -212,9 +212,9 @@ FASE 1 (per-station, existente con tweak)
                   ↓ matches.jsonl
 FASE 1.5 (per-enterprise, NUEVA)
   ┌─ N1 crown-candidates-indexer (S3 → OpenSearch + DDB STATION)
-  ├─ N2 phase1-enterprise-barrier (DDB Stream → "ready_for_validation" + notify Plataforma)
-  ├─ N3 validation-mutation-handler (GraphQL approve/reject/add — Plataforma Web)
-  └─ N4 validation-confirm (cliente OK → S3 manifest → dispara Fase 2)
+  ├─ N2 crown-enterprise-barrier (DDB Stream → "ready_for_validation" + notify Plataforma)
+  ├─ N3 crown-validation-handler (GraphQL approve/reject/add — Plataforma Web)
+  └─ N4 crown-validation-confirm (cliente OK → S3 manifest → dispara Fase 2)
                   ↓ manifest.json
 FASE 2 (per-cycle, refactor a multi-trigger)
   ┌─ N5 gse-cycle-init (refactor: multi-trigger, process_type=crown_validated)

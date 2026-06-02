@@ -96,7 +96,7 @@ No aplica.
 | STRIDE | Threat | Mitigación |
 |---|---|---|
 | Tampering | Stream duplicate cierra STATION 2 veces | Conditional `sampling_status<>sample_anonymized` exactly-once. Test: `test_duplicate_stream_record_no_double_count`. |
-| Integrity | Race con KT-17025 (phase1-enterprise-barrier) | **Filter del Pipe es por atributo**: KT-17025 filtra `scan_status=complete`, KT-17032 filtra `sampling_status exists`. Cada uno solo ve sus eventos. Sin overlap. |
+| Integrity | Race con KT-17025 (crown-enterprise-barrier) | **Filter del Pipe es por atributo**: KT-17025 filtra `scan_status=complete`, KT-17032 filtra `sampling_status exists`. Cada uno solo ve sus eventos. Sin overlap. |
 
 No hay surface externa.
 

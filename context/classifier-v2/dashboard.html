@@ -3,814 +3,567 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Classifier Backend — Tickets &amp; Arquitectura (2026-05-23)</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<title>Classifier Backend v2 — Estado del proyecto</title>
 <style>
-:root {
-  --primary: #1a73e8;
-  --success: #0f9d58;
-  --warning: #f9ab00;
-  --danger: #d93025;
-  --info: #1967d2;
-  --neutral: #5f6368;
-  --bg: #f8f9fa;
-  --card-bg: #ffffff;
-  --border: #dadce0;
-  --text: #202124;
-  --text-soft: #5f6368;
-}
 * { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --soft: #64748b;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+  --done: #16a34a;
+  --pending: #94a3b8;
+  --warning: #f59e0b;
+  --f1: #2563eb;
+  --f1v: #16a34a;
+  --sm: #d97706;
+  --f2: #be185d;
+  --ext: #475569;
+}
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
-  padding: 24px;
+  padding: 40px 24px;
 }
-.container { max-width: 1400px; margin: 0 auto; }
-header { background: var(--card-bg); border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 24px; border-left: 6px solid var(--primary); }
-header h1 { font-size: 28px; margin-bottom: 8px; }
-header .subtitle { color: var(--text-soft); font-size: 15px; }
-header .meta { margin-top: 12px; font-size: 13px; color: var(--text-soft); }
-.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.kpi { background: var(--card-bg); border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.kpi .label { font-size: 12px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-.kpi .value { font-size: 32px; font-weight: 600; color: var(--text); }
-.kpi .sub { font-size: 13px; color: var(--text-soft); margin-top: 4px; }
-.kpi.success { border-top: 3px solid var(--success); }
-.kpi.warning { border-top: 3px solid var(--warning); }
-.kpi.danger { border-top: 3px solid var(--danger); }
-.kpi.info { border-top: 3px solid var(--info); }
-section { background: var(--card-bg); border-radius: 12px; padding: 32px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-section h2 { font-size: 22px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
-section h2 .badge { font-size: 12px; padding: 4px 10px; border-radius: 12px; background: var(--info); color: white; font-weight: normal; }
-section h3 { font-size: 17px; margin: 24px 0 12px; color: var(--text); }
-section p { color: var(--text-soft); margin-bottom: 12px; }
-.diagram-container { background: #fafbfc; border: 1px solid var(--border); border-radius: 8px; padding: 20px; overflow-x: auto; }
-.mermaid { text-align: center; }
-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
-thead { background: #f1f3f4; position: sticky; top: 0; }
-th { padding: 12px 14px; text-align: left; font-weight: 600; color: var(--text); border-bottom: 2px solid var(--border); }
-td { padding: 12px 14px; border-bottom: 1px solid #eaecef; vertical-align: top; }
-tr:hover td { background: #fafbfc; }
-.ticket-id { font-family: "SF Mono", Monaco, Consolas, monospace; font-size: 13px; font-weight: 600; }
-.ticket-id a { color: var(--primary); text-decoration: none; }
-.ticket-id a:hover { text-decoration: underline; }
-.lambda-name { font-family: "SF Mono", Monaco, Consolas, monospace; font-size: 13px; color: var(--text); }
-.ticket-desc { font-size: 12px; color: var(--text-soft); margin-top: 6px; line-height: 1.45; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-.status { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
-.status.done { background: #d4edda; color: #155724; }
-.status.deployed { background: #c3e6cb; color: #0f5132; }
-.status.wip { background: #fff3cd; color: #856404; }
-.status.blocked { background: #f8d7da; color: #721c24; }
-.status.rfc { background: #cce5ff; color: #004085; }
-.status.todo { background: #e2e3e5; color: #383d41; }
-.status.cancelled { background: #f5f5f5; color: #999; text-decoration: line-through; }
-.status.superseded { background: #ececec; color: #777; }
-.phase-tag { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #e8f0fe; color: #1967d2; }
-.phase-tag.f1 { background: #e8f0fe; color: #1967d2; }
-.phase-tag.f1val { background: #fef0e6; color: #d93025; }
-.phase-tag.f2 { background: #e6f4ea; color: #0f9d58; }
-.sp { display: inline-block; min-width: 24px; padding: 2px 8px; background: #f1f3f4; border-radius: 4px; font-size: 12px; font-weight: 600; text-align: center; color: var(--text-soft); }
-.notes { font-size: 12px; color: var(--text-soft); margin-top: 4px; }
-.warning-box { background: #fff8e1; border-left: 4px solid var(--warning); padding: 16px 20px; border-radius: 4px; margin: 16px 0; }
-.warning-box strong { color: #5d4037; }
-.info-box { background: #e8f0fe; border-left: 4px solid var(--info); padding: 16px 20px; border-radius: 4px; margin: 16px 0; }
-.success-box { background: #e6f4ea; border-left: 4px solid var(--success); padding: 16px 20px; border-radius: 4px; margin: 16px 0; }
-.decision-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
-.decision-card { background: #fafbfc; border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
-.decision-card .title { font-weight: 600; color: var(--text); margin-bottom: 6px; font-size: 14px; }
-.decision-card .why { font-size: 13px; color: var(--text-soft); }
-.dependency-list { font-size: 12px; color: var(--text-soft); }
-.dependency-list a { color: var(--primary); text-decoration: none; font-weight: 500; }
-.dependency-list a:hover { text-decoration: underline; }
-.legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; padding: 12px 16px; background: #fafbfc; border-radius: 8px; font-size: 12px; }
-.legend-item { display: flex; align-items: center; gap: 6px; color: var(--text-soft); }
-ul.next-steps { list-style: none; padding-left: 0; }
-ul.next-steps li { padding: 12px 16px; background: #fafbfc; border-left: 3px solid var(--primary); margin-bottom: 8px; border-radius: 4px; }
-ul.next-steps li strong { color: var(--text); display: block; margin-bottom: 4px; }
-footer { text-align: center; padding: 24px; color: var(--text-soft); font-size: 12px; }
-.legend-color { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: middle; }
-.consolidation-banner { background: linear-gradient(135deg, #e8f0fe, #fef7e0); border-left: 4px solid var(--primary); padding: 20px 24px; border-radius: 8px; margin-bottom: 24px; }
-.consolidation-banner h3 { margin: 0 0 8px; color: var(--text); font-size: 16px; }
-.consolidation-banner p { margin: 4px 0; color: var(--text-soft); font-size: 14px; }
-.consolidation-banner code { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 3px; font-family: "SF Mono", Monaco, Consolas, monospace; font-size: 12px; }
+.container { max-width: 1280px; margin: 0 auto; }
+
+/* ============ HERO ============ */
+.hero {
+  text-align: center;
+  padding: 40px 24px 32px;
+  margin-bottom: 32px;
+}
+.hero h1 {
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+}
+.hero p {
+  font-size: 18px;
+  color: var(--soft);
+  max-width: 720px;
+  margin: 0 auto;
+}
+.hero .date {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 4px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--soft);
+}
+
+/* ============ BIG STAT ============ */
+.big-stat {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 48px;
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+.big-stat .label {
+  font-size: 14px;
+  color: var(--soft);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+.big-stat .number {
+  font-size: 96px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+  letter-spacing: -3px;
+}
+.big-stat .number span { color: var(--soft); font-size: 56px; font-weight: 600; }
+.big-stat .progress {
+  width: 100%;
+  max-width: 600px;
+  height: 14px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  margin: 24px auto 0;
+  overflow: hidden;
+  display: flex;
+}
+.big-stat .progress-fill-done {
+  width: 18%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--done), #22c55e);
+}
+.big-stat .progress-fill-wip {
+  width: 36%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--warning), #fbbf24);
+}
+.big-stat .legend-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.legend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.legend-pill .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.legend-pill.done .dot { background: var(--done); }
+.legend-pill.wip .dot { background: var(--warning); }
+.legend-pill.pending .dot { background: var(--pending); }
+
+/* ============ CARD GRID ============ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--pending);
+}
+.card.done { border-top-color: var(--done); }
+.card.f1 { border-top-color: var(--f1); }
+.card.f1v { border-top-color: var(--f1v); }
+.card.f2 { border-top-color: var(--f2); }
+.card.sm { border-top-color: var(--sm); }
+.card.in-progress { border-top-color: var(--warning); }
+
+.card .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.card .title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+.card .count {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+}
+.card .desc {
+  font-size: 13px;
+  color: var(--soft);
+  margin-bottom: 12px;
+}
+.card ul {
+  list-style: none;
+  font-size: 13px;
+  color: var(--text);
+}
+.card ul li {
+  padding: 6px 0;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card ul li:last-child { border-bottom: none; }
+.card ul li::before {
+  content: "✓";
+  color: var(--done);
+  font-weight: 700;
+  font-size: 14px;
+}
+.card.pending ul li::before {
+  content: "○";
+  color: var(--pending);
+}
+.card.in-progress ul li::before {
+  content: "◐";
+  color: var(--warning);
+  font-weight: 700;
+}
+
+/* ============ FLOW ============ */
+.flow-section {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 40px;
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+}
+.flow-section h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.flow-section .sub {
+  text-align: center;
+  color: var(--soft);
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+.flow {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+.flow-step {
+  text-align: center;
+  padding: 20px 12px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  position: relative;
+}
+.flow-step .num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.flow-step .name {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.flow-step .desc {
+  font-size: 11px;
+  color: var(--soft);
+}
+.flow-step.done {
+  background: #f0fdf4;
+  border-color: var(--done);
+}
+.flow-step.done .num { background: var(--done); }
+
+/* ============ ARCH ============ */
+.arch-section {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-radius: 16px;
+  padding: 40px;
+  margin-bottom: 32px;
+  border: 2px solid var(--sm);
+  text-align: center;
+}
+.arch-section .label {
+  color: var(--sm);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.arch-section h2 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #78350f;
+  margin-bottom: 8px;
+}
+.arch-section p {
+  color: #92400e;
+  font-size: 15px;
+  max-width: 700px;
+  margin: 0 auto 24px;
+}
+.arch-detail {
+  display: inline-block;
+  padding: 16px 32px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--sm);
+  font-family: "SF Mono", Monaco, monospace;
+  font-size: 13px;
+  color: #78350f;
+  text-align: left;
+}
+.arch-detail strong { color: #d97706; }
+
+/* ============ NEXT STEPS ============ */
+.next-section {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 40px;
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+}
+.next-section h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.milestones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.milestone {
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border-left: 4px solid var(--primary);
+}
+.milestone .num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.milestone .title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.milestone .desc {
+  font-size: 13px;
+  color: var(--soft);
+}
+
+/* ============ FOOTER ============ */
+footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--soft);
+  font-size: 13px;
+}
+footer a {
+  color: var(--primary);
+  text-decoration: none;
+  margin: 0 8px;
+}
+footer a:hover { text-decoration: underline; }
+
+@media (max-width: 900px) {
+  .flow { grid-template-columns: repeat(3, 1fr); }
+  .hero h1 { font-size: 32px; }
+  .big-stat .number { font-size: 64px; }
+}
 </style>
 </head>
 <body>
 <div class="container">
 
-<header>
-<h1>Classifier Backend — Tickets &amp; Arquitectura</h1>
-<div class="subtitle">Vista consolidada del estado del backend del Classifier de Kriptos. Fase 1 unificada (scan + match + validación) + Fase 2 (GSE sample collection) con DDB compartida.</div>
-<div class="meta">Última actualización: 2026-05-23 (consolidación post-refresh) · Owner backend: Haroldo Arias · Épica: <a href="https://kriptosteam.atlassian.net/browse/KT-16369" style="color:var(--primary)">KT-16369</a></div>
-</header>
-
-<div class="consolidation-banner">
-<h3>📌 Resumen del flujo</h3>
-<p><strong>Fase 1</strong> cubre tres pasos secuenciales: <strong>scan de archivos</strong> (agente recorre el filesystem) → <strong>match de keywords</strong> (backend EMR Spark) → <strong>validación humana</strong> (cliente revisa candidatos en la Plataforma Web y aprueba/rechaza). El output de la validación dispara Fase 2.</p>
-<p><strong>Fase 2</strong> es la recolección de samples (GSE): el agente extrae chunks de cada archivo validado, los sube a S3, el Anonymizer los procesa, y el LLM finalmente clasifica el cycle completo.</p>
-<p><strong>State machine único</strong>: una sola DDB <code>classifier-cycles-state</code> (<a href="https://kriptosteam.atlassian.net/browse/KT-17009" style="color:var(--primary)">KT-17009</a>) mantiene el estado de enterprises + stations a lo largo de las dos fases.</p>
-<p><strong>Validation mode</strong> ∈ {enterprise, station}: el cliente confirma el set completo o station por station. <strong>KEM</strong> es la verdad absoluta para saber cuántas stations hay activas por enterprise.</p>
-<p><strong>✅ Todas las specs (Skill 02) están listas</strong> en <code>specs-staging/</code> — 13 archivos, uno por ticket de código. Cada ticket está listo para arrancar Skill 03 (Plan) / Skill 04 (TDD) sin esperar el flujo completo. Ver <a href="../../specs-staging/README.md" style="color:var(--primary)">índice maestro</a>.</p>
-<p><strong>✅ Fase 1 cerrada</strong> — 11 decisiones tomadas (10 técnicas + 5 externas resueltas). Estados del CYCLE renombrados (<code>scanning → stations_complete → confirmed → phase2_collecting → complete</code>). SNS topic <code>phase1-ready-for-validation</code> dropped — UI hace polling/subscription GraphQL. AppSync resolver confirmado como canal de validation. Ver <a href="../../specs-staging/DECISIONS-FASE-1.md" style="color:var(--primary)">DECISIONS-FASE-1.md</a> + <a href="../../specs-staging/graphql-schema-appsync.md" style="color:var(--primary)">graphql-schema-appsync.md</a>.</p>
-<p><strong>✅ Fase 2 cerrada</strong> — 9 decisiones técnicas + 4 externas con stubs. STATION row reusada entre F1↔F2 (UPDATE no PUT). Sub-estados F2 <code>sampling_status: requested → uploading → sample_recolected → sample_anonymized</code>. Filter del Pipe por atributo (cada state lambda solo ve su fase). Publish-first al LLM con contrato de idempotencia. TTL 90d para cleanup automático. Ver <a href="../../specs-staging/DECISIONS-FASE-2.md" style="color:var(--primary)">DECISIONS-FASE-2.md</a>. Las 4 externas (canales Signal Handler/Anonymizer/LLM + WAF) no bloquean Skill 04 — funcionan con stubs.</p>
+<div class="hero">
+  <h1>Classifier Backend v2</h1>
+  <p>Estado del proyecto · 2 monorepos · 1 State Machine · 28 tickets consolidados</p>
+  <div class="date">2026-05-28</div>
 </div>
 
-<div class="kpis">
-<div class="kpi success">
-<div class="label">Deployed</div>
-<div class="value">1</div>
-<div class="sub">KT-16612 tree-url-generator</div>
-</div>
-<div class="kpi warning">
-<div class="label">In Progress / Blocked</div>
-<div class="value">3</div>
-<div class="sub">KT-16613/14/16 — sprint MAY-2</div>
-</div>
-<div class="kpi info">
-<div class="label">Dev tickets nuevos (RFC)</div>
-<div class="value">10</div>
-<div class="sub">42 story points</div>
-</div>
-<div class="kpi info">
-<div class="label">DevOps tickets nuevos (RFC)</div>
-<div class="value">15</div>
-<div class="sub">65 SP (incluye KT-17034 follow-up repo joyas-priorizer)</div>
-</div>
-<div class="kpi danger">
-<div class="label">DevOps Bloqueado</div>
-<div class="value">1</div>
-<div class="sub">KT-16726 — destrabar urgente</div>
-</div>
+<!-- ============ BIG STAT ============ -->
+<div class="big-stat">
+  <div class="label">Tickets en marcha</div>
+  <div class="number">15<span>/28</span></div>
+  <div class="progress">
+    <div class="progress-fill-done"></div>
+    <div class="progress-fill-wip"></div>
+  </div>
+  <div class="legend-row">
+    <span class="legend-pill done"><span class="dot"></span>5 listas</span>
+    <span class="legend-pill wip"><span class="dot"></span>10 en desarrollo</span>
+    <span class="legend-pill pending"><span class="dot"></span>13 pendientes</span>
+  </div>
 </div>
 
-<section>
-<h2>🔁 Flujo simple <span class="badge">visión rápida</span></h2>
-<p>Los 6 pasos del pipeline end-to-end. Esta es la vista para entender qué pasa de un golpe — sin tickets ni IDs.</p>
+<!-- ============ STATUS CARDS ============ -->
+<div class="grid">
 
-<div class="diagram-container">
-<div class="mermaid">
-flowchart LR
-    classDef step fill:#e8f0fe,stroke:#1967d2,color:#0d47a1,font-weight:bold
-    classDef human fill:#fef0e6,stroke:#d93025,color:#8a4100,font-weight:bold
-    classDef ext fill:#f0f0f0,stroke:#666,color:#333
+  <div class="card done">
+    <div class="header">
+      <div class="title">✅ Lambdas Fase 1 Scan</div>
+      <div class="count">4</div>
+    </div>
+    <div class="desc">Funcionales en producción · migración a monorepo en curso</div>
+    <ul>
+      <li>tree-url-generator</li>
+      <li>tree-uncompressor</li>
+      <li>emr-job-trigger</li>
+      <li>joyas-priorizer</li>
+    </ul>
+  </div>
 
-    S1["1. Agente<br/>escanea archivos"]:::step
-    S2["2. Backend<br/>matchea keywords"]:::step
-    S3["3. Indexa<br/>candidatos en<br/>OpenSearch"]:::step
-    S4["4. Cliente<br/>valida en<br/>Plataforma Web"]:::human
-    S5["5. Backend<br/>recolecta samples"]:::step
-    S6["6. IA anonimiza<br/>y clasifica"]:::ext
+  <div class="card in-progress">
+    <div class="header">
+      <div class="title">🔧 Lambdas Fase 1 Validación</div>
+      <div class="count">4</div>
+    </div>
+    <div class="desc">En desarrollo · finalizan <strong>mañana (2026-05-29)</strong></div>
+    <ul>
+      <li>crown-candidates-indexer</li>
+      <li>crown-enterprise-barrier</li>
+      <li>crown-validation-handler</li>
+      <li>crown-validation-confirm</li>
+    </ul>
+  </div>
 
-    S1 --> S2 --> S3 --> S4 --> S5 --> S6
-</div>
-</div>
+  <div class="card in-progress">
+    <div class="header">
+      <div class="title">🔧 Infra Fase 1</div>
+      <div class="count">6</div>
+    </div>
+    <div class="desc">CloudFormation en curso · monorepo scan-match-backend</div>
+    <ul>
+      <li>DDB classifier-cycles-state</li>
+      <li>ECR + IAM roles</li>
+      <li>S3 buckets Fase 1 (4)</li>
+      <li>EMR Serverless + OpenSearch</li>
+      <li>EventBridge Pipes (Stream)</li>
+      <li>VPC + Secrets Manager</li>
+    </ul>
+  </div>
 
-<table style="margin-top:16px;">
-<thead><tr><th>Paso</th><th>Quién lo hace</th><th>Output</th></tr></thead>
-<tbody>
-<tr><td><strong>1. Scan</strong></td><td>Agente (Windows / Cloud)</td><td>Árbol de archivos comprimido en S3</td></tr>
-<tr><td><strong>2. Match</strong></td><td>Backend (EMR Spark)</td><td>Lista de archivos candidatos por station</td></tr>
-<tr><td><strong>3. Index</strong></td><td>Backend (Lambda)</td><td>Candidatos en OpenSearch listos para la UI</td></tr>
-<tr><td><strong>4. Validación</strong></td><td>Cliente (Plataforma Web)</td><td>Set validado (aprobados + agregados manualmente)</td></tr>
-<tr><td><strong>5. Sampling</strong></td><td>Agente + Backend (GSE)</td><td>Chunks de cada archivo subidos a S3</td></tr>
-<tr><td><strong>6. Clasificación</strong></td><td>IA (Anonymizer + LLM)</td><td>Archivos etiquetados final</td></tr>
-</tbody>
-</table>
-</section>
+  <div class="card f2 pending">
+    <div class="header">
+      <div class="title">📋 Lambdas Fase 2 GSE</div>
+      <div class="count">6</div>
+    </div>
+    <div class="desc">En spec · monorepo gse-backend</div>
+    <ul>
+      <li>gse-cycle-init</li>
+      <li>gse-sample-reception-notifier</li>
+      <li>gse-request-complete</li>
+      <li>gse-sample-anonymizer-notifier</li>
+      <li>gse-station-status</li>
+      <li>gse-enterprise-status</li>
+    </ul>
+  </div>
 
-<section>
-<h2>📐 Arquitectura técnica detallada <span class="badge">con tickets</span> <a href="architecture-complete.drawio" download style="margin-left:auto; font-size:13px; padding:6px 14px; background:var(--success); color:white; border-radius:6px; text-decoration:none; font-weight:600;">⬇ Bajar .drawio (estilo AWS icons para Miro)</a></h2>
-<p>El mismo flujo, ahora con todos los componentes AWS, los tickets Jira y la DDB compartida en el centro. El archivo <code>.drawio</code> usa íconos AWS oficiales (mismo estilo que tu Miro) — todo en una sola página con backgrounds de fase como segmentación visual. Se abre en <a href="https://app.diagrams.net" target="_blank">app.diagrams.net</a> o en VS Code con la extensión "Draw.io Integration". Para Miro: importar como SVG/PNG o copiar/pegar los nodos.</p>
+  <div class="card f2 pending">
+    <div class="header">
+      <div class="title">📋 Infra Fase 2</div>
+      <div class="count">7</div>
+    </div>
+    <div class="desc">CloudFormation por planificar</div>
+    <ul>
+      <li>S3 gse-raw / gse-anonymized</li>
+      <li>SQS reception + anonymizer queues</li>
+      <li>SNS Signal Handler</li>
+      <li>EventBridge Pipes Fase 2</li>
+      <li>API GW /v2/gse/request-complete</li>
+      <li>CloudWatch + mTLS certs</li>
+      <li>S3 lifecycle policies</li>
+    </ul>
+  </div>
 
-<div class="legend">
-<span class="legend-item"><span class="legend-color" style="background:#c3e6cb;border:1px solid #0f5132"></span>Deployed</span>
-<span class="legend-item"><span class="legend-color" style="background:#fff3cd;border:1px solid #856404"></span>In Progress</span>
-<span class="legend-item"><span class="legend-color" style="background:#f8d7da;border:1px solid #721c24"></span>Blocked</span>
-<span class="legend-item"><span class="legend-color" style="background:#cce5ff;border:1px solid #004085"></span>RFC (nuevo)</span>
-<span class="legend-item"><span class="legend-color" style="background:#fce4ec;border:1px solid #ad1457"></span>State machine compartido</span>
-<span class="legend-item"><span class="legend-color" style="background:#fef0e6;border:1px solid #fd7e14"></span>Storage</span>
-<span class="legend-item"><span class="legend-color" style="background:#f0f0f0;border:1px dashed #666"></span>Caja negra externa</span>
-</div>
-
-<div class="diagram-container">
-<div class="mermaid">
-flowchart TB
-    classDef deployed fill:#c3e6cb,stroke:#0f5132,color:#0f5132,font-weight:bold
-    classDef wip fill:#fff3cd,stroke:#856404,color:#856404,font-weight:bold
-    classDef blocked fill:#f8d7da,stroke:#721c24,color:#721c24,font-weight:bold
-    classDef rfc fill:#cce5ff,stroke:#004085,color:#004085,font-weight:bold
-    classDef shared fill:#fce4ec,stroke:#ad1457,color:#880e4f,font-weight:bold
-    classDef storage fill:#fef0e6,stroke:#fd7e14,color:#8a4100
-    classDef external fill:#f0f0f0,stroke:#666,color:#333
-
-    Agent["Windows o Cloud Agent"]:::external
-    Plataforma["Plataforma Web"]:::external
-    KEM["KEM API"]:::external
-
-    DB[("classifier-cycles-state<br/>KT-17009<br/>DDB con Stream")]:::shared
-
-    subgraph P1 [FASE 1 - Scan Match Validacion]
-        T1["KT-16612<br/>tree-url-generator<br/>DEPLOYED"]:::deployed
-        T2["KT-16613<br/>tree-uncompressor<br/>WIP - BLOCKED"]:::blocked
-        T3["KT-16614<br/>emr-job-trigger<br/>WIP - BLOCKED"]:::blocked
-        T4["KT-16616<br/>joyas-priorizer<br/>WIP + MOD"]:::wip
-        B1[(compressed_trees)]:::storage
-        B2[(decompressed_trees)]:::storage
-        B3[(crown_jewels)]:::storage
-
-        T5["KT-17024<br/>candidates-indexer<br/>RFC"]:::rfc
-        T6["KT-17025<br/>enterprise-barrier<br/>RFC"]:::rfc
-        T7["KT-17026<br/>mutation-handler<br/>RFC"]:::rfc
-        T8["KT-17027<br/>validation-confirm<br/>RFC"]:::rfc
-        OS[("OpenSearch<br/>crown_jewel_candidates")]:::storage
-        B4[(validated_crown_jewels)]:::storage
-    end
-
-    subgraph P2 [FASE 2 - GSE Sample Collection]
-        G1["KT-17028<br/>gse-cycle-init<br/>RFC"]:::rfc
-        G2["KT-17029<br/>reception-notifier<br/>RFC"]:::rfc
-        G3["KT-17030<br/>anonymizer-notifier<br/>RFC"]:::rfc
-        G4["KT-17031<br/>request-complete<br/>RFC"]:::rfc
-        G5["KT-17032<br/>station-status<br/>RFC"]:::rfc
-        G6["KT-17033<br/>enterprise-status<br/>RFC"]:::rfc
-        B5[(gse-raw)]:::storage
-        B6[(gse-anonymized)]:::storage
-    end
-
-    SH["Signal Handler"]:::external
-    AN["Anonymizer"]:::external
-    LLM["LLM Process Queue"]:::external
-
-    Agent --> T1
-    T1 --> B1
-    B1 --> T2
-    T2 --> B2
-    B2 --> T3
-    T3 --> T4
-    T4 --> B3
-    B3 --> T5
-    KEM -.-> T5
-    T5 --> OS
-    T5 --> DB
-    DB -.-> T6
-    T6 --> DB
-    Plataforma -.->|polling / subscription GraphQL| DB
-    Plataforma --> T7
-    T7 --> OS
-    T7 --> DB
-    Plataforma --> T8
-    T8 --> OS
-    T8 --> B4
-    T8 --> DB
-    B4 --> G1
-    G1 --> DB
-    G1 -.-> SH
-    SH -.-> Agent
-    Agent --> B5
-    B5 --> G2
-    G2 --> DB
-    G2 -.-> AN
-    AN --> B6
-    B6 --> G3
-    G3 --> DB
-    Agent --> G4
-    G4 --> DB
-    DB -.-> G5
-    G5 --> DB
-    DB -.-> G6
-    G6 -.-> LLM
-</div>
 </div>
 
-<div class="info-box">
-<strong>🎯 La DDB compartida es el centro del flujo.</strong> Todos los componentes (Fase 1 y Fase 2) leen y escriben sobre la misma tabla. La distinción entre fases es solo el <code>CYCLE.status</code>: <code>scanning</code> → <code>stations_complete</code> → <code>confirmed</code> → <code>phase2_collecting</code> → <code>complete</code>. Los state lambdas filtran por el status correspondiente para no procesar transiciones que no les corresponden.
-</div>
-</section>
-
-<section>
-<h2>💻 Dev Tickets (código) <span class="badge">11 activos + 1 done</span></h2>
-
-<h3>Fase 1 — Scan + Match (cuatro Lambdas existentes) <span class="phase-tag f1">FASE 1</span></h3>
-<table>
-<thead><tr>
-<th>Ticket</th><th>Componente</th><th>Status</th><th>SP</th><th>DevOps blocker</th><th>Notas</th>
-</tr></thead>
-<tbody>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16612">KT-16612</a></td>
-<td><div class="lambda-name">tree-url-generator</div><div class="ticket-desc">Genera URL presigned para que el agente suba el árbol comprimido del filesystem a S3.</div></td>
-<td><span class="status deployed">✅ Deployed</span></td>
-<td><span class="sp">3</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-16725">KT-16725</a> WIP</td>
-<td>Repo: <code>kriptos-io/s3-tree-uploader</code></td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16613">KT-16613</a></td>
-<td><div class="lambda-name">tree-uncompressor</div><div class="ticket-desc">Descomprime el árbol subido por el agente y lo deja listo en S3 para que EMR lo procese.</div></td>
-<td><span class="status wip">🟡 In Progress</span></td>
-<td><span class="sp">3</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-16726">KT-16726</a> 🔴 BLOCKED</td>
-<td>Sprint MAY-2 · sin cambios del refresh</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16614">KT-16614</a></td>
-<td><div class="lambda-name">emr-job-trigger</div><div class="ticket-desc">Lanza el job de EMR Serverless con los parámetros correctos al detectar un árbol descomprimido nuevo.</div></td>
-<td><span class="status wip">🟡 In Progress</span></td>
-<td><span class="sp">3</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-16726">KT-16726</a> 🔴 BLOCKED</td>
-<td>Sprint MAY-2 · sin cambios del refresh</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16616">KT-16616</a></td>
-<td><div class="lambda-name">joyas-priorizer (PySpark)</div><div class="ticket-desc">Match vectorizado de cada archivo del árbol contra el catálogo de keywords (Aho-Corasick + normalize compartido) y escribe candidatos a S3.</div></td>
-<td><span class="status wip">🟡 WIP + MOD</span></td>
-<td><span class="sp">3</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-16728">KT-16728</a> ✅ DONE</td>
-<td>MOD aplicado: JSONL, Aho-Corasick, normalize compartido</td>
-</tr>
-</tbody>
-</table>
-
-<h3>Fase 1 — Validación humana (cuatro Lambdas nuevas) <span class="phase-tag f1val">FASE 1 (validación)</span></h3>
-<p style="font-size:13px; color:var(--text-soft); margin-bottom:8px;">Update 2026-05-23: estos Lambdas eran "Fase 1.5", ahora son parte de Fase 1 (validación = último paso de Fase 1). Todos usan la DDB consolidada <a href="https://kriptosteam.atlassian.net/browse/KT-17009"><code>classifier-cycles-state</code></a>.</p>
-<table>
-<thead><tr>
-<th>Ticket</th><th>Componente</th><th>Status</th><th>SP</th><th>DevOps blockers</th><th>Notas</th>
-</tr></thead>
-<tbody>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17024">KT-17024</a></td>
-<td><div class="lambda-name">crown-candidates-indexer</div><div class="ticket-desc">Lee candidatos del bucket crown_jewels, los bulk-indexa en OpenSearch y crea/actualiza STATION + CYCLE en la DDB compartida.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">5</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17012">KT-17012</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17010">KT-17010</a></td>
-<td>S3 → SQS → bulk index OS + STATION en DDB</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17025">KT-17025</a></td>
-<td><div class="lambda-name">phase1-enterprise-barrier</div><div class="ticket-desc">State lambda que cuenta stations completadas vía DDB Stream y transiciona el CYCLE a <code>stations_complete</code> cuando llega al expected (KEM).</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">3</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17013">KT-17013</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a></td>
-<td>State lambda — Pipe sobre DDB Stream, filter <code>STATION#</code></td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17026">KT-17026</a></td>
-<td><div class="lambda-name">validation-mutation-handler</div><div class="ticket-desc">AppSync resolver que aplica las mutaciones del cliente desde la UI (validar grupo carpeta+keyword, override por archivo, agregar extra paths).</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">5</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17014">KT-17014</a> + GraphQL Plataforma Web</td>
-<td>AppSync resolver. Sync con Plataforma Web (schema GraphQL en <code>specs-staging/graphql-schema-appsync.md</code>).</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17027">KT-17027</a></td>
-<td><div class="lambda-name">validation-confirm</div><div class="ticket-desc">Mutation final que congela el set validado (enterprise-wide), persiste el manifest en S3 (split 50k) y dispara la Fase 2 vía SQS FIFO.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">8</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17015">KT-17015</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17010">KT-17010</a></td>
-<td>AppSync mutation + scroll OS + manifest split a 50k. Confirm siempre global enterprise (sin <code>station_id</code>).</td>
-</tr>
-</tbody>
-</table>
-
-<h3>Fase 2 — Priority Sample Collection (GSE) <span class="phase-tag f2">FASE 2</span></h3>
-<table>
-<thead><tr>
-<th>Ticket</th><th>Componente</th><th>Status</th><th>SP</th><th>DevOps blockers</th><th>Notas</th>
-</tr></thead>
-<tbody>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17028">KT-17028</a></td>
-<td><div class="lambda-name">gse-cycle-init</div><div class="ticket-desc">Consume el manifest validado y transiciona el CYCLE existente a <code>phase2_collecting</code>, materializa REQUESTs por STATION y notifica al Signal Handler.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">5</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17018">KT-17018</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a></td>
-<td>Transición CYCLE → <code>phase2_collecting</code> (no crea CYCLE nuevo). Multi-trigger por <code>process_type</code>.</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17029">KT-17029</a></td>
-<td><div class="lambda-name">gse-sample-reception-notifier</div><div class="ticket-desc">Detecta sample subido a <code>gse-raw</code>, incrementa <code>samples_received</code> en STATION y notifica al canal del Anonymizer (IA).</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">3</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17019">KT-17019</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17017">KT-17017</a></td>
-<td>Simple counter update + notify Anonymizer</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17030">KT-17030</a></td>
-<td><div class="lambda-name">gse-sample-anonymizer-notifier</div><div class="ticket-desc">Detecta sample anonimizado en <code>gse-anonymized</code> e incrementa <code>samples_anonymized</code> en la STATION correspondiente.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">2</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17020">KT-17020</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17017">KT-17017</a></td>
-<td>El más simple — solo counter</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17031">KT-17031</a></td>
-<td><div class="lambda-name">gse-request-complete</div><div class="ticket-desc">Endpoint que el agente llama cuando termina de subir una request — marca REQUEST=sent y acumula <code>samples_skipped</code> en STATION (TransactWriteItems).</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">3</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17021">KT-17021</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a></td>
-<td>API GW POST /v2/gse/request-complete + TransactWriteItems</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17032">KT-17032</a></td>
-<td><div class="lambda-name">gse-station-status</div><div class="ticket-desc">State lambda que cierra la STATION (<code>sampling_status=sample_anonymized</code>) cuando counters cuadran e incrementa el CYCLE padre.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">3</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17022">KT-17022</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a></td>
-<td>State lambda STATION (filter por <code>CYCLE.status=phase2_collecting</code>)</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17033">KT-17033</a></td>
-<td><div class="lambda-name">gse-enterprise-status</div><div class="ticket-desc">State lambda que cierra el CYCLE cuando todas las STATIONs cerraron, setea TTL 90d (cascade) y notifica al LLM Process Queue downstream.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">5</span></td>
-<td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17023">KT-17023</a> + <a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a></td>
-<td>State lambda CYCLE + notify LLM (una vez por cycle cerrado)</td>
-</tr>
-</tbody>
-</table>
-</section>
-
-<section>
-<h2>⚙️ DevOps Tickets (infra) <span class="badge">6 existentes + 14 nuevos efectivos</span> <a href="devops-reunion.html" style="margin-left:auto; font-size:13px; padding:6px 14px; background:var(--primary); color:white; border-radius:6px; text-decoration:none; font-weight:600;">📋 Brief reunión DevOps →</a></h2>
-
-<h3>Existentes <span class="phase-tag f1">FASE 1</span></h3>
-<table>
-<thead><tr>
-<th>Ticket</th><th>Entregable</th><th>Status</th><th>Owner</th><th>Notas</th>
-</tr></thead>
-<tbody>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16725">KT-16725</a></td>
-<td><div>tree-url-generator (Lambda + API GW + bucket compressed_trees)</div><div class="ticket-desc">Provisiona el primer endpoint del pipeline: API GW route + Lambda + bucket donde el agente sube el árbol.</div></td>
-<td><span class="status wip">🟡 In Progress</span></td>
-<td>Cristian Armas</td>
-<td>Lambda deployed, loose ends pendientes</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16726">KT-16726</a></td>
-<td><div>tree-uncompressor + emr-job-trigger (Lambdas + decompressed_trees + DLQ + EventBridge)</div><div class="ticket-desc">Provisiona dos Lambdas en cadena, el bucket intermedio descomprimido y las rules que las conectan con EMR.</div></td>
-<td><span class="status blocked">🔴 BLOCKED</span></td>
-<td>Fabian Buitron</td>
-<td><strong>Urgente — bloquea KT-16613 y KT-16614</strong></td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16727">KT-16727</a></td>
-<td><div>emr-job-trigger standalone</div><div class="ticket-desc">Ticket original ya consolidado dentro de KT-16726 — no se trabaja por separado.</div></td>
-<td><span class="status cancelled">Cancelled</span></td>
-<td>Fabian Buitron</td>
-<td>Consolidado en KT-16726</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16728">KT-16728</a></td>
-<td><div>joyas-priorizer (EMR Serverless + buckets keywords y crown_jewels)</div><div class="ticket-desc">Aplicación EMR Serverless + buckets para input (keywords) y output (crown_jewels) del matcher.</div></td>
-<td><span class="status deployed">✅ DONE</span></td>
-<td>Cristian Armas</td>
-<td>Bucket crown_jewels se reusa como candidatos (no rename)</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-16729">KT-16729</a></td>
-<td><div>Monitoring base (SNS kriptos-backend-alerts + subs)</div><div class="ticket-desc">Topic SNS + suscripciones (email/Slack) consumido por todas las alarmas CloudWatch del backend.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td>Cristian Armas</td>
-<td>Bloquea todas las alarmas del backend</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17034">KT-17034</a></td>
-<td><div>Crear repo <code>kriptos-io/joyas-priorizer</code> (follow-up KT-16728)</div><div class="ticket-desc">Follow-up de KT-16728: la infra AWS está deployada (EMR + buckets) pero el repo de código nunca se creó. Bloquea a KT-16616 (dev WIP).</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td>(sin asignar)</td>
-<td>Mini ticket de 4h — repo + pipeline EMR Serverless</td>
-</tr>
-</tbody>
-</table>
-
-<div class="info-box">
-<strong>✅ Creación de repos GitHub: cubierta por DevOps.</strong> Verificado 2026-05-23: <strong>cada DevOps ticket nuevo de Lambda (KT-17012/13/14/15/18/19/20/21/22/23) ya incluye la creación del repo <code>kriptos-io/&lt;nombre&gt;</code> en su AC01</strong> (mismo patrón que <code>kriptos-io/s3-tree-uploader</code>). Estado actual en GitHub: <strong>4 repos existen</strong> (s3-tree-uploader, tree-uncompressor, emr-job-trigger, unlockstack) y <strong>11 faltan</strong> (joyas-priorizer + 10 nuevos). Los 11 están cubiertos por DevOps tickets — Haroldo NO crea repos manualmente.
+<!-- ============ FLOW ============ -->
+<div class="flow-section">
+  <h2>Flujo end-to-end</h2>
+  <div class="sub">6 pasos · de scan a clasificación final</div>
+  <div class="flow">
+    <div class="flow-step done">
+      <div class="num">1</div>
+      <div class="name">Scan</div>
+      <div class="desc">Agent escanea workstations</div>
+    </div>
+    <div class="flow-step done">
+      <div class="num">2</div>
+      <div class="name">Match</div>
+      <div class="desc">EMR matchea keywords</div>
+    </div>
+    <div class="flow-step">
+      <div class="num">3</div>
+      <div class="name">Validate</div>
+      <div class="desc">Cliente aprueba/rechaza</div>
+    </div>
+    <div class="flow-step">
+      <div class="num">4</div>
+      <div class="name">Confirm</div>
+      <div class="desc">Materializa manifest</div>
+    </div>
+    <div class="flow-step">
+      <div class="num">5</div>
+      <div class="name">Sample</div>
+      <div class="desc">Agent extrae + anonimiza</div>
+    </div>
+    <div class="flow-step">
+      <div class="num">6</div>
+      <div class="name">Classify</div>
+      <div class="desc">LLM genera labels</div>
+    </div>
+  </div>
 </div>
 
-<h3>Nuevos — Shared State (consolidado) <span class="phase-tag" style="background:#fce4ec;color:#ad1457">SHARED</span></h3>
-<table>
-<thead><tr>
-<th>Ticket</th><th>Entregable</th><th>Status</th><th>SP</th><th>Bloquea a</th>
-</tr></thead>
-<tbody>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17009">KT-17009</a></td>
-<td><div><strong>DDB <code>classifier-cycles-state</code> + Stream</strong> (consolidada Fase 1 + Fase 2 — absorbe lo de KT-17016)</div><div class="ticket-desc">Single-table con PK=enterprise_id y SK multi-prefix (CYCLE# / STATION# / REQUEST#). Stream NEW_AND_OLD_IMAGES alimenta a todas las state lambdas.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">3</span></td>
-<td class="dependency-list">Los 10 DevOps de Lambdas (KT-17012 a KT-17023)</td>
-</tr>
-<tr>
-<td class="ticket-id"><s><a href="https://kriptosteam.atlassian.net/browse/KT-17016">KT-17016</a></s></td>
-<td><div><s>DDB gse-cycles-samples + Stream (Fase 2)</s></div><div class="ticket-desc">Tabla separada de Fase 2 — innecesaria tras la consolidación. Cerrar como Cancelled cuando DevOps lo vea en el board.</div></td>
-<td><span class="status superseded">⛔ SUPERSEDED</span></td>
-<td>—</td>
-<td class="dependency-list">Consolidado en KT-17009</td>
-</tr>
-</tbody>
-</table>
-
-<h3>Nuevos — Fase 1 (validación) <span class="phase-tag f1val">FASE 1 (validación)</span></h3>
-<table>
-<thead><tr>
-<th>Ticket</th><th>Entregable</th><th>Status</th><th>SP</th><th>Bloquea a</th>
-</tr></thead>
-<tbody>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17010">KT-17010</a></td>
-<td><div>Índice OpenSearch <code>crown_jewel_candidates</code> + mappings</div><div class="ticket-desc">Índice OS donde se persisten los candidatos para la UI de validación (queries directas vía AppSync con IAM SigV4).</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">5</span></td>
-<td class="dependency-list">KT-17024, 17026, 17027, GraphQL Plataforma Web</td>
-</tr>
-<tr>
-<td class="ticket-id"><s><a href="https://kriptosteam.atlassian.net/browse/KT-17011">KT-17011</a></s></td>
-<td><div><s>Secret <code>kem-api-key</code></s></div><div class="ticket-desc">Cancelado 2026-05-26 — redundante. El IAM grant ya está en el AC de cada Lambda que lo consume (KT-17078, KT-17082).</div></td>
-<td><span class="status cancelled">⛔ Cancelled</span></td>
-<td><span class="sp">—</span></td>
-<td class="dependency-list">—</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17012">KT-17012</a></td>
-<td><div>Lambda crown-candidates-indexer + SQS + EventBridge sobre crown_jewels</div><div class="ticket-desc">Provisiona el indexer: ECR + Lambda + SQS de input + EventBridge rule sobre el bucket crown_jewels.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">5</span></td>
-<td class="dependency-list">KT-17024 (código)</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17013">KT-17013</a></td>
-<td><div>Lambda phase1-enterprise-barrier + EventBridge Pipe sobre DDB Stream</div><div class="ticket-desc">Provisiona la state lambda y el Pipe (filter por SK prefix STATION# y scan_status=complete).</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">5</span></td>
-<td class="dependency-list">KT-17025 (código), Plataforma Web (notify)</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17014">KT-17014</a></td>
-<td><div>Lambda validation-mutation-handler + invocación desde GraphQL Plataforma Web</div><div class="ticket-desc">Provisiona la Lambda + datasource AppSync con permisos para que la Plataforma Web invoque las mutations del cliente.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">5</span></td>
-<td class="dependency-list">KT-17026 (código), Plataforma Web</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17015">KT-17015</a></td>
-<td><div>Lambda validation-confirm + API GW route + bucket validated_crown_jewels + SQS FIFO</div><div class="ticket-desc">Provisiona toda la salida de Fase 1: Lambda + bucket de manifests validados + SQS FIFO que dispara a Fase 2.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">8</span></td>
-<td class="dependency-list">KT-17027 (código), Fase 2</td>
-</tr>
-</tbody>
-</table>
-
-<h3>Nuevos — Fase 2 <span class="phase-tag f2">FASE 2</span></h3>
-<table>
-<thead><tr>
-<th>Ticket</th><th>Entregable</th><th>Status</th><th>SP</th><th>Bloquea a</th>
-</tr></thead>
-<tbody>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17017">KT-17017</a></td>
-<td><div>Buckets <code>gse-raw</code> + <code>gse-anonymized</code> + EventBridge rules + SQS queues</div><div class="ticket-desc">Storage de samples (crudo + anonimizado) y la plomería EventBridge → SQS que conecta agente, notifiers y Anonymizer.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">5</span></td>
-<td class="dependency-list">KT-17029, 17030, Agente, Anonymizer, LLM (IA)</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17018">KT-17018</a></td>
-<td><div>Lambda gse-cycle-init + SQS FIFO consumer</div><div class="ticket-desc">Provisiona la Lambda que arranca Fase 2: consumer del SQS FIFO de manifests validados.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">5</span></td>
-<td class="dependency-list">KT-17028 (código)</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17019">KT-17019</a></td>
-<td><div>Lambda gse-sample-reception-notifier + SQS consumer</div><div class="ticket-desc">Provisiona la Lambda que escucha eventos S3 PutObject sobre gse-raw vía SQS.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">3</span></td>
-<td class="dependency-list">KT-17029 (código)</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17020">KT-17020</a></td>
-<td><div>Lambda gse-sample-anonymizer-notifier + SQS consumer</div><div class="ticket-desc">Provisiona la Lambda que escucha eventos S3 PutObject sobre gse-anonymized vía SQS.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">3</span></td>
-<td class="dependency-list">KT-17030 (código)</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17021">KT-17021</a></td>
-<td><div>Lambda gse-request-complete + API GW route</div><div class="ticket-desc">Provisiona el endpoint HTTP que el agente llama al cerrar una request (API GW route + Lambda + API key compartida con /v2/tree/init).</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">3</span></td>
-<td class="dependency-list">KT-17031 (código)</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17022">KT-17022</a></td>
-<td><div>Lambda gse-station-status + EventBridge Pipe sobre DDB Stream</div><div class="ticket-desc">Provisiona la state lambda STATION + Pipe (filter por atributo sampling_status existe → solo eventos Fase 2).</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">5</span></td>
-<td class="dependency-list">KT-17032 (código)</td>
-</tr>
-<tr>
-<td class="ticket-id"><a href="https://kriptosteam.atlassian.net/browse/KT-17023">KT-17023</a></td>
-<td><div>Lambda gse-enterprise-status + EventBridge Pipe + notify LLM</div><div class="ticket-desc">Provisiona la state lambda CYCLE + Pipe (filter status=phase2_collecting) + permisos de publish al canal del LLM Process Queue.</div></td>
-<td><span class="status rfc">📋 RFC</span></td>
-<td><span class="sp">5</span></td>
-<td class="dependency-list">KT-17033 (código)</td>
-</tr>
-</tbody>
-</table>
-</section>
-
-<section>
-<h2>🎯 Decisiones del refresh (consolidadas)</h2>
-<div class="decision-grid">
-<div class="decision-card">
-<div class="title">Fase 1 unificada</div>
-<div class="why">Scan + match + validación humana son una sola fase. No hay "Fase 1.5". La validación es el último paso de Fase 1 antes de pasar a Fase 2 (GSE).</div>
-</div>
-<div class="decision-card">
-<div class="title">DDB única <code>classifier-cycles-state</code></div>
-<div class="why">Un solo state machine para todo el pipeline. PK = enterprise_id, SK con multi-prefix (CYCLE#, STATION#, REQUEST#). Stream NEW_AND_OLD_IMAGES alimenta a las 3 state lambdas.</div>
-</div>
-<div class="decision-card">
-<div class="title">Validation mode = enterprise OR station</div>
-<div class="why">Cliente decide si confirma el set completo del enterprise o station por station. Fase 2 corre en consecuencia (un manifest o N manifests).</div>
-</div>
-<div class="decision-card">
-<div class="title">KEM = verdad absoluta</div>
-<div class="why">Para <code>stations_expected</code>. Consultado en cycle creation (Fase 1, indexer). En Fase 2 cycle-init no se reconsulta — se mantiene el valor del CYCLE existente.</div>
-</div>
-<div class="decision-card">
-<div class="title">Mantener bucket <code>crown_jewels</code></div>
-<div class="why">KT-16728 ya lo creó. Documentar semánticamente que contiene candidatos pre-validación. Sin rename in-place.</div>
-</div>
-<div class="decision-card">
-<div class="title">Validación por carpeta + keyword</div>
-<div class="why">Con override por archivo. Volumen alto (10k+ matches) hace inviable archivo-por-archivo. UX scaleable.</div>
-</div>
-<div class="decision-card">
-<div class="title">Multi-trigger gse-cycle-init</div>
-<div class="why">Desde el inicio. Distintos event sources → distinto <code>process_type</code> via env var. Reusable para classification y otros futuros.</div>
-</div>
-<div class="decision-card">
-<div class="title">Normalización compartida</div>
-<div class="why"><code>normalize_category.py</code> determinístico entre generador de keywords (IA) y matcher (joyas-priorizer). Versionar para evitar drift.</div>
-</div>
-<div class="decision-card">
-<div class="title">Aho-Corasick + pandas_udf</div>
-<div class="why">Para multi-token match de 2k-5k patrones × 10M+ archivos. Decisión final en Skill 02 de KT-16616.</div>
-</div>
-</div>
-</section>
-
-<section>
-<h2>🔄 Transiciones del CYCLE (state machine)</h2>
-<div class="info-box">
-El <code>CYCLE.status</code> en la DDB compartida atraviesa estas transiciones secuenciales:
-</div>
-<table>
-<thead><tr><th>Estado</th><th>Quién lo setea</th><th>Quién consume</th><th>Acción</th></tr></thead>
-<tbody>
-<tr><td><code>scanning</code></td><td>crown-candidates-indexer (al crear CYCLE)</td><td>phase1-enterprise-barrier</td><td>Stations escanean en paralelo</td></tr>
-<tr><td><code>stations_complete</code></td><td>phase1-enterprise-barrier (cuando stations_completed >= stations_expected)</td><td>validation-mutation-handler (sigue permitiendo mutaciones), validation-confirm (habilita confirm)</td><td>UI habilita botón "Confirmar todo". Cliente ya viene aprobando/rechazando desde antes.</td></tr>
-<tr><td><code>confirmed</code></td><td>validation-confirm (al confirmar global)</td><td>gse-cycle-init (transiciona a phase2_collecting)</td><td>Cliente confirmó. Sólo lectura.</td></tr>
-<tr><td><code>phase2_collecting</code></td><td>gse-cycle-init (al recibir manifest)</td><td>gse-station-status, gse-enterprise-status</td><td>GSE recolectando samples per-station</td></tr>
-<tr><td><code>phase2_skipped</code></td><td>validation-confirm (si 0 approved)</td><td>—</td><td>Cycle termina sin disparar Fase 2</td></tr>
-<tr><td><code>complete</code></td><td>gse-enterprise-status (cuando todas las stations cerraron)</td><td>—</td><td>Notify al LLM Process Queue</td></tr>
-</tbody>
-</table>
-<p style="margin-top:12px; font-size:13px;">Cada state lambda **filtra** los stream records por el status correspondiente. Esto evita que `gse-station-status` procese stations de Fase 1, y que `phase1-enterprise-barrier` procese stations de Fase 2.</p>
-</section>
-
-<section>
-<h2>📦 Stack productivo (validado en s3-tree-uploader)</h2>
-<div class="info-box">
-Toda Lambda Python del backend sigue el patrón establecido por KT-16612 / <code>kriptos-io/s3-tree-uploader</code> (deployed). Cualquier ticket nuevo se implementa con esta misma arquitectura.
-</div>
-<table>
-<thead><tr><th>Pieza</th><th>Tecnología</th></tr></thead>
-<tbody>
-<tr><td>Lenguaje + runtime</td><td>Python 3.11 + AWS Lambda Container Image (no zip), ECR</td></tr>
-<tr><td>Deps runtime</td><td><code>aws-lambda-powertools[tracer]&gt;=2</code>, <code>boto3&gt;=1.34</code>, <code>pydantic&gt;=2</code></td></tr>
-<tr><td>Deps dev</td><td><code>pytest</code>, <code>moto[s3,server]</code>, <code>ruff</code>, <code>mypy</code>, <code>types-boto3</code></td></tr>
-<tr><td>Lock file</td><td><code>uv</code> (uv.lock)</td></tr>
-<tr><td>Arquitectura</td><td>Clean / hexagonal: <code>src/{domain,application/ports,application/usecases,adapters}</code> + <code>handler.py</code> en root</td></tr>
-<tr><td>Quality gates</td><td><code>ruff check + format</code>, <code>mypy --strict src</code>, <code>pytest --cov-fail-under=80</code></td></tr>
-<tr><td>CI/CD</td><td>GitHub Actions con reusable workflow <code>kriptos-io/unlockstack</code> (commitlint → SonarCloud → Snyk → Docker → ECR → deploy con QA gate)</td></tr>
-<tr><td>Naming</td><td>Repo: <code>{nombre-componente}</code>. ECR + Lambda: <code>lambda-{nombre}</code></td></tr>
-<tr><td>Workflow</td><td>Spec-Driven Development + TDD estricto. <code>/superpowers:*</code> + <code>/security-review</code>. Branches <code>KT-XXXXX-descripcion</code> (English). Commits <code>chore/feat/refactor</code> (English).</td></tr>
-</tbody>
-</table>
-</section>
-
-<section>
-<h2>🚀 Plan de arranque</h2>
-<ul class="next-steps">
-<li><strong>HOY — Bloqueante crítico</strong>
-Ping a Fabian Buitron sobre <a href="https://kriptosteam.atlassian.net/browse/KT-16726" style="color:var(--primary)">KT-16726</a> (BLOCKED). Sin esto, KT-16613 y KT-16614 no pueden deployarse. Es lo que más fricción está creando en el sprint vivo MAY-2.</li>
-
-<li><strong>Esta semana — Coordinaciones</strong>
-Sync con Nelson Garzón (<a href="https://kriptosteam.atlassian.net/browse/KT-16920" style="color:var(--primary)">KT-16920</a>) para alinear formato JSONL + normalize_category.py antes de cerrar Skill 02 de KT-16616.
-Sync con Plataforma Web para schema GraphQL + canal de notificación (bloquea KT-17013, 17014, 17026).</li>
-
-<li><strong>Sprint 1 (DevOps) — Infra crítica</strong>
-<a href="https://kriptosteam.atlassian.net/browse/KT-17009" style="color:var(--primary)">KT-17009</a> (DDB consolidada — <strong>bloquea las 10 Lambdas nuevas</strong>) → <a href="https://kriptosteam.atlassian.net/browse/KT-17010" style="color:var(--primary)">KT-17010</a> (OpenSearch índice nuevo en cluster existente).
-También priorizar <a href="https://kriptosteam.atlassian.net/browse/KT-16729" style="color:var(--primary)">KT-16729</a> (monitoring base) — bloquea todas las alarmas.</li>
-
-<li><strong>Sprint 1 (Dev) — Brainstorm individual + Skill 02 por código</strong>
-Mientras DevOps construye infra, arrancar Skill 01 (brainstorm individual) por cada componente, en orden:
-KT-16613 → KT-16614 → KT-17024 (indexer) → KT-17025 (barrier) → KT-16616 (con algoritmo Aho-Corasick).</li>
-
-<li><strong>Sprint 2 — Lambdas Fase 1 validación</strong>
-KT-17024, KT-17025 en paralelo (no dependen de Plataforma Web).
-KT-17027 (validation-confirm) cuando esté listo el bucket validated_crown_jewels + SQS FIFO de KT-17015.
-KT-17026 (validation-mutation-handler) queda en espera de Plataforma Web.</li>
-
-<li><strong>Sprint 3+ — Fase 2</strong>
-Arrancar con KT-17017 (buckets/SQS Fase 2) en paralelo. Note: la DDB ya existe de Sprint 1 (KT-17009 consolidada).
-KT-17028 (gse-cycle-init) primero — bloquea al resto.
-Resto de Lambdas Fase 2 (KT-17029-17033) en paralelo o orden según capacidad.</li>
-</ul>
-</section>
-
-<section>
-<h2>⚠️ Bloqueos críticos abiertos</h2>
-
-<div class="warning-box">
-<strong>🔴 KT-16726 BLOCKED (Fabian Buitron)</strong> — bloquea KT-16613 (tree-uncompressor) y KT-16614 (emr-job-trigger) del sprint vivo. Sin destrabar, dos tickets en MAY-2 no cierran. Investigar causa raíz y desbloquear.
+<!-- ============ ARCH ============ -->
+<div class="arch-section">
+  <div class="label">⭐ Arquitectura central</div>
+  <h2>State Machine compartido</h2>
+  <p>Una sola tabla DynamoDB orquesta el flujo completo. Las 3 fases leen y escriben aquí. DDB Stream + EventBridge Pipes propagan los cambios.</p>
+  <div class="arch-detail">
+    <strong>Table:</strong> classifier-cycles-state<br>
+    <strong>PK:</strong> enterprise_id<br>
+    <strong>SK:</strong> CYCLE# / STATION# / REQUEST#<br>
+    <strong>Estados:</strong> scanning → stations_complete → confirmed → phase2_collecting → complete
+  </div>
 </div>
 
-<div class="warning-box">
-<strong>📋 KT-16729 RFC (Monitoring base)</strong> — sin SNS topic <code>kriptos-backend-alerts</code> aprobado, ninguna de las 30+ alarmas que se proponen en los tickets nuevos puede ser provisionada efectivamente.
+<!-- ============ NEXT STEPS ============ -->
+<div class="next-section">
+  <h2>Próximos hitos</h2>
+  <div class="milestones">
+    <div class="milestone">
+      <div class="num">Hito 1 — Foundation</div>
+      <div class="title">DDB + Monorepo 1</div>
+      <div class="desc">Crear classifier-cycles-state + ECR + monorepo scan-match-backend. Migrar las 4 Lambdas funcionales.</div>
+    </div>
+    <div class="milestone">
+      <div class="num">Hito 2 — Fase 1 completa</div>
+      <div class="title">+4 Lambdas + infra</div>
+      <div class="desc">Validación humana funcionando. CYCLE puede llegar a 'confirmed'.</div>
+    </div>
+    <div class="milestone">
+      <div class="num">Hito 3 — Fase 2 GSE</div>
+      <div class="title">Monorepo 2 + 6 Lambdas</div>
+      <div class="desc">Integración Signal Handler + Anonymizer + LLM. Cycle end-to-end.</div>
+    </div>
+    <div class="milestone">
+      <div class="num">Hito 4 — Cleanup</div>
+      <div class="title">Cerrar repos legacy</div>
+      <div class="desc">Archivar 4 repos viejos. Monorepos como única source of truth.</div>
+    </div>
+  </div>
 </div>
-
-<div class="info-box">
-<strong>⏳ Sync pendiente con Plataforma Web</strong> — KT-17013, 17014, 17026 dependen de decisiones que tiene que tomar Plataforma Web (canal de notificación, schema GraphQL exacto, mecánica de invocación). No es urgente pero define el shape de 3 tickets nuevos.
-</div>
-
-<div class="info-box">
-<strong>🟡 KT-16920 In Progress (Nelson Garzón)</strong> — "Revisión de formato del documento de Joyas de la Corona". Colisiona con el JSONL + normalize que documentamos. Sync antes de cerrar Skill 02 de KT-16616.
-</div>
-
-<div class="info-box">
-<strong>⛔ KT-17016 SUPERSEDED</strong> — el ticket original para `gse-cycles-samples` queda obsoleto (consolidado en KT-17009). Cuando DevOps lo vea en el board, transicionarlo a "Closed - Cancelled".
-</div>
-</section>
-
-<section>
-<h2>✅ Decisiones cerradas (2026-05-26)</h2>
-<table>
-<thead><tr><th>Decisión</th><th>Resolución</th><th>Afecta</th></tr></thead>
-<tbody>
-<tr><td><strong>AppSync</strong></td><td>Reusar el de Plataforma Web (no crear dedicado)</td><td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17080">KT-17080</a></td></tr>
-<tr><td><strong>OpenSearch</strong></td><td>Reusar cluster existente con índice nuevo <code>crown_jewel_candidates</code> (no Serverless dedicado)</td><td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17010">KT-17010</a></td></tr>
-<tr><td><strong>Secret <code>kem-api-key</code></strong></td><td>Existe — <a href="https://kriptosteam.atlassian.net/browse/KT-17011">KT-17011</a> cancelado (redundante: el IAM grant ya está en el AC de KT-17078 y KT-17082)</td><td class="dependency-list">—</td></tr>
-<tr><td><strong>Naming buckets</strong></td><td>No requiere convención global — infra dividida dev/prod ya cubre el caso</td><td class="dependency-list">N/A</td></tr>
-<tr><td><strong>Canales del Equipo IA</strong></td><td>Backend solo emite eventos estándar (DDB updates + S3 PutObject). El Equipo IA suscribe sus propios consumers por su lado (no necesitamos canal dedicado).</td><td class="dependency-list"><a href="https://kriptosteam.atlassian.net/browse/KT-17082">KT-17082</a> · <a href="https://kriptosteam.atlassian.net/browse/KT-17083">KT-17083</a> · <a href="https://kriptosteam.atlassian.net/browse/KT-17087">KT-17087</a></td></tr>
-<tr><td><strong>Formato keywords</strong></td><td>Cerrado — Haroldo ya pasó el formato JSONL + <code>normalize_category.py</code></td><td class="dependency-list">—</td></tr>
-</tbody>
-</table>
-</section>
-
-<section>
-<h2>📚 Referencias</h2>
-<table>
-<thead><tr><th>Documento</th><th>Propósito</th></tr></thead>
-<tbody>
-<tr><td><code>brainstorms/architecture-refresh-phase-1-2-2026-05-19.md</code></td><td>Racional del refresh arquitectónico + consolidación 2026-05-23</td></tr>
-<tr><td><code>brainstorms/ticket-texts-fase-1-5-batch-1.md</code></td><td>Textos detallados de KT-16616 MOD + 4 lambdas validación (referencia para Skill 02)</td></tr>
-<tr><td><code>context/classifier-v2/dev-tickets.md</code></td><td>Source-of-truth viva de tickets de código (estado + links)</td></tr>
-<tr><td><code>context/classifier-v2/devops-tickets.md</code></td><td>Source-of-truth viva de tickets DevOps (inventario por recurso)</td></tr>
-<tr><td><code>context/classifier-v2/components/phase-1/normalize_category.py</code></td><td>Función de normalización compartida agent/IA/EMR</td></tr>
-<tr><td><code>context/classifier-v2/components/phase-1/keywords-example.jsonl</code></td><td>Ejemplo de formato JSONL de keywords (sanitizado)</td></tr>
-<tr><td><code>context/classifier-v2/ecosystem.md</code></td><td>Overview del producto Classifier (primera lectura)</td></tr>
-<tr><td><code>context/classifier-v2/current-decisions.md</code></td><td>Stack + testing + arquitectura + CI/CD</td></tr>
-<tr><td><a href="https://kriptosteam.atlassian.net/browse/KT-16369">Épica KT-16369</a></td><td>Épica padre en Jira de todos los tickets</td></tr>
-</tbody>
-</table>
-</section>
 
 <footer>
-Generado por Skill 01 (Brainstorm) en Claude Code · Opus 4.7 · 2026-05-23 (post-consolidación). <br>
-Para regenerar: leer <code>dev-tickets.md</code> + <code>devops-tickets.md</code> y rehacer este HTML.
+  <a href="devops-reunion.html">→ Vista DevOps</a>
+  <a href="architecture-global.drawio" download>⬇ Diagrama arquitectura</a>
+  <a href="status.html">📊 STATUS detallado</a>
+  <br><br>
+  Stack: Python 3.11 · Lambda Container Image · ECR · CloudFormation · pytest/ruff/mypy
 </footer>
 
 </div>
-
-<script>
-mermaid.initialize({
-  startOnLoad: true,
-  theme: 'default',
-  flowchart: {
-    htmlLabels: true,
-    curve: 'basis',
-    nodeSpacing: 50,
-    rankSpacing: 60
-  }
-});
-</script>
 </body>
 </html>

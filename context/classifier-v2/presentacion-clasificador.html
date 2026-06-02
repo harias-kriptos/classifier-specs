@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classifier Backend v2 — Método, trabajo y resultado</title>
+<style>
+  :root{
+    --navy:#15152b; --navy2:#1b2347; --indigo:#7c8cff; --indigo2:#667eea; --purple:#a855f7;
+    --teal:#43cea2; --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --blue:#3b82f6;
+    --ink:#15182b; --muted:#5b6478; --line:#e6e8f0; --bg:#f5f6fb; --card:#fff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Ubuntu,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.5;scroll-snap-type:y mandatory;overflow-x:hidden}
+  .slide{min-height:100vh;padding:6vh 7vw;scroll-snap-align:start;display:flex;flex-direction:column;
+    justify-content:center;position:relative;border-bottom:1px solid var(--line)}
+  .slide.dark{background:radial-gradient(1200px 600px at 80% -10%,#26306b 0%,transparent 60%),
+    linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);color:#fff}
+  .kicker{font-size:.82rem;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:var(--indigo2);margin-bottom:16px}
+  .dark .kicker{color:var(--teal)}
+  h1{font-size:clamp(2.4rem,5.5vw,4.4rem);line-height:1.04;font-weight:800;letter-spacing:-.025em}
+  h2{font-size:clamp(1.8rem,3.6vw,3rem);font-weight:800;letter-spacing:-.025em;max-width:20ch}
+  p.lead{font-size:clamp(1.1rem,1.7vw,1.45rem);color:var(--muted);max-width:62ch;margin-top:20px;font-weight:450}
+  .dark p.lead{color:#cdd2ec}
+  .grad{background:linear-gradient(110deg,var(--indigo),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
+  /* cards */
+  .grid{display:grid;gap:18px;margin-top:36px}
+  .g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)} .g5{grid-template-columns:repeat(5,1fr)} .g6{grid-template-columns:repeat(3,1fr)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .dark .card{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14)}
+  .card .ico{font-size:1.8rem;display:block;margin-bottom:12px}
+  .card h3{font-size:1.15rem;font-weight:800;color:var(--ink)}
+  .dark .card h3{color:#fff}
+  .card p{color:var(--muted);font-size:1rem;margin-top:8px;line-height:1.45}
+  .dark .card p{color:#cdd2ec}
+  /* steps */
+  .step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 18px;position:relative;text-align:left}
+  .step .num{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    font-weight:800;color:#fff;font-size:1.1rem;margin-bottom:14px}
+  .s1 .num{background:#6366f1}.s2 .num{background:#8b5cf6}.s3 .num{background:#a855f7}.s4 .num{background:#11998e}.s5 .num{background:#0ea5e9}
+  .step h3{font-size:1.08rem;font-weight:800;line-height:1.15}
+  .step .role{display:inline-block;font-size:.72rem;font-weight:700;color:var(--indigo2);background:#eef0ff;
+    padding:3px 9px;border-radius:7px;margin:8px 0}
+  .step p{font-size:.92rem;color:var(--muted);line-height:1.4}
+  .phasetime{font-size:clamp(1.9rem,3.2vw,2.6rem);font-weight:800;line-height:1;margin:12px 0 8px;letter-spacing:-.02em}
+  .phasetime.i{color:var(--indigo2)}.phasetime.p{color:var(--purple)}.phasetime.t{color:#0d9488}.phasetime.g{color:var(--green)}
+  /* stats */
+  .stat{font-size:clamp(2.6rem,5.5vw,4rem);font-weight:800;line-height:1;letter-spacing:-.02em}
+  .stat.b{color:var(--blue)}.stat.g{color:var(--green)}.stat.p{color:var(--purple)}.stat.t{color:#0d9488}.stat.a{color:var(--amber)}.stat.i{color:var(--indigo2)}
+  .statlbl{color:var(--muted);font-size:1rem;margin-top:10px;font-weight:600;line-height:1.35}
+  .dark .statlbl{color:#cdd2ec}
+  /* chips */
+  .chips{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+  .chip{font-size:.92rem;font-weight:700;padding:9px 16px;border-radius:11px;background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.16);color:#fff}
+  .light .chip,.slide:not(.dark) .chip{background:#fff;border-color:var(--line);color:var(--ink)}
+  /* model table */
+  .models{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:18px}
+  .models div{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:14px 16px}
+  .models b{display:block;font-size:1.05rem;color:#fff}
+  .models span{font-size:.85rem;color:#cdd2ec}
+  .tag{display:inline-block;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:7px}
+  .t-ok{background:#dcfce7;color:#166534}.t-go{background:#dbeafe;color:#1e40af}.t-mid{background:#fef3c7;color:#92400e}
+  .nav{position:fixed;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:11px;z-index:50}
+  .nav a{width:11px;height:11px;border-radius:50%;background:#c7cbe0;transition:.25s;display:block}
+  .nav a.on{background:var(--indigo2);transform:scale(1.4)}
+  .foot{position:absolute;bottom:22px;left:7vw;font-size:.8rem;color:var(--muted)}
+  .dark .foot{color:#8a90c0}
+  .hl{font-weight:800;color:var(--ink)}.dark .hl{color:#fff}
+  @media(max-width:900px){.g2,.g3,.g4,.g5,.g6,.models{grid-template-columns:1fr}}
+  @media print{.slide{min-height:auto;page-break-after:always}.nav{display:none}}
+</style>
+</head>
+<body>
+<div class="nav" id="nav"></div>
+
+<!-- 1 · PORTADA -->
+<section class="slide dark">
+  <span class="kicker">Kriptos · Desarrollo asistido por agentes IA</span>
+  <h1 style="margin-top:10px">Classifier Backend <span class="grad">v2</span></h1>
+  <p class="lead">Cómo manejamos los agentes para construirlo, los pasos del proceso,
+  lo que ya está <span class="hl">desplegado y probado</span> y lo que está en desarrollo.</p>
+  <div class="chips">
+    <span class="chip">🤖 Pipeline de 5 agentes</span>
+    <span class="chip">🏗️ La máquina primero, el producto después</span>
+    <span class="chip">🧪 TDD + threat model + review</span>
+    <span class="chip">✅ Scan + Match en producción</span>
+  </div>
+  <div class="foot">Junio 2026 · Stack: Python 3.11 · Lambda Container · CloudFormation</div>
+</section>
+
+<!-- 2 · EL CAMINO con tiempos (cada etapa pesa lo suyo) -->
+<section class="slide">
+  <span class="kicker">Cómo llegamos hasta acá</span>
+  <h2 style="max-width:none">Ese día fue el <span class="grad">último paso</span>, no el primero</h2>
+  <p class="lead" style="margin-bottom:6px">Cada etapa llevó su tiempo —y varias se trabajaron <span class="hl">en paralelo</span>—. El desarrollo rápido <span class="hl">rinde</span> esa inversión, no la reemplaza.</p>
+  <div class="grid g4" style="margin-top:18px;align-items:stretch">
+    <div class="step s1"><div class="num">1</div><h3>Crear los agentes</h3>
+      <div class="phasetime i">3–4 sem</div>
+      <p>El framework: 5 pasos, 5 roles, 12 templates y reglas del stack.</p></div>
+    <div class="step s2"><div class="num">2</div><h3>Brainstorm + documentar</h3>
+      <div class="phasetime p">2 sem</div>
+      <p>Cada módulo del clasificador pensado y documentado · 10 docs.</p></div>
+    <div class="step s3"><div class="num">3</div><h3>Aclarar la arquitectura</h3>
+      <div class="phasetime t">2 sem</div>
+      <p>Diagramas, procesos, flujos · 15→2 monorepos · DDB única.</p></div>
+    <div class="step s5" style="border:2px solid var(--green)"><div class="num" style="background:var(--green)">4</div><h3>Desarrollar la etapa</h3>
+      <div class="phasetime g">~1 día</div>
+      <p><b style="color:var(--green)">El retorno</b>: etapa completa con specs, tests y review.</p></div>
+  </div>
+  <p class="lead" style="margin-top:18px"><span class="hl">Pasos 1–3 = la inversión</span> (en paralelo, una sola vez) que ahora rinde <span class="hl">~1 día por etapa</span> (paso 4, se repite en cada una).</p>
+</section>
+
+<!-- 3 · LOS 5 PASOS -->
+<section class="slide">
+  <span class="kicker">La máquina · los pasos</span>
+  <h2 style="max-width:none">Cada cambio pasa por 5 agentes, de la idea a producción</h2>
+  <p class="lead" style="margin-bottom:8px">Ninguna Lambda llega a prod sin recorrer los cinco. Cada paso, un rol especializado.</p>
+  <div class="grid g5">
+    <div class="step s1"><div class="num">1</div><h3>Brainstorm</h3><span class="role">Product Manager</span>
+      <p>Desafía la idea o el ticket hasta volverlo escribible como spec.</p></div>
+    <div class="step s2"><div class="num">2</div><h3>Spec + Threat Model</h3><span class="role">Architect</span>
+      <p>El contrato técnico del que depende el resto + análisis STRIDE.</p></div>
+    <div class="step s3"><div class="num">3</div><h3>Plan</h3><span class="role">Tech Lead</span>
+      <p>Descompone la spec en tareas atómicas, ordenadas y testeables.</p></div>
+    <div class="step s4"><div class="num">4</div><h3>TDD Implementation</h3><span class="role">Developer</span>
+      <p>RED → GREEN → REFACTOR. Cada línea trazada en <em>tdd-trace</em>.</p></div>
+    <div class="step s5"><div class="num">5</div><h3>Review + Evals</h3><span class="role">Reviewer</span>
+      <p>Gates: tests, coverage, mypy, threat model. READY o BLOCKED.</p></div>
+  </div>
+  <p class="lead" style="margin-top:30px">El output de cada paso alimenta al siguiente — y queda
+  registrado: brainstorms, specs, planes, trazas de TDD y reportes de review.</p>
+</section>
+
+<!-- 4 · CÓMO MANEJAMOS LOS AGENTES -->
+<section class="slide dark">
+  <span class="kicker">La gestión de los agentes</span>
+  <h2>Cada agente, optimizado para su trabajo</h2>
+  <div class="grid g2" style="margin-top:30px">
+    <div class="card"><span class="ico">🎭</span><h3>Un rol = un mindset</h3>
+      <p>El PM pregunta y desafía. El Architect escribe el contrato. El Reviewer audita sin piedad. No es un agente genérico haciendo de todo.</p></div>
+    <div class="card"><span class="ico">💰</span><h3>El modelo correcto en cada paso</h3>
+      <p>Opus donde hay que pensar (spec, brainstorm). Modelo barato donde se itera en loop (implementación). Costo controlado sin perder calidad.</p>
+      <div class="models">
+        <div><b>Opus</b><span>Brainstorm · Spec</span></div>
+        <div><b>Sonnet</b><span>Plan · Review</span></div>
+        <div><b>Barato</b><span>Implementación TDD</span></div>
+      </div></div>
+    <div class="card"><span class="ico">📐</span><h3>Outputs estandarizados</h3>
+      <p>12 templates: specs, threat models, descripciones de PR, comentarios de Jira. Resultados comparables entre todos los tickets.</p></div>
+    <div class="card"><span class="ico">🚦</span><h3>Gates duros, no sugerencias</h3>
+      <p>Coverage ≥ 80%, mypy strict, pip-audit, threat model verificado. El agente no "arregla" el lint para pasar: si algo falla, lo reporta.</p></div>
+  </div>
+</section>
+
+<!-- 5 · EL RETORNO (velocidad, honesto) -->
+<section class="slide">
+  <span class="kicker">El retorno de la inversión</span>
+  <h2 style="max-width:none">La inversión se hace <span class="grad">una vez</span>. El retorno, en cada etapa.</h2>
+  <p class="lead">Con el framework y el diseño ya construidos, levantar una etapa completa
+  —con specs, tests, threat model y review— pasó a medirse en días, no en sprints.</p>
+  <div class="grid g3" style="margin-top:28px;align-items:stretch">
+    <div class="card" style="text-align:center">
+      <div class="stat g" style="font-size:clamp(2.6rem,6.5vw,4.4rem)">~1 día</div>
+      <div class="statlbl">levantar una etapa hoy<br>(framework + diseño ya hechos)</div></div>
+    <div style="display:flex;align-items:center;justify-content:center;font-size:2.4rem;font-weight:800;color:var(--indigo2)">vs</div>
+    <div class="card" style="text-align:center">
+      <div class="stat a" style="font-size:clamp(2.6rem,6.5vw,4.4rem)">3–4 sprints</div>
+      <div class="statlbl">esfuerzo equivalente<br>en el flujo tradicional*</div></div>
+  </div>
+  <p class="lead" style="margin-top:24px">Y el retorno se multiplica: cada etapa y cada producto nuevo
+  reusa la misma máquina. <span class="hl">La velocidad no sacrifica calidad</span> — tests y riesgos vienen incluidos.</p>
+  <div class="foot">* Estimación de esfuerzo equivalente (sprint = 2 semanas), no una medición cronometrada.</div>
+</section>
+
+<!-- 6 · QUÉ TENEMOS -->
+<section class="slide">
+  <span class="kicker">Lo que tenemos</span>
+  <h2 style="max-width:none">Artefactos reales, no diapositivas</h2>
+  <div class="grid g4">
+    <div class="card"><div class="stat g">14</div><div class="statlbl">Lambdas diseñadas<br>en 2 monorepos</div></div>
+    <div class="card"><div class="stat b">17</div><div class="statlbl">specs técnicas<br>con threat model</div></div>
+    <div class="card"><div class="stat p">10</div><div class="statlbl">documentos<br>de arquitectura</div></div>
+    <div class="card"><div class="stat t">3</div><div class="statlbl">diagramas AWS<br>reproducibles</div></div>
+    <div class="card"><div class="stat i">28</div><div class="statlbl">tickets trazados<br>(dev · infra · cleanup)</div></div>
+    <div class="card"><div class="stat t">≥80%</div><div class="statlbl">coverage obligatorio<br>en cada Lambda</div></div>
+    <div class="card"><div class="stat a">15→2</div><div class="statlbl">repos consolidados<br>(−87% complejidad)</div></div>
+    <div class="card"><div class="stat g">100%</div><div class="statlbl">del diseño<br>completado</div></div>
+  </div>
+</section>
+
+<!-- 7 · ESTADO -->
+<section class="slide dark">
+  <span class="kicker">Estado</span>
+  <h2 style="max-width:none">Entregado y en construcción</h2>
+  <div class="grid g2" style="margin-top:30px">
+    <div class="card">
+      <span class="ico">✅</span><h3>Ya entregado · desplegado y probado</h3>
+      <p style="margin-top:14px"><b style="color:#fff">Scan + Match</b> corriendo: tree-url-generator, uncompressor, EMR trigger, joyas-priorizer.</p>
+      <p>Calidad de fábrica: TDD + review + threat model antes de mergear.</p>
+      <p>Trazabilidad total: de cada línea al ticket y la spec que la originó.</p>
+    </div>
+    <div class="card">
+      <span class="ico">🔨</span><h3>En construcción · sobre specs cerradas</h3>
+      <p style="margin-top:14px"><b style="color:#fff">Validación humana</b> — 4 Lambdas, en implementación.</p>
+      <p><b style="color:#fff">Fase 2 · GSE</b> — 6 Lambdas, spec y contrato listos.</p>
+      <p><b style="color:#fff">Infra CloudFormation</b> — 15 tickets coordinados con DevOps.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · CIERRE -->
+<section class="slide dark">
+  <span class="kicker">En una frase</span>
+  <h1>Un método replicable.<br>Un resultado <span class="grad">real y desplegado</span>.</h1>
+  <p class="lead">La inversión en el framework y el diseño ya rinde: Scan + Match desplegado y probado,
+  con cada decisión especificada y documentada. La misma máquina se reusa en el resto del producto — y en el próximo.</p>
+  <div class="chips">
+    <span class="chip">⚡ 1 día ≈ 3–4 sprints</span>
+    <span class="chip">14 Lambdas · 17 specs · 10 docs</span>
+    <span class="chip">Scan + Match en prod</span>
+    <span class="chip">Diseño 100%</span>
+  </div>
+  <div class="foot">Classifier Backend v2 · Kriptos · Junio 2026</div>
+</section>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const nav=document.getElementById('nav');
+  slides.forEach((s,i)=>{const a=document.createElement('a');a.href='#';a.title='Slide '+(i+1);
+    a.onclick=e=>{e.preventDefault();s.scrollIntoView({behavior:'smooth'})};nav.appendChild(a);});
+  const dots=[...nav.children];
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const i=slides.indexOf(e.target);
+    dots.forEach(d=>d.classList.remove('on'));dots[i]&&dots[i].classList.add('on');}}),{threshold:.5});
+  slides.forEach(s=>io.observe(s));
+  let cur=0;
+  addEventListener('keydown',e=>{
+    if(['ArrowDown','ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();cur=Math.min(cur+1,slides.length-1);slides[cur].scrollIntoView({behavior:'smooth'});}
+    if(['ArrowUp','ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();cur=Math.max(cur-1,0);slides[cur].scrollIntoView({behavior:'smooth'});}
+  });
+  addEventListener('scroll',()=>{const m=innerHeight/2;const i=slides.findIndex(s=>{const r=s.getBoundingClientRect();return r.top<=m&&r.bottom>=m;});if(i>=0)cur=i;});
+</script>
+</body>
+</html>

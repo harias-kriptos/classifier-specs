@@ -1,8 +1,8 @@
-# Spec — validation-mutation-handler
+# Spec — crown-validation-handler
 
 > Ticket: [KT-17026](https://kriptosteam.atlassian.net/browse/KT-17026)
 > Status: accepted (Fase 1 cerrada 2026-05-23)
-> Repo destino futuro: `kriptos-io/validation-mutation-handler`
+> Repo destino futuro: `kriptos-io/crown-validation-handler`
 
 ---
 
@@ -153,10 +153,10 @@ No aplica.
 
 ## 12. Rollout
 
-- Branch: `KT-17026-validation-mutation-handler`
+- Branch: `KT-17026-crown-validation-handler`
 - Spec commit + TDD commits
 - Quality gates verdes
-- PR a `main` con `Implements specs/001-validation-mutation-handler.md`
+- PR a `main` con `Implements specs/001-crown-validation-handler.md`
 - Deploy via reusable workflow
 
 **Bloqueantes de deploy:** [KT-17014](https://kriptosteam.atlassian.net/browse/KT-17014) (Lambda + AppSync resolver + IAM) + [KT-17009](https://kriptosteam.atlassian.net/browse/KT-17009) (DDB) + [KT-17010](https://kriptosteam.atlassian.net/browse/KT-17010) (OS index) + AppSync schema configurado por Plataforma Web (usando `graphql-schema-appsync.md`).
