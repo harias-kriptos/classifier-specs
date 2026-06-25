@@ -1,8 +1,10 @@
 # Estado Actual — Backend Classifier v2
 
-> **Última actualización:** 2026-06-02 (reorganización en 3 épicas + modelo infra-en-entregable)
+> **Última actualización:** 2026-06-24 (sync con Jira real + cierre de Fase 1 por Excel manual)
 > **Source of truth** del estado del backend. Reemplaza la versión anterior (que usaba numeración de tickets ficticia).
 > **Stack:** Python 3.11 · Lambda Container (ECR) · CloudFormation · pytest/ruff/mypy · uv.
+>
+> **Novedades 2026-06-24:** la Máquina de Estados (KT-17028/17032/17033 + monorepo KT-17271 + AppSync KT-17487) está **Done**. El cierre de Fase 1 pasó a ser **manual por Excel a nivel de categoría** (confirmado por KAIM-6315/6316), sin OpenSearch en el camino crítico. KT-17024/17026/17027 (modelo web por-archivo) descopeados/parkeados → BE 07.
 
 ---
 
@@ -12,10 +14,10 @@ Cada módulo = **una épica + un monorepo**. La infraestructura de cada lambda v
 
 | # | Épica | Jira | Monorepo | Estado |
 |---|---|---|---|---|
-| 1 | **Discovery** (scan → match → candidatos) | [KT-16369](https://kriptosteam.atlassian.net/browse/KT-16369) | `classifier-v2-backend` ([KT-17132](https://kriptosteam.atlassian.net/browse/KT-17132) ✅) | In Progress |
-| 2 | **Máquina de Estados** (ciclos/estaciones) | [KT-17270](https://kriptosteam.atlassian.net/browse/KT-17270) | `classifier-state-backend` ([KT-17271](https://kriptosteam.atlassian.net/browse/KT-17271)) | RFC |
-| 3 | **GSE** (sample collection) | [KT-16370](https://kriptosteam.atlassian.net/browse/KT-16370) | `classifier-gse-backend` ([KT-17134](https://kriptosteam.atlassian.net/browse/KT-17134)) | RFC |
-| 4 | **Validación** (humana, client-facing) | _futura — BE 07_ | TBD | No creada |
+| 1 | **Discovery / Fase 1** (scan → match → Excel) | [KT-16369](https://kriptosteam.atlassian.net/browse/KT-16369) | `classifier-v2-backend` ([KT-17132](https://kriptosteam.atlassian.net/browse/KT-17132) ✅) | In Progress |
+| 2 | **Máquina de Estados** (ciclos/estaciones) | [KT-17270](https://kriptosteam.atlassian.net/browse/KT-17270) | `classifier-state-backend` ([KT-17271](https://kriptosteam.atlassian.net/browse/KT-17271) ✅) | In Progress · núcleo Done |
+| 3 | **GSE** (sample collection) | [KT-16370](https://kriptosteam.atlassian.net/browse/KT-16370) | `classifier-gse-backend` ([KT-17134](https://kriptosteam.atlassian.net/browse/KT-17134)) | To Do · RFC |
+| 4 | **Validación web** (client-facing, AppSync) | _futura — BE 07_ | TBD | No creada (aloja KT-17026/17027) |
 
 ---
 
@@ -23,21 +25,31 @@ Cada módulo = **una épica + un monorepo**. La infraestructura de cada lambda v
 
 ```mermaid
 flowchart TB
-  subgraph DISC["🔍 Discovery · KT-16369 · classifier-v2-backend"]
+  subgraph DISC["🔍 Discovery / Fase 1 · KT-16369 · classifier-v2-backend"]
     direction LR
     A1[tree-url-generator<br/>KT-16612 ✅] --> A2[tree-uncompressor<br/>KT-16613 ✅] --> A3[emr-job-trigger<br/>KT-16614 ✅] --> A4[joyas-priorizer<br/>KT-16616 ✅ · EMR]
-    A4 -->|matches.jsonl| A5[crown-candidates-indexer<br/>KT-17024]
-    A5 --> OS[(OpenSearch<br/>crown_jewel_candidates)]
+    AG0[[harness agentic<br/>categorías+keywords<br/>KT-16859]] -.->|keywords| A4
+    A4 -->|matches.jsonl + rollup.json<br/>KT-17588| RC[crown-report-consolidator<br/>KT-17586]
+    RC -->|assessment.xlsx| BPEND[(S3 crown-reports-pending)]
+    BVAL[(S3 crown-reports-validated)] --> IC[crown-excel-ingest-confirm<br/>KT-17587]
+    IC -->|manifest.json| BMAN[(S3 validated_crown_jewels)]
   end
+
+  CLIENT([Cliente: responde Excel])
+  BPEND --> CLIENT --> BVAL
 
   subgraph STATE["⚙️ Máquina de Estados · KT-17270 · classifier-state-backend"]
     DDB[(DynamoDB<br/>classifier-cycles-state<br/>+ Stream)]
-    S1[state-cycle-init<br/>KT-17028]
-    S2[state-station-status<br/>KT-17032]
-    S3[state-enterprise-status<br/>KT-17033]
-    S1 --> DDB
+    S0[state-enterprise-init<br/>KT-17370]
+    SB[exploration + barrier → ready<br/>KT-17371]
+    S1[state-cycle-init<br/>KT-17028 ✅]
+    S2[state-station-status<br/>KT-17032 ✅]
+    S3[state-enterprise-status<br/>KT-17033 ✅]
+    S0 --> DDB
+    DDB -. stream .-> SB --> DDB
     DDB -. stream .-> S2 --> DDB
     DDB -. stream .-> S3
+    S1 --> DDB
   end
 
   subgraph GSE["📦 GSE · KT-16370 · classifier-gse-backend"]
@@ -46,11 +58,11 @@ flowchart TB
     G3[gse-request-complete<br/>KT-17031]
   end
 
-  VAL{{"Validación humana<br/>futura · BE 07"}}
-
-  A5 --> DDB
-  OS --> VAL
-  VAL -->|manifest.json| S1
+  A4 -->|EMR done| SB
+  SB -->|CYCLE ready| RC
+  RC -->|CYCLE awaiting_validation| DDB
+  IC -->|CYCLE confirmed| DDB
+  BMAN -->|dispara Fase 2| S1
   S1 -->|signal| AG([Agente Windows / Cloud])
   AG --> G1 --> DDB
   AG --> G3 --> DDB
@@ -62,19 +74,18 @@ flowchart TB
   classDef rfc fill:#fff3bf,stroke:#e67700,color:#663c00;
   classDef ext fill:#e7e7e7,stroke:#868e96,color:#212529,font-style:italic;
   classDef future fill:#e5dbff,stroke:#7048e8,color:#3b2a6b;
-  class A1,A2,A3,A4 done;
-  class A5,S1,S2,S3,G1,G2,G3 rfc;
-  class AG,ANON,LLM ext;
-  class VAL future;
+  class A1,A2,A3,A4,S1,S2,S3 done;
+  class RC,IC,SB,S0,G1,G2,G3 rfc;
+  class AG,AG0,ANON,LLM,CLIENT ext;
 ```
 
-**Lectura:** Discovery escanea y matchea → registra candidatos (OpenSearch) y estado de estación (DDB). La **Máquina de Estados** orquesta el ciclo de vida (CYCLE/STATION/REQUEST) sobre la DDB con Stream. La **Validación humana** (futura) cierra el set y dispara, vía `manifest.json`, el `state-cycle-init`. **GSE** recolecta y anonimiza muestras; los notifiers actualizan contadores en la DDB; cuando el ciclo cierra, `state-enterprise-status` notifica al **LLM Process Queue**.
+**Lectura:** Discovery escanea y matchea (EMR). El **harness agentic** (KT-16859) sugiere categorías + keywords que alimentan el match. EMR emite `rollup.json` por estación (KT-17588). La **Máquina de Estados** lleva el CYCLE por `initialized → scanning → ready → awaiting_validation → confirmed`: el **barrier** (KT-17371) marca `ready` cuando todas las estaciones terminaron → dispara `crown-report-consolidator` (KT-17586) que genera **un Excel por enterprise** y lo deja en `crown-reports-pending`. El **cliente responde el Excel** → se deposita en `crown-reports-validated` → `crown-excel-ingest-confirm` (KT-17587) lo procesa, escribe `manifest.json` y **dispara Fase 2** (`state-cycle-init`). **GSE** recolecta/anonimiza; al cerrar, `state-enterprise-status` notifica al **LLM Process Queue**. **Sin OpenSearch en el camino crítico** (modelo web por-archivo diferido a BE 07).
 
 ---
 
 ## 3. Tickets por épica
 
-### 🔍 Discovery — KT-16369
+### 🔍 Discovery / Fase 1 — KT-16369
 
 | Ticket | Componente | Estado |
 |---|---|---|
@@ -82,19 +93,28 @@ flowchart TB
 | KT-16613 | tree-uncompressor | ✅ Done |
 | KT-16614 | emr-job-trigger | ✅ Done |
 | KT-16616 | joyas-priorizer (EMR) | ✅ Done |
-| KT-17024 | crown-candidates-indexer (incluye índice OpenSearch) | 📋 RFC |
-| KT-17247 | JDC — inclusión de `area_id` en metadata | 📋 RFC |
 | KT-17132 | Monorepo `classifier-v2-backend` | ✅ Done |
-| _parkeados (→ Validación)_ | KT-17026 validation-handler · KT-17027 validation-confirm | 📋 RFC |
+| KT-17247 | JDC — inclusión de `area_id` en metadata | ✅ Done |
+| KT-16859 | harness agentic — sugiere categorías+keywords (re-scope Fase 1) | 🔄 In Progress |
+| **KT-17588** | **EMR `rollup.json` por estación** (add-on a KT-16616) | 🆕 RFC |
+| **KT-17586** | **crown-report-consolidator** — Excel por enterprise (KAIM-6316) | 🆕 RFC |
+| **KT-17587** | **crown-excel-ingest-confirm** — Excel validado → manifest → Fase 2 | 🆕 RFC |
+| KT-17024 | crown-candidates-indexer (modelo web por-archivo) | ⛔ descopeado · recomendado cancelar |
+| _parkeados (→ BE 07)_ | KT-17026 validation-handler · KT-17027 validation-confirm | 📋 RFC |
 
 ### ⚙️ Máquina de Estados — KT-17270
 
 | Ticket | Componente | Estado |
 |---|---|---|
-| KT-17028 | **state-cycle-init** (crea CYCLE/STATION/REQUEST, multi-trigger) | 📋 RFC |
-| KT-17032 | **state-station-status** (cierre STATION) | 📋 RFC |
-| KT-17033 | **state-enterprise-status** (cierre CYCLE + notify LLM) | 📋 RFC |
-| KT-17271 | Monorepo `classifier-state-backend` (aloja la DDB `classifier-cycles-state`) | 📋 RFC |
+| KT-17271 | Monorepo `classifier-state-backend` (aloja la DDB `classifier-cycles-state`) | ✅ Done |
+| KT-17028 | **state-cycle-init** (crea CYCLE/STATION/REQUEST, multi-trigger) | ✅ Done |
+| KT-17032 | **state-station-status** (cierre STATION) | ✅ Done |
+| KT-17033 | **state-enterprise-status** (cierre CYCLE + notify LLM) | ✅ Done |
+| KT-17487 | AppSync `CreateEvent` + `getAnalysisDocument` | ✅ Done |
+| KT-17370 | **state-enterprise-init** (alta ENTERPRISE+CYCLE al iniciar exploración) | 📋 RFC |
+| **KT-17371** | **exploration + barrier → CYCLE `ready`** (estados nuevos) | 📋 RFC |
+
+> **Estados del CYCLE:** `initialized → scanning → ready → awaiting_validation → confirmed → (Fase 2)`; `phase2_skipped` si el cliente rechaza todo. `ready` lo setea KT-17371; `awaiting_validation` KT-17586; `confirmed`/`phase2_skipped` KT-17587.
 
 ### 📦 GSE — KT-16370
 
@@ -138,10 +158,14 @@ flowchart TB
 
 | # | Pendiente | Owner |
 |---|---|---|
-| 1 | **Épica de Validación (BE 07)** — crear con KT-17026/27 + recrear KT-17025 | Producto + Backend |
+| 1 | **Épica de Validación web (BE 07)** — crear y mover KT-17026/17027 (+ recrear KT-17025) | Producto + Backend |
 | 2 | Gap **`signal-handler`** / **`url-generator`** (pre-signed URL Windows) — sin ticket | Equipo Agente / IA |
-| 3 | **JDC — reportes Excel + loop de reprocesamiento** — esperan insumos de Esteban (KAIM-6315/6316) | Esteban → Backend |
-| 4 | Canales finales con Equipo IA: Signal Handler, Anonymizer, LLM Process Queue (hoy stubs) | Equipo IA |
+| 3 | Canales finales con Equipo IA: Signal Handler, Anonymizer, LLM Process Queue (hoy stubs) | Equipo IA |
+| 4 | **Cancelar KT-17024** (sin alcance propio tras descope) | Backend |
+| 5 | **OQ del Excel**: ¿emitimos `.xlsx` estilado o dataset para CO? · layout de la columna de decisión en el Excel respondido | Producto + CO |
+| 6 | **Re-scope KT-16859**: spec del harness agentic (output de categorías+keywords) — owner IA | Equipo IA + Backend |
+
+**Desbloqueado 2026-06-24:** insumos JDC de Esteban (KAIM-6316 **Done**, KAIM-6315 en **Review**) → el formato del Excel y las casuísticas ya están definidos; habilitan KT-17586/17587.
 
 ---
 

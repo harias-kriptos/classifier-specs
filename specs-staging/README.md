@@ -24,24 +24,33 @@
 
 ## Índice de specs (reorganizado en 3 épicas · 2026-06-02)
 
-### 🔍 Discovery — KT-16369 · monorepo `classifier-v2-backend`
+### 🔍 Discovery / Fase 1 — KT-16369 · monorepo `classifier-v2-backend`
 
 | Ticket | Slug | Estado | Notas |
 |---|---|---|---|
 | [KT-16613](https://kriptosteam.atlassian.net/browse/KT-16613) | [`KT-16613-tree-uncompressor.md`](KT-16613-tree-uncompressor.md) | ✅ Done | — |
 | [KT-16614](https://kriptosteam.atlassian.net/browse/KT-16614) | [`KT-16614-emr-job-trigger.md`](KT-16614-emr-job-trigger.md) | ✅ Done | — |
 | [KT-16616](https://kriptosteam.atlassian.net/browse/KT-16616) | [`KT-16616-joyas-priorizer.md`](KT-16616-joyas-priorizer.md) | ✅ Done | Aho-Corasick + normalize compartido |
-| [KT-17024](https://kriptosteam.atlassian.net/browse/KT-17024) | [`KT-17024-crown-candidates-indexer.md`](KT-17024-crown-candidates-indexer.md) | RFC | Bulk index OS + STATION; **incluye el índice OpenSearch** |
+| [KT-17588](https://kriptosteam.atlassian.net/browse/KT-17588) | [`KT-17588-emr-rollup.md`](KT-17588-emr-rollup.md) | 🆕 draft | add-on EMR: `rollup.json` por categoría/estación |
+| [KT-17586](https://kriptosteam.atlassian.net/browse/KT-17586) | [`KT-17586-crown-report-consolidator.md`](KT-17586-crown-report-consolidator.md) | 🆕 draft | Excel consolidado por enterprise (KAIM-6316) |
+| [KT-17587](https://kriptosteam.atlassian.net/browse/KT-17587) | [`KT-17587-crown-excel-ingest-confirm.md`](KT-17587-crown-excel-ingest-confirm.md) | 🆕 draft | Excel validado → manifest → dispara Fase 2 |
+| [KT-16859](https://kriptosteam.atlassian.net/browse/KT-16859) | _(spec en IA)_ | In Progress | harness agentic: sugiere categorías + keywords (re-scope Fase 1) |
+| [KT-17024](https://kriptosteam.atlassian.net/browse/KT-17024) | [`KT-17024-crown-candidates-indexer.md`](KT-17024-crown-candidates-indexer.md) | ⛔ descopeado | superseded: STATION→KT-17371, rollup→KT-17588, OS→BE 07. **Recomendado cancelar** |
+
+> **Cierre de Fase 1 (manual por Excel, sin front — confirmado KAIM-6315/6316):** EMR escribe `rollup.json` por estación → barrier (KT-17371) marca CYCLE `ready` → `crown-report-consolidator` (KT-17586) genera el Excel por enterprise → cliente responde Excel → `crown-excel-ingest-confirm` (KT-17587) lo procesa y dispara Fase 2. **Sin OpenSearch en el camino crítico.**
 
 ### ⚙️ Máquina de Estados — KT-17270 · monorepo `classifier-state-backend`
 
 | Ticket | Slug | Estado | Notas |
 |---|---|---|---|
-| [KT-17028](https://kriptosteam.atlassian.net/browse/KT-17028) | [`KT-17028-state-cycle-init.md`](KT-17028-state-cycle-init.md) | RFC | crea CYCLE/STATION/REQUEST · multi-trigger |
-| [KT-17032](https://kriptosteam.atlassian.net/browse/KT-17032) | [`KT-17032-state-station-status.md`](KT-17032-state-station-status.md) | RFC | cierre STATION (state lambda) |
-| [KT-17033](https://kriptosteam.atlassian.net/browse/KT-17033) | [`KT-17033-state-enterprise-status.md`](KT-17033-state-enterprise-status.md) | RFC | cierre CYCLE + notify LLM |
+| [KT-17028](https://kriptosteam.atlassian.net/browse/KT-17028) | [`KT-17028-state-cycle-init.md`](KT-17028-state-cycle-init.md) | ✅ Done | crea CYCLE/STATION/REQUEST · multi-trigger |
+| [KT-17032](https://kriptosteam.atlassian.net/browse/KT-17032) | [`KT-17032-state-station-status.md`](KT-17032-state-station-status.md) | ✅ Done | cierre STATION (state lambda) |
+| [KT-17033](https://kriptosteam.atlassian.net/browse/KT-17033) | [`KT-17033-state-enterprise-status.md`](KT-17033-state-enterprise-status.md) | ✅ Done | cierre CYCLE + notify LLM |
+| [KT-17370](https://kriptosteam.atlassian.net/browse/KT-17370) | _(pendiente)_ | RFC | state-enterprise-init: alta ENTERPRISE+CYCLE al iniciar exploración |
+| [KT-17371](https://kriptosteam.atlassian.net/browse/KT-17371) | [`KT-17371-state-exploration-barrier.md`](KT-17371-state-exploration-barrier.md) | 🆕 draft | notificación recorrido + barrier → CYCLE `ready` |
 
 > La DDB `classifier-cycles-state` (ex-KT-17009) vive en este monorepo. La infra de cada lambda va dentro de su entregable.
+> **Estados del CYCLE:** `initialized → scanning → ready → awaiting_validation → confirmed → (Fase 2)` · `phase2_skipped` si el cliente rechaza todo.
 
 ### 📦 GSE — KT-16370 · monorepo `classifier-gse-backend`
 
@@ -56,8 +65,10 @@
 | Ticket | Slug | Estado | Notas |
 |---|---|---|---|
 | [KT-17025](https://kriptosteam.atlassian.net/browse/KT-17025) | [`KT-17025-crown-enterprise-barrier.md`](KT-17025-crown-enterprise-barrier.md) | ⛔ cancelado · diferido | recrear en la épica de Validación; contexto preservado en este spec |
-| [KT-17026](https://kriptosteam.atlassian.net/browse/KT-17026) | [`KT-17026-crown-validation-handler.md`](KT-17026-crown-validation-handler.md) | RFC (parkeado) | GraphQL approve/reject/add |
-| [KT-17027](https://kriptosteam.atlassian.net/browse/KT-17027) | [`KT-17027-crown-validation-confirm.md`](KT-17027-crown-validation-confirm.md) | RFC (parkeado) | scroll OS + manifest → dispara state-cycle-init |
+| [KT-17026](https://kriptosteam.atlassian.net/browse/KT-17026) | [`KT-17026-crown-validation-handler.md`](KT-17026-crown-validation-handler.md) | RFC (parkeado · → BE 07) | GraphQL approve/reject/add. Equivalente manual hoy: parte de KT-17587 |
+| [KT-17027](https://kriptosteam.atlassian.net/browse/KT-17027) | [`KT-17027-crown-validation-confirm.md`](KT-17027-crown-validation-confirm.md) | RFC (parkeado · → BE 07) | scroll OS + manifest. **Equivalente manual vigente: KT-17587** |
+
+> **Nota (2026-06-24):** el cierre de Fase 1 pasó a ser **manual por Excel** (KT-17586 + KT-17587). KT-17026/17027 (validación web vía AppSync) se conservan para cuando exista el front y se moverán a la épica BE 07.
 
 ---
 
