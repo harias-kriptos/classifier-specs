@@ -1,8 +1,9 @@
-# Spec — gse-enterprise-status
+# Spec — state-enterprise-status
 
 > Ticket: [KT-17033](https://kriptosteam.atlassian.net/browse/KT-17033)
-> Status: accepted (Fase 2 cerrada 2026-05-23)
-> Repo destino futuro: `kriptos-io/gse-enterprise-status`
+> Status: accepted (2026-05-23) · renombrado `gse-enterprise-status` → `state-enterprise-status` (2026-06-02)
+> Épica: **Máquina de Estados** (KT-17270) · Monorepo: `kriptos-io/classifier-state-backend` (KT-17271)
+> Infra: incluida en el entregable (no hay ticket DevOps aparte)
 
 ---
 

@@ -95,12 +95,12 @@ body {
   display: flex;
 }
 .big-stat .progress-fill-done {
-  width: 18%;
+  width: 36%;
   height: 100%;
   background: linear-gradient(90deg, var(--done), #22c55e);
 }
 .big-stat .progress-fill-wip {
-  width: 36%;
+  width: 64%;
   height: 100%;
   background: linear-gradient(90deg, var(--warning), #fbbf24);
 }
@@ -377,22 +377,22 @@ footer a:hover { text-decoration: underline; }
 
 <div class="hero">
   <h1>Classifier Backend v2</h1>
-  <p>Estado del proyecto · 2 monorepos · 1 State Machine · 28 tickets consolidados</p>
-  <div class="date">2026-05-28</div>
+  <p>Estado del proyecto · 3 épicas (+ 1 futura) · 1 monorepo por módulo · infra dentro de cada ticket</p>
+  <div class="date">2026-06-02</div>
 </div>
 
 <!-- ============ BIG STAT ============ -->
 <div class="big-stat">
-  <div class="label">Tickets en marcha</div>
-  <div class="number">15<span>/28</span></div>
+  <div class="label">Lambdas del backend</div>
+  <div class="number">4<span>/11</span></div>
   <div class="progress">
     <div class="progress-fill-done"></div>
     <div class="progress-fill-wip"></div>
   </div>
   <div class="legend-row">
-    <span class="legend-pill done"><span class="dot"></span>5 listas</span>
-    <span class="legend-pill wip"><span class="dot"></span>10 en desarrollo</span>
-    <span class="legend-pill pending"><span class="dot"></span>13 pendientes</span>
+    <span class="legend-pill done"><span class="dot"></span>4 desplegadas (Discovery)</span>
+    <span class="legend-pill wip"><span class="dot"></span>7 en spec / RFC</span>
+    <span class="legend-pill pending"><span class="dot"></span>Validación · épica futura</span>
   </div>
 </div>
 
@@ -401,78 +401,57 @@ footer a:hover { text-decoration: underline; }
 
   <div class="card done">
     <div class="header">
-      <div class="title">✅ Lambdas Fase 1 Scan</div>
-      <div class="count">4</div>
-    </div>
-    <div class="desc">Funcionales en producción · migración a monorepo en curso</div>
-    <ul>
-      <li>tree-url-generator</li>
-      <li>tree-uncompressor</li>
-      <li>emr-job-trigger</li>
-      <li>joyas-priorizer</li>
-    </ul>
-  </div>
-
-  <div class="card in-progress">
-    <div class="header">
-      <div class="title">🔧 Lambdas Fase 1 Validación</div>
-      <div class="count">4</div>
-    </div>
-    <div class="desc">En desarrollo · finalizan <strong>mañana (2026-05-29)</strong></div>
-    <ul>
-      <li>crown-candidates-indexer</li>
-      <li>crown-enterprise-barrier</li>
-      <li>crown-validation-handler</li>
-      <li>crown-validation-confirm</li>
-    </ul>
-  </div>
-
-  <div class="card in-progress">
-    <div class="header">
-      <div class="title">🔧 Infra Fase 1</div>
+      <div class="title">🔍 Discovery · KT-16369</div>
       <div class="count">6</div>
     </div>
-    <div class="desc">CloudFormation en curso · monorepo scan-match-backend</div>
+    <div class="desc">Monorepo <strong>classifier-v2-backend</strong> (KT-17132 ✅) · Scan + Match en producción</div>
     <ul>
-      <li>DDB classifier-cycles-state</li>
-      <li>ECR + IAM roles</li>
-      <li>S3 buckets Fase 1 (4)</li>
-      <li>EMR Serverless + OpenSearch</li>
-      <li>EventBridge Pipes (Stream)</li>
-      <li>VPC + Secrets Manager</li>
+      <li>tree-url-generator · KT-16612</li>
+      <li>tree-uncompressor · KT-16613</li>
+      <li>emr-job-trigger · KT-16614</li>
+      <li>joyas-priorizer (EMR) · KT-16616</li>
+      <li>crown-candidates-indexer · KT-17024 (RFC · + índice OpenSearch)</li>
+      <li>area_id en metadata · KT-17247 (RFC)</li>
     </ul>
   </div>
 
-  <div class="card f2 pending">
+  <div class="card in-progress sm">
     <div class="header">
-      <div class="title">📋 Lambdas Fase 2 GSE</div>
-      <div class="count">6</div>
+      <div class="title">⚙️ Máquina de Estados · KT-17270</div>
+      <div class="count">5</div>
     </div>
-    <div class="desc">En spec · monorepo gse-backend</div>
+    <div class="desc">Monorepo <strong>classifier-state-backend</strong> (KT-17271 · RFC) · aloja la DDB classifier-cycles-state</div>
     <ul>
-      <li>gse-cycle-init</li>
-      <li>gse-sample-reception-notifier</li>
-      <li>gse-request-complete</li>
-      <li>gse-sample-anonymizer-notifier</li>
-      <li>gse-station-status</li>
-      <li>gse-enterprise-status</li>
+      <li>state-enterprise-init · KT-17370 <em>(init exploración)</em></li>
+      <li>exploración-notifier · KT-17371 <em>(recorrido + joyas)</em></li>
+      <li>state-cycle-init · KT-17028</li>
+      <li>state-station-status · KT-17032</li>
+      <li>state-enterprise-status · KT-17033</li>
     </ul>
   </div>
 
-  <div class="card f2 pending">
+  <div class="card in-progress f2">
     <div class="header">
-      <div class="title">📋 Infra Fase 2</div>
-      <div class="count">7</div>
+      <div class="title">📦 GSE · KT-16370</div>
+      <div class="count">3</div>
     </div>
-    <div class="desc">CloudFormation por planificar</div>
+    <div class="desc">Monorepo <strong>classifier-gse-backend</strong> (KT-17134 · RFC) · sample collection</div>
     <ul>
-      <li>S3 gse-raw / gse-anonymized</li>
-      <li>SQS reception + anonymizer queues</li>
-      <li>SNS Signal Handler</li>
-      <li>EventBridge Pipes Fase 2</li>
-      <li>API GW /v2/gse/request-complete</li>
-      <li>CloudWatch + mTLS certs</li>
-      <li>S3 lifecycle policies</li>
+      <li>gse-sample-reception-notifier · KT-17029</li>
+      <li>gse-sample-anonymizer-notifier · KT-17030</li>
+      <li>gse-request-complete · KT-17031</li>
+    </ul>
+  </div>
+
+  <div class="card pending">
+    <div class="header">
+      <div class="title">📋 Validación · BE 07 (futura)</div>
+      <div class="count">2</div>
+    </div>
+    <div class="desc">Épica aún no creada · tickets parkeados desde Discovery</div>
+    <ul>
+      <li>validation-handler · KT-17026 (parkeado)</li>
+      <li>validation-confirm · KT-17027 (parkeado)</li>
     </ul>
   </div>
 
@@ -486,32 +465,32 @@ footer a:hover { text-decoration: underline; }
     <div class="flow-step done">
       <div class="num">1</div>
       <div class="name">Scan</div>
-      <div class="desc">Agent escanea workstations</div>
+      <div class="desc">Discovery escanea workstations</div>
     </div>
     <div class="flow-step done">
       <div class="num">2</div>
       <div class="name">Match</div>
-      <div class="desc">EMR matchea keywords</div>
+      <div class="desc">EMR matchea + indexa candidatos</div>
     </div>
     <div class="flow-step">
       <div class="num">3</div>
       <div class="name">Validate</div>
-      <div class="desc">Cliente aprueba/rechaza</div>
+      <div class="desc">Cliente aprueba (Validación · futura)</div>
     </div>
     <div class="flow-step">
       <div class="num">4</div>
-      <div class="name">Confirm</div>
-      <div class="desc">Materializa manifest</div>
+      <div class="name">State</div>
+      <div class="desc">Máquina de Estados abre el ciclo</div>
     </div>
     <div class="flow-step">
       <div class="num">5</div>
       <div class="name">Sample</div>
-      <div class="desc">Agent extrae + anonimiza</div>
+      <div class="desc">GSE extrae + anonimiza muestras</div>
     </div>
     <div class="flow-step">
       <div class="num">6</div>
       <div class="name">Classify</div>
-      <div class="desc">LLM genera labels</div>
+      <div class="desc">LLM Process Queue genera labels</div>
     </div>
   </div>
 </div>
@@ -519,13 +498,13 @@ footer a:hover { text-decoration: underline; }
 <!-- ============ ARCH ============ -->
 <div class="arch-section">
   <div class="label">⭐ Arquitectura central</div>
-  <h2>State Machine compartido</h2>
-  <p>Una sola tabla DynamoDB orquesta el flujo completo. Las 3 fases leen y escriben aquí. DDB Stream + EventBridge Pipes propagan los cambios.</p>
+  <h2>Máquina de Estados compartida</h2>
+  <p>Una sola tabla DynamoDB (vive en el monorepo de Máquina de Estados) orquesta el ciclo de vida. Discovery y GSE reciben grant IAM cross-stack. DDB Stream propaga los cambios a state-station-status y state-enterprise-status.</p>
   <div class="arch-detail">
-    <strong>Table:</strong> classifier-cycles-state<br>
+    <strong>Table:</strong> classifier-cycles-state (+ Stream)<br>
     <strong>PK:</strong> enterprise_id<br>
     <strong>SK:</strong> CYCLE# / STATION# / REQUEST#<br>
-    <strong>Estados:</strong> scanning → stations_complete → confirmed → phase2_collecting → complete
+    <strong>Flujo:</strong> scanning → stations_complete → confirmed → collecting → complete
   </div>
 </div>
 
@@ -534,31 +513,31 @@ footer a:hover { text-decoration: underline; }
   <h2>Próximos hitos</h2>
   <div class="milestones">
     <div class="milestone">
-      <div class="num">Hito 1 — Foundation</div>
-      <div class="title">DDB + Monorepo 1</div>
-      <div class="desc">Crear classifier-cycles-state + ECR + monorepo scan-match-backend. Migrar las 4 Lambdas funcionales.</div>
+      <div class="num">Hito 1 — Discovery</div>
+      <div class="title">crown-candidates-indexer + area_id</div>
+      <div class="desc">KT-17024 (índice OpenSearch crown_jewel_candidates) y KT-17247 sobre el monorepo classifier-v2-backend.</div>
     </div>
     <div class="milestone">
-      <div class="num">Hito 2 — Fase 1 completa</div>
-      <div class="title">+4 Lambdas + infra</div>
-      <div class="desc">Validación humana funcionando. CYCLE puede llegar a 'confirmed'.</div>
+      <div class="num">Hito 2 — Máquina de Estados</div>
+      <div class="title">Monorepo + DDB + 3 Lambdas</div>
+      <div class="desc">classifier-state-backend (KT-17271) con la DDB classifier-cycles-state + Stream. CYCLE puede abrir y cerrar.</div>
     </div>
     <div class="milestone">
-      <div class="num">Hito 3 — Fase 2 GSE</div>
-      <div class="title">Monorepo 2 + 6 Lambdas</div>
-      <div class="desc">Integración Signal Handler + Anonymizer + LLM. Cycle end-to-end.</div>
+      <div class="num">Hito 3 — GSE</div>
+      <div class="title">Monorepo + 3 Lambdas</div>
+      <div class="desc">classifier-gse-backend (KT-17134). Integración Signal Handler + Anonymizer + LLM Process Queue. Cycle end-to-end.</div>
     </div>
     <div class="milestone">
-      <div class="num">Hito 4 — Cleanup</div>
-      <div class="title">Cerrar repos legacy</div>
-      <div class="desc">Archivar 4 repos viejos. Monorepos como única source of truth.</div>
+      <div class="num">Hito 4 — Validación (BE 07)</div>
+      <div class="title">Crear épica futura</div>
+      <div class="desc">Recrear KT-17025 + recolocar KT-17026/27. Validación humana client-facing cierra el set de candidatos.</div>
     </div>
   </div>
 </div>
 
 <footer>
   <a href="devops-reunion.html">→ Vista DevOps</a>
-  <a href="architecture-global.drawio" download>⬇ Diagrama arquitectura</a>
+  <a href="STATUS.md">📄 STATUS (source of truth)</a>
   <a href="status.html">📊 STATUS detallado</a>
   <br><br>
   Stack: Python 3.11 · Lambda Container Image · ECR · CloudFormation · pytest/ruff/mypy

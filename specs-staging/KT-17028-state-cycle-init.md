@@ -1,8 +1,9 @@
-# Spec — gse-cycle-init
+# Spec — state-cycle-init
 
 > Ticket: [KT-17028](https://kriptosteam.atlassian.net/browse/KT-17028)
-> Status: accepted (Fase 2 cerrada 2026-05-23)
-> Repo destino futuro: `kriptos-io/gse-cycle-init`
+> Status: accepted (2026-05-23) · renombrado `gse-cycle-init` → `state-cycle-init` (2026-06-02)
+> Épica: **Máquina de Estados** (KT-17270) · Monorepo: `kriptos-io/classifier-state-backend` (KT-17271)
+> Infra: incluida en el entregable (no hay ticket DevOps aparte)
 
 ---
 

@@ -1,10 +1,12 @@
 # Specs staging — Classifier backend
 
-> **Última actualización:** 2026-05-23.
+> **Última actualización:** 2026-06-02 (reorganización en 3 épicas + modelo infra-en-entregable).
 >
-> Especificaciones técnicas (output de Skill 02) para los 13 tickets de código del backend. **Staging area** — cuando DevOps provisione el repo del producto correspondiente, cada spec se migra a `kriptos-io/<componente>/specs/001-<slug>.md`.
+> Especificaciones técnicas (output de Skill 02) de los tickets de código del backend. **Staging area** — cada spec se migra al monorepo del módulo: `kriptos-io/classifier-v2-backend` (Discovery), `classifier-state-backend` (Máquina de Estados) o `classifier-gse-backend` (GSE), en `<monorepo>/specs/001-<slug>.md`.
 >
-> Las specs siguen [`templates/SPEC_TEMPLATE.md`](../templates/SPEC_TEMPLATE.md) — 11 secciones, ninguna skipeable. Threat model embedido en sección 9 (sin archivo separado en staging).
+> **Estado actual del backend:** ver [`context/classifier-v2/STATUS.md`](../context/classifier-v2/STATUS.md) (verdad viva: 3 épicas, monorepos, tickets). La infra de cada lambda va **dentro de su entregable** — no hay specs/tickets de infra suelta.
+>
+> Las specs siguen [`templates/SPEC_TEMPLATE.md`](../templates/SPEC_TEMPLATE.md) — 11 secciones, ninguna skipeable. Threat model embedido en sección 9.
 
 ---
 
@@ -20,35 +22,42 @@
 
 ---
 
-## Índice de specs
+## Índice de specs (reorganizado en 3 épicas · 2026-06-02)
 
-### Fase 1 — Scan + Match (sprint vivo)
+### 🔍 Discovery — KT-16369 · monorepo `classifier-v2-backend`
 
-| Ticket | Slug | Status spec | Notas |
+| Ticket | Slug | Estado | Notas |
 |---|---|---|---|
-| [KT-16613](https://kriptosteam.atlassian.net/browse/KT-16613) | [`KT-16613-tree-uncompressor.md`](KT-16613-tree-uncompressor.md) | draft | DevOps blocker: KT-16726 |
-| [KT-16614](https://kriptosteam.atlassian.net/browse/KT-16614) | [`KT-16614-emr-job-trigger.md`](KT-16614-emr-job-trigger.md) | draft | DevOps blocker: KT-16726 |
-| [KT-16616](https://kriptosteam.atlassian.net/browse/KT-16616) | [`KT-16616-joyas-priorizer.md`](KT-16616-joyas-priorizer.md) | draft | MOD aplicado: Aho-Corasick + normalize compartido |
+| [KT-16613](https://kriptosteam.atlassian.net/browse/KT-16613) | [`KT-16613-tree-uncompressor.md`](KT-16613-tree-uncompressor.md) | ✅ Done | — |
+| [KT-16614](https://kriptosteam.atlassian.net/browse/KT-16614) | [`KT-16614-emr-job-trigger.md`](KT-16614-emr-job-trigger.md) | ✅ Done | — |
+| [KT-16616](https://kriptosteam.atlassian.net/browse/KT-16616) | [`KT-16616-joyas-priorizer.md`](KT-16616-joyas-priorizer.md) | ✅ Done | Aho-Corasick + normalize compartido |
+| [KT-17024](https://kriptosteam.atlassian.net/browse/KT-17024) | [`KT-17024-crown-candidates-indexer.md`](KT-17024-crown-candidates-indexer.md) | RFC | Bulk index OS + STATION; **incluye el índice OpenSearch** |
 
-### Fase 1 — Validación humana
+### ⚙️ Máquina de Estados — KT-17270 · monorepo `classifier-state-backend`
 
-| Ticket | Slug | Status spec | Notas |
+| Ticket | Slug | Estado | Notas |
 |---|---|---|---|
-| [KT-17024](https://kriptosteam.atlassian.net/browse/KT-17024) | [`KT-17024-crown-candidates-indexer.md`](KT-17024-crown-candidates-indexer.md) | draft | Bulk index OS + STATION en DDB |
-| [KT-17025](https://kriptosteam.atlassian.net/browse/KT-17025) | [`KT-17025-crown-enterprise-barrier.md`](KT-17025-crown-enterprise-barrier.md) | draft | State lambda — exactly-once barrier |
-| [KT-17026](https://kriptosteam.atlassian.net/browse/KT-17026) | [`KT-17026-crown-validation-handler.md`](KT-17026-crown-validation-handler.md) | draft | GraphQL mutations — approve/reject/add |
-| [KT-17027](https://kriptosteam.atlassian.net/browse/KT-17027) | [`KT-17027-crown-validation-confirm.md`](KT-17027-crown-validation-confirm.md) | draft | Scroll OS + manifest + bridge a Fase 2 |
+| [KT-17028](https://kriptosteam.atlassian.net/browse/KT-17028) | [`KT-17028-state-cycle-init.md`](KT-17028-state-cycle-init.md) | RFC | crea CYCLE/STATION/REQUEST · multi-trigger |
+| [KT-17032](https://kriptosteam.atlassian.net/browse/KT-17032) | [`KT-17032-state-station-status.md`](KT-17032-state-station-status.md) | RFC | cierre STATION (state lambda) |
+| [KT-17033](https://kriptosteam.atlassian.net/browse/KT-17033) | [`KT-17033-state-enterprise-status.md`](KT-17033-state-enterprise-status.md) | RFC | cierre CYCLE + notify LLM |
 
-### Fase 2 — GSE
+> La DDB `classifier-cycles-state` (ex-KT-17009) vive en este monorepo. La infra de cada lambda va dentro de su entregable.
 
-| Ticket | Slug | Status spec | Notas |
+### 📦 GSE — KT-16370 · monorepo `classifier-gse-backend`
+
+| Ticket | Slug | Estado | Notas |
 |---|---|---|---|
-| [KT-17028](https://kriptosteam.atlassian.net/browse/KT-17028) | [`KT-17028-gse-cycle-init.md`](KT-17028-gse-cycle-init.md) | draft | Multi-trigger por process_type |
-| [KT-17029](https://kriptosteam.atlassian.net/browse/KT-17029) | [`KT-17029-gse-sample-reception-notifier.md`](KT-17029-gse-sample-reception-notifier.md) | draft | SQS consumer + counter + notify Anonymizer |
-| [KT-17030](https://kriptosteam.atlassian.net/browse/KT-17030) | [`KT-17030-gse-sample-anonymizer-notifier.md`](KT-17030-gse-sample-anonymizer-notifier.md) | draft | SQS consumer + counter |
-| [KT-17031](https://kriptosteam.atlassian.net/browse/KT-17031) | [`KT-17031-gse-request-complete.md`](KT-17031-gse-request-complete.md) | draft | API GW + TransactWriteItems |
-| [KT-17032](https://kriptosteam.atlassian.net/browse/KT-17032) | [`KT-17032-gse-station-status.md`](KT-17032-gse-station-status.md) | draft | State lambda STATION Fase 2 |
-| [KT-17033](https://kriptosteam.atlassian.net/browse/KT-17033) | [`KT-17033-gse-enterprise-status.md`](KT-17033-gse-enterprise-status.md) | draft | State lambda CYCLE + notify LLM |
+| [KT-17029](https://kriptosteam.atlassian.net/browse/KT-17029) | [`KT-17029-gse-sample-reception-notifier.md`](KT-17029-gse-sample-reception-notifier.md) | RFC | counter + notify Anonymizer |
+| [KT-17030](https://kriptosteam.atlassian.net/browse/KT-17030) | [`KT-17030-gse-sample-anonymizer-notifier.md`](KT-17030-gse-sample-anonymizer-notifier.md) | RFC | counter |
+| [KT-17031](https://kriptosteam.atlassian.net/browse/KT-17031) | [`KT-17031-gse-request-complete.md`](KT-17031-gse-request-complete.md) | RFC | API GW + TransactWriteItems |
+
+### 🧩 Validación — futura (BE 07, sin crear)
+
+| Ticket | Slug | Estado | Notas |
+|---|---|---|---|
+| [KT-17025](https://kriptosteam.atlassian.net/browse/KT-17025) | [`KT-17025-crown-enterprise-barrier.md`](KT-17025-crown-enterprise-barrier.md) | ⛔ cancelado · diferido | recrear en la épica de Validación; contexto preservado en este spec |
+| [KT-17026](https://kriptosteam.atlassian.net/browse/KT-17026) | [`KT-17026-crown-validation-handler.md`](KT-17026-crown-validation-handler.md) | RFC (parkeado) | GraphQL approve/reject/add |
+| [KT-17027](https://kriptosteam.atlassian.net/browse/KT-17027) | [`KT-17027-crown-validation-confirm.md`](KT-17027-crown-validation-confirm.md) | RFC (parkeado) | scroll OS + manifest → dispara state-cycle-init |
 
 ---
 

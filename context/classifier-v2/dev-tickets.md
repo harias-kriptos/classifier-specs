@@ -1,5 +1,7 @@
-# Dev Tickets — Source of Truth
+# Dev Tickets — histórico del refresh (2026-05)
 
+> ⚠️ **Estado actual del backend → [`STATUS.md`](STATUS.md).** El 2026-06-02 se reorganizó todo en **3 épicas** (🔍 Discovery KT-16369 · ⚙️ Máquina de Estados KT-17270 · 📦 GSE KT-16370) + 1 futura (Validación), con **un monorepo por módulo** e **infra dentro de cada entregable** (sin tickets DevOps sueltos). Los lambdas `gse-cycle-init/station-status/enterprise-status` se renombraron a `state-*`. Este documento conserva el detalle histórico del refresh; varios status/épicas de acá quedaron desactualizados.
+>
 > **Última actualización:** 2026-05-19.
 > **Owner:** Haroldo Arias Molina.
 > **Para:** futuras sesiones de Claude / cualquier persona que se sume al backend del Classifier.

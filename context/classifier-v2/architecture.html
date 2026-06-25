@@ -3,743 +3,193 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arquitectura — Classifier Backend v2</title>
+<title>Arquitectura — Backend Classifier v2</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #f8fafc;
-  --card: #ffffff;
-  --text: #0f172a;
-  --soft: #64748b;
-  --border: #e2e8f0;
-  --primary: #2563eb;
-  --done: #16a34a;
-  --warning: #f59e0b;
-  /* AWS service colors */
-  --lambda: #ED7100;
-  --s3: #7AA116;
-  --ddb: #4D72F3;
-  --sqs: #E7157B;
-  --eb: #E7157B;
-  --emr: #8C4FFF;
-  --opensearch: #8C4FFF;
-  --bedrock: #01A88D;
-  --apigw: #8C4FFF;
-}
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.4;
-  padding: 40px 24px;
-}
-.container { max-width: 1280px; margin: 0 auto; }
-
-.hero { text-align: center; padding: 32px 24px; margin-bottom: 32px; }
-.hero .breadcrumb { font-size: 13px; color: var(--soft); margin-bottom: 12px; }
-.hero .breadcrumb a { color: var(--primary); text-decoration: none; }
-.hero h1 { font-size: 44px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
-.hero p { font-size: 18px; color: var(--soft); max-width: 720px; margin: 0 auto; }
-
-/* ============ LANES ============ */
-.lane {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 28px 32px;
-  margin-bottom: 16px;
-  border: 1px solid var(--border);
-  border-left: 8px solid var(--primary);
-}
-.lane.actors { border-left-color: #475569; background: #f1f5f9; }
-.lane.f1 { border-left-color: var(--primary); }
-.lane.f1v { border-left-color: var(--done); }
-.lane.sm {
-  border-left-color: var(--warning);
-  border-width: 1px;
-  border-left-width: 8px;
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-}
-.lane.f2 { border-left-color: #be185d; }
-.lane.ext { border-left-color: #475569; background: #f1f5f9; }
-
-.lane-header {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.lane-num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: var(--primary);
-  color: white;
-  border-radius: 50%;
-  font-weight: 800;
-  font-size: 18px;
-}
-.lane.actors .lane-num { background: #475569; }
-.lane.f1 .lane-num { background: var(--primary); }
-.lane.f1v .lane-num { background: var(--done); }
-.lane.sm .lane-num { background: var(--warning); font-size: 22px; }
-.lane.f2 .lane-num { background: #be185d; }
-.lane.ext .lane-num { background: #475569; }
-
-.lane-title { font-size: 22px; font-weight: 800; }
-.lane-subtitle { font-size: 14px; color: var(--soft); margin-left: auto; }
-
-/* ============ FLOW ============ */
-.flow {
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-.flow-item {
-  flex: 1;
-  min-width: 160px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  position: relative;
-}
-.flow-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: var(--soft);
-  font-weight: 700;
-  padding: 0 4px;
-  align-self: center;
-}
-.flow-arrow.dashed { color: var(--warning); }
-
-/* ============ BOX (servicio AWS) ============ */
-.box {
-  padding: 16px 14px;
-  border-radius: 12px;
-  text-align: center;
-  background: white;
-  border: 2px solid var(--border);
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 110px;
-}
-.box .service {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
-}
-.box .name {
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 4px;
-  word-break: break-word;
-}
-.box .desc { font-size: 11px; color: var(--soft); line-height: 1.3; }
-
-.box.lambda { border-color: var(--lambda); }
-.box.lambda .service { color: var(--lambda); }
-.box.lambda .icon { color: var(--lambda); }
-
-.box.s3 { border-color: var(--s3); background: #f7fee7; }
-.box.s3 .service { color: var(--s3); }
-
-.box.ddb { border-color: var(--ddb); background: #eff6ff; }
-.box.ddb .service { color: var(--ddb); }
-
-.box.sqs { border-color: var(--sqs); background: #fdf2f8; }
-.box.sqs .service { color: var(--sqs); }
-
-.box.eb { border-color: var(--eb); background: #fdf2f8; }
-.box.eb .service { color: var(--eb); }
-
-.box.emr { border-color: var(--emr); background: #f5f3ff; }
-.box.emr .service { color: var(--emr); }
-
-.box.opensearch { border-color: var(--opensearch); background: #f5f3ff; }
-.box.opensearch .service { color: var(--opensearch); }
-
-.box.apigw { border-color: var(--apigw); background: #f5f3ff; }
-.box.apigw .service { color: var(--apigw); }
-
-.box.actor {
-  border-color: #475569;
-  background: #1e293b;
-  color: white;
-}
-.box.actor .service { color: #94a3b8; }
-.box.actor .desc { color: #cbd5e1; }
-
-.box.external {
-  border-color: #475569;
-  background: #475569;
-  color: white;
-  border-style: dashed;
-}
-.box.external .service { color: #cbd5e1; }
-.box.external .desc { color: #e2e8f0; }
-
-.box.bedrock { border-color: var(--bedrock); background: #ecfdf5; }
-.box.bedrock .service { color: var(--bedrock); }
-
-/* Status indicator */
-.box .status-pill {
-  display: inline-block;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 10px;
-  margin-top: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-.box .status-pill.done { background: #d4f5d8; color: #14532d; }
-.box .status-pill.wip { background: #fef3c7; color: #78350f; }
-.box .status-pill.todo { background: #f1f5f9; color: #475569; }
-
-/* ============ STATE MACHINE CENTER ============ */
-.state-machine {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  gap: 24px;
-  align-items: center;
-}
-.sm-side {
-  background: white;
-  border: 2px solid var(--warning);
-  border-radius: 12px;
-  padding: 20px;
-  font-size: 13px;
-  color: #78350f;
-}
-.sm-side h3 {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--warning);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
-}
-.sm-side .step {
-  padding: 6px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid #fef3c7;
-  font-family: "SF Mono", Monaco, monospace;
-  font-size: 12px;
-}
-.sm-side .step:last-child { border-bottom: none; }
-.sm-side .step .arrow { color: var(--warning); }
-.sm-side code {
-  background: #fffbeb;
-  padding: 1px 5px;
-  border-radius: 3px;
-  font-size: 11px;
-}
-
-.sm-center {
-  text-align: center;
-  padding: 32px;
-  background: var(--ddb);
-  border-radius: 16px;
-  color: white;
-  box-shadow: 0 8px 24px rgba(77, 114, 243, 0.3);
-}
-.sm-center .emoji { font-size: 64px; margin-bottom: 12px; line-height: 1; }
-.sm-center .label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.8;
-  margin-bottom: 6px;
-}
-.sm-center .name {
-  font-size: 22px;
-  font-weight: 800;
-  font-family: "SF Mono", Monaco, monospace;
-  margin-bottom: 16px;
-  word-break: break-word;
-}
-.sm-center .meta {
-  font-size: 12px;
-  font-family: "SF Mono", Monaco, monospace;
-  background: rgba(0,0,0,0.2);
-  padding: 12px;
-  border-radius: 8px;
-  text-align: left;
-}
-.sm-center .meta div { padding: 2px 0; }
-
-/* ============ WRITERS BANNER ============ */
-.writers-banner {
-  background: #eff6ff;
-  border-radius: 12px;
-  padding: 16px 24px;
-  margin: 16px 0;
-  text-align: center;
-  border: 1px solid #bfdbfe;
-}
-.writers-banner .title {
-  font-size: 12px;
-  font-weight: 700;
-  color: #1e3a8a;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
-}
-.writers-banner .list {
-  font-size: 13px;
-  color: #1e40af;
-  font-family: "SF Mono", Monaco, monospace;
-}
-
-/* ============ LEGEND ============ */
-.legend-section {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 24px 32px;
-  margin-top: 24px;
-  border: 1px solid var(--border);
-}
-.legend-section h2 {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--soft);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 16px;
-}
-.legend-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
-}
-.legend-grid .item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-}
-.legend-grid .swatch {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  border: 2px solid;
-}
-
-footer {
-  text-align: center;
-  padding: 24px;
-  color: var(--soft);
-  font-size: 13px;
-}
-footer a {
-  color: var(--primary);
-  text-decoration: none;
-  margin: 0 8px;
-}
-
-@media (max-width: 1000px) {
-  .state-machine { grid-template-columns: 1fr; }
-  .flow { flex-direction: column; }
-  .flow-arrow { transform: rotate(90deg); }
-}
+  :root{
+    --bg:#0f1115; --panel:#171a21; --ink:#e7eaf0; --muted:#9aa3b2;
+    --line:#2a2f3a; --done:#2b8a3e; --rfc:#e67700; --future:#7048e8; --ext:#5c636e;
+    --accent:#4dabf7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;line-height:1.5}
+  header{padding:32px 40px 8px}
+  h1{margin:0;font-size:24px;letter-spacing:.2px}
+  .sub{color:var(--muted);font-size:14px;margin-top:6px}
+  main{padding:8px 40px 48px;max-width:1280px;margin:0 auto}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:18px 0}
+  .diagram{overflow-x:auto;text-align:center}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:4px}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:6px}
+  .epic{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#1b1f28}
+  .epic h3{margin:0 0 4px;font-size:15px}
+  .epic .repo{font-size:12px;color:var(--accent);font-family:ui-monospace,Menlo,monospace}
+  .epic ul{margin:10px 0 0;padding-left:18px;font-size:13px;color:#cdd3dd}
+  .epic li{margin:3px 0}
+  .tag{font-size:10px;padding:1px 7px;border-radius:999px;vertical-align:middle;margin-left:4px}
+  .t-done{background:rgba(43,138,62,.2);color:#69db7c}
+  .t-rfc{background:rgba(230,119,0,.2);color:#ffc078}
+  .t-future{background:rgba(112,72,232,.2);color:#b197fc}
+  h2{font-size:16px;margin:26px 0 6px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  .note{font-size:13px;color:var(--muted)}
+  code{font-family:ui-monospace,Menlo,monospace;background:#22262f;padding:1px 5px;border-radius:4px;font-size:12px}
+  footer{color:var(--muted);font-size:12px;padding:0 40px 40px;max-width:1280px;margin:0 auto}
+  a{color:var(--accent)}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad:true, theme:"base",
+    themeVariables:{
+      fontFamily:'-apple-system,Segoe UI,Inter,sans-serif', fontSize:'13px',
+      primaryColor:'#1b1f28', primaryTextColor:'#e7eaf0', primaryBorderColor:'#2a2f3a',
+      lineColor:'#6b7280', clusterBkg:'#13161c', clusterBorder:'#2a2f3a', tertiaryColor:'#171a21'
+    },
+    flowchart:{curve:'basis', nodeSpacing:45, rankSpacing:55}
+  });
+</script>
 </head>
 <body>
-<div class="container">
+<header>
+  <h1>Arquitectura — Backend Classifier v2</h1>
+  <div class="sub">3 épicas · 1 monorepo por módulo · infra dentro del entregable · <b>2026-06-02</b></div>
+</header>
 
-<div class="hero">
-  <div class="breadcrumb">← <a href="dashboard.html">Dashboard</a> · <a href="devops-reunion.html">Vista DevOps</a> · <a href="status.html">STATUS</a></div>
-  <h1>Arquitectura</h1>
-  <p>Classifier Backend v2 — 6 pasos, 2 monorepos, 1 State Machine</p>
-</div>
+<main>
+  <div class="card">
+    <div class="diagram">
+<pre class="mermaid">
+flowchart TB
+  AG(["Agente Windows / Cloud<br/>Exploración · Fase 1"]):::ext
 
-<!-- ============ 1. ACTORS ============ -->
-<section class="lane actors">
-  <div class="lane-header">
-    <span class="lane-num">1</span>
-    <span class="lane-title">External Actors</span>
-    <span class="lane-subtitle">disparan el flujo</span>
-  </div>
-  <div class="flow">
-    <div class="box actor">
-      <div class="service">💻 Software System</div>
-      <div class="name">Windows Agent</div>
-      <div class="desc">Escanea workstations locales del cliente</div>
-    </div>
-    <div class="box actor">
-      <div class="service">☁️ Software System</div>
-      <div class="name">Cloud Agent</div>
-      <div class="desc">Gsuite · OneDrive · SharePoint</div>
-    </div>
-    <div class="box actor">
-      <div class="service">👤 Software System</div>
-      <div class="name">Client UI</div>
-      <div class="desc">Aprueba/rechaza candidatos · Human-in-the-loop</div>
-    </div>
-    <div class="box actor">
-      <div class="service">📋 External Service</div>
-      <div class="name">KEM API</div>
-      <div class="desc">stations_expected per enterprise</div>
-    </div>
-  </div>
-</section>
+  subgraph DISC["🔍 Discovery · KT-16369 · classifier-v2-backend"]
+    direction LR
+    A1["tree-url-generator<br/>KT-16612"]:::done --> A2["tree-uncompressor<br/>KT-16613"]:::done --> A3["emr-job-trigger<br/>KT-16614"]:::done --> A4["joyas-priorizer · EMR<br/>KT-16616"]:::done
+    A4 -->|matches.jsonl| A5["crown-candidates-indexer<br/>KT-17024"]:::rfc
+    A5 --> OS[("OpenSearch<br/>crown_jewel_candidates")]:::store
+  end
 
-<!-- ============ 2. FASE 1 SCAN ============ -->
-<section class="lane f1">
-  <div class="lane-header">
-    <span class="lane-num">2</span>
-    <span class="lane-title">Fase 1 — Scan &amp; Match</span>
-    <span class="lane-subtitle">Agent → presigned URL → S3 → EMR → OpenSearch</span>
-  </div>
-  <div class="flow">
-    <div class="flow-item">
-      <div class="box lambda">
-        <div class="service">λ Lambda</div>
-        <div class="name">tree-url-generator</div>
-        <div class="desc">Sign presigned URL</div>
-        <span class="status-pill done">✓ Lista</span>
-      </div>
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box s3">
-        <div class="service">📦 Amazon S3</div>
-        <div class="name">compressed_trees</div>
-        <div class="desc">{ent}/{station}.jsonl.gz</div>
-      </div>
-    </div>
-    <div class="flow-arrow dashed">⇢</div>
-    <div class="flow-item">
-      <div class="box lambda">
-        <div class="service">λ Lambda</div>
-        <div class="name">tree-uncompressor</div>
-        <div class="desc">Stream decompress</div>
-        <span class="status-pill done">✓ Lista</span>
-      </div>
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box s3">
-        <div class="service">📦 Amazon S3</div>
-        <div class="name">decompressed_trees</div>
-        <div class="desc">NDJSON · UTF-8</div>
-      </div>
-    </div>
-    <div class="flow-arrow dashed">⇢</div>
-    <div class="flow-item">
-      <div class="box lambda">
-        <div class="service">λ Lambda</div>
-        <div class="name">emr-job-trigger</div>
-        <div class="desc">Start Spark job</div>
-        <span class="status-pill done">✓ Lista</span>
-      </div>
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box emr">
-        <div class="service">⚙️ EMR Serverless</div>
-        <div class="name">joyas-priorizer</div>
-        <div class="desc">PySpark Aho-Corasick</div>
-        <span class="status-pill done">✓ Lista</span>
-      </div>
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box s3">
-        <div class="service">📦 Amazon S3</div>
-        <div class="name">crown_jewels</div>
-        <div class="desc">candidatos</div>
-      </div>
-    </div>
-    <div class="flow-arrow dashed">⇢</div>
-    <div class="flow-item">
-      <div class="box lambda">
-        <div class="service">λ Lambda</div>
-        <div class="name">crown-candidates-indexer</div>
-        <div class="desc">Bulk index OS</div>
-        <span class="status-pill wip">◐ En curso</span>
-      </div>
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box opensearch">
-        <div class="service">🔍 OpenSearch</div>
-        <div class="name">crown_jewel_candidates</div>
-        <div class="desc">searchable index</div>
-      </div>
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box lambda">
-        <div class="service">λ Lambda</div>
-        <div class="name">crown-enterprise-barrier</div>
-        <div class="desc">Wait all stations</div>
-        <span class="status-pill wip">◐ En curso</span>
-      </div>
-    </div>
-  </div>
-</section>
+  subgraph STATE["⚙️ Máquina de Estados · KT-17270 · classifier-state-backend"]
+    DDB[("DynamoDB<br/>classifier-cycles-state<br/>+ Stream")]:::store
+    SE["state-enterprise-init<br/>KT-17370"]:::rfc
+    SN["exploración-notifier<br/>recorrido + joyas<br/>KT-17371"]:::rfc
+    S1["state-cycle-init<br/>KT-17028"]:::done
+    S2["state-station-status<br/>KT-17032"]:::rfc
+    S3["state-enterprise-status<br/>KT-17033"]:::rfc
+    SE --> DDB
+    SN --> DDB
+    S1 --> DDB
+    DDB -. stream .-> S2 --> DDB
+    DDB -. stream .-> S3
+  end
 
-<!-- ============ 3. FASE 1 VALIDACIÓN ============ -->
-<section class="lane f1v">
-  <div class="lane-header">
-    <span class="lane-num">3</span>
-    <span class="lane-title">Fase 1 — Validación humana</span>
-    <span class="lane-subtitle">cliente revisa, aprueba, confirma → manifest</span>
-  </div>
-  <div class="flow">
-    <div class="flow-item">
-      <div class="box apigw">
-        <div class="service">🌐 API Gateway</div>
-        <div class="name">/v2/validation/*</div>
-        <div class="desc">REST endpoints</div>
-      </div>
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box lambda">
-        <div class="service">λ Lambda</div>
-        <div class="name">crown-validation-handler</div>
-        <div class="desc">GraphQL: approve/reject</div>
-        <span class="status-pill wip">◐ En curso</span>
-      </div>
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box lambda">
-        <div class="service">λ Lambda</div>
-        <div class="name">crown-validation-confirm</div>
-        <div class="desc">Freeze → manifest</div>
-        <span class="status-pill wip">◐ En curso</span>
-      </div>
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box s3">
-        <div class="service">📦 Amazon S3</div>
-        <div class="name">validated_crown_jewels</div>
-        <div class="desc">manifest.json</div>
-      </div>
-    </div>
-  </div>
-</section>
+  subgraph GSE["📦 GSE · KT-16370 · classifier-gse-backend"]
+    G1["gse-sample-reception-notifier<br/>KT-17029"]:::rfc
+    G2["gse-sample-anonymizer-notifier<br/>KT-17030"]:::rfc
+    G3["gse-request-complete<br/>KT-17031"]:::rfc
+  end
 
-<!-- ============ 4. STATE MACHINE ============ -->
-<section class="lane sm">
-  <div class="lane-header">
-    <span class="lane-num">⭐</span>
-    <span class="lane-title">State Machine</span>
-    <span class="lane-subtitle">single source of truth · compartido por las 3 fases</span>
-  </div>
+  VAL{{"Validación humana<br/>futura · BE 07"}}:::future
 
-  <div class="state-machine">
-    <div class="sm-side">
-      <h3>Estados CYCLE</h3>
-      <div class="step"><span class="arrow">1.</span><code>scanning</code></div>
-      <div class="step"><span class="arrow">↓</span></div>
-      <div class="step"><span class="arrow">2.</span><code>stations_complete</code></div>
-      <div class="step"><span class="arrow">↓</span></div>
-      <div class="step"><span class="arrow">3.</span><code>confirmed</code></div>
-      <div class="step"><span class="arrow">↓</span></div>
-      <div class="step"><span class="arrow">4.</span><code>phase2_collecting</code></div>
-      <div class="step"><span class="arrow">↓</span></div>
-      <div class="step"><span class="arrow">5.</span><code>complete</code></div>
+  AG -->|inicia exploración| SE
+  AG --> A1
+  AG -. recorrido por estación .-> SN
+  A4 -->|joyas EMR| SN
+  OS --> VAL
+  VAL -->|manifest.json| S1
+  S1 -->|signal| AG
+  AG --> G1 --> DDB
+  AG --> G3 --> DDB
+  G1 -. sample .-> ANON[["Anonymizer · Equipo IA"]]:::ext
+  ANON --> G2 --> DDB
+  S3 -->|notify| LLM[["LLM Process Queue · Equipo IA"]]:::ext
+
+  classDef done fill:#13311c,stroke:#2b8a3e,color:#b2f2bb;
+  classDef rfc fill:#33260a,stroke:#e67700,color:#ffd8a8;
+  classDef future fill:#241b3d,stroke:#7048e8,color:#d0bfff;
+  classDef ext fill:#20242c,stroke:#5c636e,color:#ced4da,font-style:italic;
+  classDef store fill:#102a33,stroke:#1098ad,color:#99e9f2;
+</pre>
     </div>
-
-    <div class="sm-center">
-      <div class="emoji">🗄️</div>
-      <div class="label">Amazon DynamoDB</div>
-      <div class="name">classifier-cycles-state</div>
-      <div class="meta">
-        <div><strong>PK:</strong> enterprise_id</div>
-        <div><strong>SK:</strong> CYCLE# / STATION# / REQUEST#</div>
-        <div><strong>Stream:</strong> NEW_AND_OLD_IMAGES</div>
-        <div><strong>TTL:</strong> 90d after complete</div>
-        <div><strong>Pipes:</strong> EventBridge filter</div>
-      </div>
-    </div>
-
-    <div class="sm-side">
-      <h3>Exactly-once</h3>
-      <p style="font-size:12px; line-height:1.6; margin-bottom:12px;">DDB Stream entrega <strong>at-least-once</strong>. Garantizamos exactly-once con <strong>conditional writes</strong>:</p>
-      <div style="font-family:'SF Mono',Monaco,monospace;font-size:11px;background:#fffbeb;padding:10px;border-radius:6px;line-height:1.5;">
-        <div>SET barrier_counted=true</div>
-        <div style="color:var(--warning)">IF barrier_counted &lt;&gt; true</div>
-        <div style="margin-top:8px">ADD stations_completed=1</div>
-        <div style="color:var(--warning)">IF status='scanning'</div>
-      </div>
-      <p style="font-size:11px;margin-top:12px;color:#78350f"><strong>Barrier Fase 2:</strong><br>samples_anonymized + samples_skipped ≥ samples_expected</p>
+    <div class="legend">
+      <span><i class="dot" style="background:#2b8a3e"></i> Done</span>
+      <span><i class="dot" style="background:#e67700"></i> RFC (spec lista)</span>
+      <span><i class="dot" style="background:#7048e8"></i> Futuro</span>
+      <span><i class="dot" style="background:#5c636e"></i> Externo / Equipo IA</span>
+      <span><i class="dot" style="background:#1098ad"></i> Store (DDB / OpenSearch)</span>
     </div>
   </div>
 
-  <div class="writers-banner">
-    <div class="title">✏️ Lambdas que escriben al State Machine</div>
-    <div class="list">crown-candidates-indexer · crown-enterprise-barrier · crown-validation-confirm · gse-cycle-init · gse-sample-reception-notifier · gse-request-complete · gse-sample-anonymizer-notifier · gse-station-status · gse-enterprise-status</div>
-  </div>
-</section>
+  <h2>Lectura del flujo</h2>
+  <p class="note">
+    Al <b>iniciar la exploración</b> de un enterprise, <code>state-enterprise-init</code> (KT-17370) da de alta ENTERPRISE + CYCLE en la DDB.
+    Durante el recorrido, <code>exploración-notifier</code> (KT-17371) recibe el avance por estación (<code>in_progress</code>) y marca <code>scan_complete</code> cuando el EMR (joyas-priorizer) entrega las joyas; el barrier deja el ciclo en <code>ready</code>. <b>Acá termina el scope de integración actual.</b>
+    <b>Discovery</b> escanea y matchea joyas → registra candidatos en OpenSearch.
+    La <b>Máquina de Estados</b> orquesta el ciclo de vida (CYCLE / STATION / REQUEST) sobre <code>classifier-cycles-state</code> con Stream.
+    La <b>Validación humana</b> (futura) cierra el set aprobado y dispara, vía <code>manifest.json</code>, a <code>state-cycle-init</code>.
+    <b>GSE</b> recolecta y anonimiza muestras; los notifiers actualizan contadores; al cerrar el ciclo, <code>state-enterprise-status</code> notifica al <b>LLM Process Queue</b>.
+  </p>
 
-<!-- ============ 5. FASE 2 GSE ============ -->
-<section class="lane f2">
-  <div class="lane-header">
-    <span class="lane-num">4</span>
-    <span class="lane-title">Fase 2 — GSE Sample Collection</span>
-    <span class="lane-subtitle">Signal → Agent → S3 → Anonymizer → LLM</span>
-  </div>
-  <div class="flow">
-    <div class="flow-item">
-      <div class="box lambda">
-        <div class="service">λ Lambda</div>
-        <div class="name">gse-cycle-init</div>
-        <div class="desc">Materialize STATIONs</div>
-        <span class="status-pill todo">○ Spec</span>
-      </div>
+  <h2>Épicas y tickets</h2>
+  <div class="grid">
+    <div class="epic">
+      <h3>🔍 Discovery</h3>
+      <div class="repo">KT-16369 · classifier-v2-backend</div>
+      <ul>
+        <li>tree-url-generator <span class="tag t-done">KT-16612</span></li>
+        <li>tree-uncompressor <span class="tag t-done">KT-16613</span></li>
+        <li>emr-job-trigger <span class="tag t-done">KT-16614</span></li>
+        <li>joyas-priorizer <span class="tag t-done">KT-16616</span></li>
+        <li>crown-candidates-indexer <span class="tag t-rfc">KT-17024</span></li>
+        <li>JDC area_id <span class="tag t-rfc">KT-17247</span></li>
+      </ul>
     </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box s3">
-        <div class="service">📦 Amazon S3</div>
-        <div class="name">gse-raw</div>
-        <div class="desc">samples del agent</div>
-      </div>
+    <div class="epic">
+      <h3>⚙️ Máquina de Estados</h3>
+      <div class="repo">KT-17270 · classifier-state-backend</div>
+      <ul>
+        <li>state-enterprise-init <span class="tag t-rfc">KT-17370</span></li>
+        <li>exploración-notifier <span class="tag t-rfc">KT-17371</span></li>
+        <li>state-cycle-init <span class="tag t-done">KT-17028</span></li>
+        <li>state-station-status <span class="tag t-rfc">KT-17032</span></li>
+        <li>state-enterprise-status <span class="tag t-rfc">KT-17033</span></li>
+        <li>monorepo + DDB <span class="tag t-rfc">KT-17271</span></li>
+      </ul>
     </div>
-    <div class="flow-arrow dashed">⇢</div>
-    <div class="flow-item">
-      <div class="box lambda">
-        <div class="service">λ Lambda</div>
-        <div class="name">gse-sample-reception-notifier</div>
-        <div class="desc">count received</div>
-        <span class="status-pill todo">○ Spec</span>
-      </div>
+    <div class="epic">
+      <h3>📦 GSE</h3>
+      <div class="repo">KT-16370 · classifier-gse-backend</div>
+      <ul>
+        <li>gse-sample-reception-notifier <span class="tag t-rfc">KT-17029</span></li>
+        <li>gse-sample-anonymizer-notifier <span class="tag t-rfc">KT-17030</span></li>
+        <li>gse-request-complete <span class="tag t-rfc">KT-17031</span></li>
+        <li>monorepo <span class="tag t-rfc">KT-17134</span></li>
+      </ul>
     </div>
-    <div class="flow-arrow">↓</div>
-    <div class="flow-item">
-      <div class="box sqs">
-        <div class="service">📨 Amazon SQS</div>
-        <div class="name">reception-queue</div>
-        <div class="desc">→ Anonymizer</div>
-      </div>
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box s3">
-        <div class="service">📦 Amazon S3</div>
-        <div class="name">gse-anonymized</div>
-        <div class="desc">PII removed</div>
-      </div>
-    </div>
-    <div class="flow-arrow dashed">⇢</div>
-    <div class="flow-item">
-      <div class="box lambda">
-        <div class="service">λ Lambda</div>
-        <div class="name">gse-sample-anonymizer-notifier</div>
-        <div class="desc">count anonymized</div>
-        <span class="status-pill todo">○ Spec</span>
-      </div>
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box lambda">
-        <div class="service">λ Lambda</div>
-        <div class="name">gse-station-status</div>
-        <div class="desc">Barrier STATION</div>
-        <span class="status-pill todo">○ Spec</span>
-      </div>
-    </div>
-    <div class="flow-arrow">→</div>
-    <div class="flow-item">
-      <div class="box lambda">
-        <div class="service">λ Lambda</div>
-        <div class="name">gse-enterprise-status</div>
-        <div class="desc">Close CYCLE</div>
-        <span class="status-pill todo">○ Spec</span>
-      </div>
+    <div class="epic">
+      <h3>🧩 Validación <span class="tag t-future">futura</span></h3>
+      <div class="repo">BE 07 · sin crear</div>
+      <ul>
+        <li>validation-handler <span class="tag t-rfc">KT-17026</span></li>
+        <li>validation-confirm <span class="tag t-rfc">KT-17027</span></li>
+        <li>enterprise-barrier <span class="tag t-future">recrear (ex-KT-17025)</span></li>
+      </ul>
     </div>
   </div>
 
-  <div style="display:flex;gap:12px;margin-top:12px;">
-    <div class="box lambda" style="flex:1;max-width:300px;">
-      <div class="service">λ Lambda · adicional</div>
-      <div class="name">gse-request-complete</div>
-      <div class="desc">Endpoint POST /v2/gse/request-complete · Agent: "termine la carga"</div>
-      <span class="status-pill todo">○ Spec</span>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 6. EXTERNAL SYSTEMS ============ -->
-<section class="lane ext">
-  <div class="lane-header">
-    <span class="lane-num">5</span>
-    <span class="lane-title">External Systems</span>
-    <span class="lane-subtitle">cajas negras — interfaces definidas</span>
-  </div>
-  <div class="flow">
-    <div class="box external">
-      <div class="service">📨 External Service</div>
-      <div class="name">Signal Handler</div>
-      <div class="desc">Push payload a los Agents</div>
-    </div>
-    <div class="box bedrock">
-      <div class="service">🤖 Amazon Bedrock</div>
-      <div class="name">Keywords generation</div>
-      <div class="desc">2K-5K keywords por enterprise</div>
-    </div>
-    <div class="box external">
-      <div class="service">🔒 External Service</div>
-      <div class="name">Anonymizer</div>
-      <div class="desc">PII removal · gse-raw → gse-anonymized</div>
-    </div>
-    <div class="box external">
-      <div class="service">🧠 External Service</div>
-      <div class="name">LLM Process Queue</div>
-      <div class="desc">Final classification</div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ LEGEND ============ -->
-<section class="legend-section">
-  <h2>Leyenda</h2>
-  <div class="legend-grid">
-    <div class="item"><span class="swatch" style="border-color:var(--lambda);background:white"></span>λ AWS Lambda</div>
-    <div class="item"><span class="swatch" style="border-color:var(--s3);background:#f7fee7"></span>📦 Amazon S3</div>
-    <div class="item"><span class="swatch" style="border-color:var(--ddb);background:#eff6ff"></span>🗄️ DynamoDB</div>
-    <div class="item"><span class="swatch" style="border-color:var(--sqs);background:#fdf2f8"></span>📨 SQS · EventBridge</div>
-    <div class="item"><span class="swatch" style="border-color:var(--emr);background:#f5f3ff"></span>⚙️ EMR · 🔍 OpenSearch</div>
-    <div class="item"><span class="swatch" style="border-color:var(--bedrock);background:#ecfdf5"></span>🤖 Amazon Bedrock</div>
-    <div class="item"><span class="swatch" style="border-color:#475569;background:#1e293b"></span>👥 Actor</div>
-    <div class="item"><span class="swatch" style="border-color:#475569;background:#475569;border-style:dashed"></span>⬛ External (black box)</div>
-  </div>
-  <div style="margin-top:20px;display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--soft);">
-    <span><strong style="color:var(--text)">→</strong> sync (HTTP, S3 PUT)</span>
-    <span><strong style="color:var(--warning)">⇢</strong> async (S3 event, DDB Stream, SQS)</span>
-    <span><span class="status-pill done" style="font-size:9px;">✓ Lista</span> implementada</span>
-    <span><span class="status-pill wip" style="font-size:9px;">◐ En curso</span> en desarrollo</span>
-    <span><span class="status-pill todo" style="font-size:9px;">○ Spec</span> pendiente</span>
-  </div>
-</section>
+  <h2>Modelo de infraestructura</h2>
+  <p class="note">
+    Un <b>monorepo por módulo</b> (CloudFormation + lambdas + pipeline). La infra de cada lambda (SQS, EventBridge, IAM) va
+    <b>dentro de su ticket de implementación</b> — no hay tickets DevOps de infra suelta.
+    La DDB <code>classifier-cycles-state</code> es el store compartido (vive en el monorepo de Estados; los demás reciben grant IAM cross-stack).
+    Tickets de infra suelta cancelados: KT-17009, KT-17010, KT-17011, KT-17016, KT-17017.
+  </p>
+</main>
 
 <footer>
-  <a href="dashboard.html">← Dashboard</a>
-  <a href="devops-reunion.html">Vista DevOps</a>
-  <a href="status.html">STATUS</a>
-  <br><br>
-  classifier-specs · 2026-05-28
+  Fuente de verdad: <a href="STATUS.md">STATUS.md</a>. Los diagramas <code>.drawio</code> anteriores se eliminaron por estar desactualizados.
 </footer>
-
-</div>
 </body>
 </html>

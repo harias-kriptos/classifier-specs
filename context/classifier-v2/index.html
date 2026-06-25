@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Índice — Presentaciones Classifier Backend v2</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--panel2:#1b1f28;--ink:#e7eaf0;--muted:#9aa3b2;
+    --line:#2a2f3a;--accent:#4dabf7;--prog:#1c7ed6;--warn:#e67700;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;line-height:1.55}
+  header{padding:34px 40px 6px}
+  h1{margin:0;font-size:25px}
+  .sub{color:var(--muted);font-size:14px;margin-top:6px}
+  main{padding:8px 40px 56px;max-width:1080px;margin:0 auto}
+  h2{font-size:16px;margin:30px 0 10px;border-bottom:1px solid var(--line);padding-bottom:7px}
+
+  /* orden recomendado */
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;margin-top:6px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:7px 12px}
+  .step b{color:var(--accent)}
+  .arrow{color:var(--muted)}
+
+  /* cards */
+  .cards{display:grid;gap:12px;margin-top:6px}
+  .c{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;
+     display:grid;grid-template-columns:42px 1fr auto;gap:14px;align-items:start}
+  .c .ic{font-size:24px;line-height:1.2}
+  .c h3{margin:0;font-size:16px}
+  .c .file{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--accent)}
+  .c p{margin:7px 0 0;font-size:13.5px;color:#cdd3dd}
+  .c .meta{margin-top:8px;font-size:12px;color:var(--muted)}
+  .c .meta b{color:var(--ink)}
+  .open{align-self:center;white-space:nowrap;font-size:13px;text-decoration:none;
+        background:var(--prog);color:#fff;padding:8px 14px;border-radius:9px}
+  .open.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .pill{font-size:10px;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
+  .p-pres{background:rgba(28,126,214,.22);color:#74c0fc}
+  .p-tech{background:rgba(16,152,173,.22);color:#66d9e8}
+  .p-src{background:rgba(43,138,62,.22);color:#69db7c}
+
+  .note{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--warn);
+        border-radius:10px;padding:12px 16px;font-size:13px;color:#cdd3dd;margin-top:8px}
+  code{font-family:ui-monospace,Menlo,monospace;background:#22262f;padding:1px 5px;border-radius:4px;font-size:12px}
+  a{color:var(--accent)}
+  footer{color:var(--muted);font-size:12px;padding:0 40px 40px;max-width:1080px;margin:0 auto}
+</style>
+</head>
+<body>
+<header>
+  <h1>Índice — Presentaciones Classifier Backend v2</h1>
+  <div class="sub">Qué es cada archivo, para quién, y en qué orden usarlo · 2026-06-03</div>
+</header>
+
+<main>
+  <h2>Orden recomendado para presentar</h2>
+  <div class="flow">
+    <span class="step"><b>1.</b> presentacion-clasificador — el pitch</span>
+    <span class="arrow">→</span>
+    <span class="step"><b>2.</b> avance — dónde estamos</span>
+    <span class="arrow">→</span>
+    <span class="step"><b>3.</b> architecture — el cómo técnico</span>
+    <span class="arrow">→</span>
+    <span class="step"><b>4.</b> status — drill-down</span>
+    <span class="arrow">·</span>
+    <span class="step"><b>DevOps:</b> devops-reunion</span>
+  </div>
+
+  <h2>Presentaciones</h2>
+  <div class="cards">
+
+    <div class="c">
+      <div class="ic">🎤</div>
+      <div>
+        <h3>Pitch / método <span class="pill p-pres">presentación</span></h3>
+        <div class="file">presentacion-clasificador.html</div>
+        <p>Deck narrativo: el método (spec-driven con agentes), el trabajo y el resultado. <b>Sin números de ticket</b>, pensado para contar la historia.</p>
+        <div class="meta"><b>Audiencia:</b> liderazgo / no técnicos &nbsp;·&nbsp; <b>Cuándo:</b> abrir una reunión, explicar el porqué</div>
+      </div>
+      <a class="open" href="presentacion-clasificador.html">Abrir</a>
+    </div>
+
+    <div class="c" style="border-color:var(--prog)">
+      <div class="ic">📈</div>
+      <div>
+        <h3>Avance <span class="pill p-pres">presentación</span></h3>
+        <div class="file">avance.html</div>
+        <p>Dónde estamos hoy: los <b>3 monorepos y qué incluye cada uno</b>, estado global por épica, la fase en curso (Máquina de Estados), y specs/brainstorm/tickets por épica. <b>Ésta es la principal para mostrar progreso.</b></p>
+        <div class="meta"><b>Audiencia:</b> liderazgo + equipo &nbsp;·&nbsp; <b>Cuándo:</b> reportar avance</div>
+      </div>
+      <a class="open" href="avance.html">Abrir</a>
+    </div>
+
+    <div class="c">
+      <div class="ic">🗺️</div>
+      <div>
+        <h3>Arquitectura <span class="pill p-tech">técnica</span></h3>
+        <div class="file">architecture.html</div>
+        <p>El diagrama end-to-end (Mermaid): Discovery → Máquina de Estados → GSE + Validación + LLM, con leyenda de estados y tarjetas de tickets por épica.</p>
+        <div class="meta"><b>Audiencia:</b> técnicos / DevOps &nbsp;·&nbsp; <b>Cuándo:</b> explicar el flujo y las piezas</div>
+      </div>
+      <a class="open" href="architecture.html">Abrir</a>
+    </div>
+
+    <div class="c">
+      <div class="ic">📋</div>
+      <div>
+        <h3>Status (drill-down) <span class="pill p-tech">técnica</span></h3>
+        <div class="file">status.html</div>
+        <p>Estado de implementación granular: tablas de tickets por épica, modelo de infra, tabla JDC, gaps. Más detalle que <code>avance.html</code>.</p>
+        <div class="meta"><b>Audiencia:</b> equipo / PM &nbsp;·&nbsp; <b>Cuándo:</b> revisar ticket por ticket</div>
+      </div>
+      <a class="open ghost" href="status.html">Abrir</a>
+    </div>
+
+    <div class="c">
+      <div class="ic">⚙️</div>
+      <div>
+        <h3>DevOps <span class="pill p-tech">técnica</span></h3>
+        <div class="file">devops-reunion.html</div>
+        <p>Vista para DevOps: 1 monorepo por módulo, modelo de infra dentro del entregable, qué se provisiona en cada CloudFormation.</p>
+        <div class="meta"><b>Audiencia:</b> DevOps &nbsp;·&nbsp; <b>Cuándo:</b> coordinar infra / repos</div>
+      </div>
+      <a class="open ghost" href="devops-reunion.html">Abrir</a>
+    </div>
+
+    <div class="c">
+      <div class="ic">📊</div>
+      <div>
+        <h3>Dashboard <span class="pill p-tech">técnica</span></h3>
+        <div class="file">dashboard.html</div>
+        <p>Tablero de estado de alto nivel (cards + flujo + próximos hitos). Se <b>solapa con avance/status</b> — ver nota abajo.</p>
+        <div class="meta"><b>Audiencia:</b> equipo &nbsp;·&nbsp; <b>Cuándo:</b> vistazo rápido</div>
+      </div>
+      <a class="open ghost" href="dashboard.html">Abrir</a>
+    </div>
+
+  </div>
+
+  <h2>Fuentes de verdad (no son presentaciones)</h2>
+  <div class="cards">
+    <div class="c">
+      <div class="ic">✅</div>
+      <div>
+        <h3>STATUS.md <span class="pill p-src">fuente de verdad</span></h3>
+        <div class="file">STATUS.md</div>
+        <p>El estado real del backend en markdown: 3 épicas, monorepos, tickets, modelo de infra, limpieza, gaps + el diagrama Mermaid. <b>De acá salen todas las presentaciones.</b></p>
+        <div class="meta"><b>Si algo no coincide, manda este archivo.</b></div>
+      </div>
+      <a class="open ghost" href="STATUS.md">Abrir</a>
+    </div>
+    <div class="c">
+      <div class="ic">🗃️</div>
+      <div>
+        <h3>dev-tickets.md <span class="pill p-src">histórico</span></h3>
+        <div class="file">dev-tickets.md</div>
+        <p>Detalle histórico del refresh 2026-05 (cómo se llegó acá). Tiene un banner que apunta a STATUS.md para el estado actual.</p>
+        <div class="meta"><b>Cuándo:</b> entender decisiones pasadas</div>
+      </div>
+      <a class="open ghost" href="dev-tickets.md">Abrir</a>
+    </div>
+  </div>
+
+  <h2>Nota: solapamiento</h2>
+  <div class="note">
+    <b>avance.html</b>, <b>status.html</b> y <b>dashboard.html</b> muestran "estado" desde ángulos parecidos.
+    Recomendación: usar <b>avance.html</b> como la oficial de progreso (la más completa), <b>status.html</b> para el drill-down ticket a ticket,
+    y <b>archivar o borrar dashboard.html</b> para evitar ruido. Decime y lo limpio.
+  </div>
+</main>
+
+<footer>
+  Portada de presentaciones · Backend Classifier v2. Todas se alimentan de <a href="STATUS.md">STATUS.md</a>.
+</footer>
+</body>
+</html>

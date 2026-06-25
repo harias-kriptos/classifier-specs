@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avance — Backend Classifier v2</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1b1f28; --ink:#e7eaf0; --muted:#9aa3b2;
+    --line:#2a2f3a; --done:#2b8a3e; --prog:#1c7ed6; --rfc:#e67700; --future:#7048e8; --ext:#5c636e;
+    --accent:#4dabf7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;line-height:1.55}
+  header{padding:34px 40px 6px}
+  h1{margin:0;font-size:26px}
+  .sub{color:var(--muted);font-size:14px;margin-top:6px}
+  main{padding:8px 40px 56px;max-width:1240px;margin:0 auto}
+  h2{font-size:17px;margin:30px 0 10px;border-bottom:1px solid var(--line);padding-bottom:7px}
+  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .chip{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:13px}
+  .chip b{font-size:18px;display:block}
+
+  /* estado global */
+  .bars{display:grid;gap:10px;margin-top:6px}
+  .bar{display:grid;grid-template-columns:200px 1fr 120px;align-items:center;gap:14px;font-size:13px}
+  .track{background:#22262f;border-radius:999px;height:12px;overflow:hidden}
+  .fill{height:100%;border-radius:999px}
+  .st{font-size:12px;color:var(--muted);text-align:right}
+
+  /* monorepos */
+  .repos{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px;margin-top:6px}
+  .repo{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;position:relative}
+  .repo.active{border-color:var(--prog);box-shadow:0 0 0 1px var(--prog) inset}
+  .repo h3{margin:0 0 2px;font-size:16px}
+  .repo .slug{font-size:12px;color:var(--accent);font-family:ui-monospace,Menlo,monospace}
+  .badge{position:absolute;top:16px;right:16px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px}
+  .b-done{background:rgba(43,138,62,.22);color:#69db7c}
+  .b-prog{background:rgba(28,126,214,.25);color:#74c0fc}
+  .b-wait{background:rgba(154,163,178,.2);color:#adb5bd}
+  .repo h4{margin:14px 0 5px;font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+  .repo ul{margin:0;padding-left:18px;font-size:13px}
+  .repo li{margin:3px 0}
+  .ok{color:#69db7c} .pend{color:#ffc078}
+  .infra-line{margin-top:12px;font-size:12.5px;padding:8px 10px;border-radius:8px;background:var(--panel2)}
+
+  /* tablas por épica */
+  .epic-block{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:14px 0}
+  .epic-block h3{margin:0 0 10px;font-size:15px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  td code{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .tag{font-size:10px;padding:1px 7px;border-radius:999px;white-space:nowrap}
+  .t-done{background:rgba(43,138,62,.2);color:#69db7c}
+  .t-prog{background:rgba(28,126,214,.25);color:#74c0fc}
+  .t-rfc{background:rgba(230,119,0,.2);color:#ffc078}
+  .t-future{background:rgba(112,72,232,.2);color:#b197fc}
+  .refs{font-size:12px;color:var(--muted);margin-top:8px}
+  .refs code{background:#22262f;padding:1px 5px;border-radius:4px}
+
+  .diagram{overflow-x:auto;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .gaps{font-size:13px;color:#cdd3dd}
+  .gaps li{margin:5px 0}
+  footer{color:var(--muted);font-size:12px;padding:0 40px 40px;max-width:1240px;margin:0 auto}
+  a{color:var(--accent)}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad:true,theme:"base",
+    themeVariables:{fontFamily:'-apple-system,Segoe UI,sans-serif',fontSize:'13px',
+      primaryColor:'#1b1f28',primaryTextColor:'#e7eaf0',primaryBorderColor:'#2a2f3a',
+      lineColor:'#6b7280',clusterBkg:'#13161c',clusterBorder:'#2a2f3a'},
+    flowchart:{curve:'basis',nodeSpacing:42,rankSpacing:52}});
+</script>
+</head>
+<body>
+<header>
+  <h1>Avance — Backend Classifier v2</h1>
+  <div class="sub">3 épicas · 1 monorepo por módulo · infra dentro del entregable · <b>2026-06-03</b></div>
+  <div class="chips">
+    <div class="chip"><b>3</b> monorepos (+1 fase futura)</div>
+    <div class="chip"><b>12</b> lambdas (4 ✅ desplegadas)</div>
+    <div class="chip ms"><b style="color:#74c0fc">Máquina de Estados</b> fase en curso</div>
+    <div class="chip"><b>13</b> specs definidas</div>
+  </div>
+</header>
+
+<main>
+  <!-- ESTADO GLOBAL -->
+  <h2>Estado global</h2>
+  <div class="bars">
+    <div class="bar">
+      <span>🔍 Discovery</span>
+      <div class="track"><div class="fill" style="width:80%;background:var(--done)"></div></div>
+      <span class="st">infra ✅ · 4/5 lambdas</span>
+    </div>
+    <div class="bar">
+      <span>⚙️ Máquina de Estados</span>
+      <div class="track"><div class="fill" style="width:20%;background:var(--prog)"></div></div>
+      <span class="st">EN PROGRESO</span>
+    </div>
+    <div class="bar">
+      <span>📦 GSE</span>
+      <div class="track"><div class="fill" style="width:0%;background:var(--rfc)"></div></div>
+      <span class="st">specs listas · por arrancar</span>
+    </div>
+    <div class="bar">
+      <span>🧩 Validación</span>
+      <div class="track"><div class="fill" style="width:0%;background:var(--future)"></div></div>
+      <span class="st">fase futura (BE 07)</span>
+    </div>
+  </div>
+
+  <!-- LOS 3 MONOREPOS -->
+  <h2>Los 3 monorepos — qué incluye cada uno</h2>
+  <div class="repos">
+
+    <!-- Discovery -->
+    <div class="repo">
+      <span class="badge b-done">INFRA COMPLETA</span>
+      <h3>🔍 Discovery</h3>
+      <div class="slug">classifier-v2-backend · KT-16369</div>
+      <h4>Lambdas</h4>
+      <ul>
+        <li class="ok">tree-url-generator ✅</li>
+        <li class="ok">tree-uncompressor ✅</li>
+        <li class="ok">emr-job-trigger ✅</li>
+        <li class="ok">joyas-priorizer (EMR) ✅</li>
+        <li class="pend">crown-candidates-indexer · RFC</li>
+      </ul>
+      <div class="infra-line">🏗️ <b>Infra (CloudFormation) base ✅ — KT-17132 Done:</b> buckets S3 (trees comprimidos/descomprimidos, crown_jewels, validated_crown_jewels), EventBridge rules, EMR Serverless, IAM, ECR + pipeline CI/CD. Índice OpenSearch dentro de KT-17024.</div>
+    </div>
+
+    <!-- Máquina de Estados -->
+    <div class="repo active">
+      <span class="badge b-prog">EN PROGRESO</span>
+      <h3>⚙️ Máquina de Estados</h3>
+      <div class="slug">classifier-state-backend · KT-17270</div>
+      <h4>Lambdas</h4>
+      <ul>
+        <li class="pend">state-enterprise-init · RFC <span style="color:var(--muted)">(KT-17370)</span></li>
+        <li class="pend">exploración-notifier · RFC <span style="color:var(--muted)">(KT-17371)</span></li>
+        <li class="ok">state-cycle-init ✅</li>
+        <li class="pend">state-station-status · RFC</li>
+        <li class="pend">state-enterprise-status · RFC</li>
+      </ul>
+      <h4>Store compartido</h4>
+      <ul><li>DynamoDB <code style="font-family:ui-monospace">classifier-cycles-state</code> + Stream</li></ul>
+      <div class="infra-line">🏗️ <b>Infra en el entregable (KT-17271, arrancando):</b> monorepo + CloudFormation, DDB con Stream, EventBridge Pipes sobre el Stream, SQS FIFO, IAM cross-stack para los demás módulos.</div>
+    </div>
+
+    <!-- GSE -->
+    <div class="repo">
+      <span class="badge b-wait">POR ARRANCAR</span>
+      <h3>📦 GSE</h3>
+      <div class="slug">classifier-gse-backend · KT-16370</div>
+      <h4>Lambdas</h4>
+      <ul>
+        <li class="pend">gse-sample-reception-notifier · RFC</li>
+        <li class="pend">gse-sample-anonymizer-notifier · RFC</li>
+        <li class="pend">gse-request-complete (API GW) · RFC</li>
+      </ul>
+      <div class="infra-line">🏗️ <b>Infra en el entregable (KT-17134):</b> monorepo + CloudFormation, buckets gse-raw / gse-anonymized, SQS reception/anonymizer + DLQs, EventBridge rules, ruta API GW <code>/v2/gse/request-complete</code>.</div>
+    </div>
+  </div>
+
+  <!-- DIAGRAMA -->
+  <h2>Flujo end-to-end</h2>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart TB
+  AG(["Agente · Exploración Fase 1"]):::ext
+  subgraph DISC["🔍 Discovery · classifier-v2-backend"]
+    direction LR
+    A1["tree-url-generator"]:::done --> A2["tree-uncompressor"]:::done --> A3["emr-job-trigger"]:::done --> A4["joyas-priorizer · EMR"]:::done
+    A4 -->|matches.jsonl| A5["crown-candidates-indexer<br/>KT-17024"]:::rfc
+    A5 --> OS[("OpenSearch")]:::store
+  end
+  subgraph STATE["⚙️ Máquina de Estados · classifier-state-backend · EN PROGRESO"]
+    DDB[("DynamoDB<br/>classifier-cycles-state")]:::store
+    SE["state-enterprise-init<br/>KT-17370"]:::rfc
+    SN["exploración-notifier<br/>recorrido + joyas<br/>KT-17371"]:::rfc
+    S1["state-cycle-init"]:::prog
+    S2["state-station-status"]:::prog
+    S3["state-enterprise-status"]:::prog
+    SE --> DDB
+    SN --> DDB
+    S1 --> DDB
+    DDB -. stream .-> S2 --> DDB
+    DDB -. stream .-> S3
+  end
+  subgraph GSE["📦 GSE · classifier-gse-backend"]
+    G1["gse-sample-reception-notifier"]:::rfc
+    G2["gse-sample-anonymizer-notifier"]:::rfc
+    G3["gse-request-complete"]:::rfc
+  end
+  VAL{{"Validación humana<br/>futura · BE 07"}}:::future
+  AG -->|inicia exploración| SE
+  AG --> A1
+  AG -. recorrido por estación .-> SN
+  A4 -->|joyas EMR| SN
+  OS --> VAL
+  VAL -->|manifest.json| S1
+  S1 -->|signal| AG
+  AG --> G1 --> DDB
+  AG --> G3 --> DDB
+  G1 -. sample .-> ANON[["Anonymizer · IA"]]:::ext
+  ANON --> G2 --> DDB
+  S3 -->|notify| LLM[["LLM Process Queue · IA"]]:::ext
+  classDef done fill:#13311c,stroke:#2b8a3e,color:#b2f2bb;
+  classDef prog fill:#0b2e4d,stroke:#1c7ed6,color:#a5d8ff;
+  classDef rfc fill:#33260a,stroke:#e67700,color:#ffd8a8;
+  classDef future fill:#241b3d,stroke:#7048e8,color:#d0bfff;
+  classDef ext fill:#20242c,stroke:#5c636e,color:#ced4da,font-style:italic;
+  classDef store fill:#102a33,stroke:#1098ad,color:#99e9f2;
+</pre>
+  </div>
+
+  <!-- SPECS / BRAINSTORM / TICKETS POR ÉPICA -->
+  <h2>Definición por épica — specs · brainstorm · tickets</h2>
+
+  <div class="epic-block">
+    <h3>🔍 Discovery — KT-16369 · <span class="tag t-done">infra completa</span></h3>
+    <table>
+      <tr><th>Ticket</th><th>Componente</th><th>Estado</th></tr>
+      <tr><td><code>KT-16612</code></td><td>tree-url-generator</td><td><span class="tag t-done">Done</span></td></tr>
+      <tr><td><code>KT-16613</code></td><td>tree-uncompressor</td><td><span class="tag t-done">Done</span></td></tr>
+      <tr><td><code>KT-16614</code></td><td>emr-job-trigger</td><td><span class="tag t-done">Done</span></td></tr>
+      <tr><td><code>KT-16616</code></td><td>joyas-priorizer (EMR)</td><td><span class="tag t-done">Done</span></td></tr>
+      <tr><td><code>KT-17024</code></td><td>crown-candidates-indexer (+ índice OS)</td><td><span class="tag t-rfc">RFC</span></td></tr>
+      <tr><td><code>KT-17247</code></td><td>JDC — inclusión de area_id</td><td><span class="tag t-rfc">RFC</span></td></tr>
+      <tr><td><code>KT-17132</code></td><td>Monorepo classifier-v2-backend</td><td><span class="tag t-done">Done</span></td></tr>
+    </table>
+    <div class="refs"><b>Specs:</b> <code>KT-16613/14/16</code>, <code>KT-17024-crown-candidates-indexer.md</code> · <b>Brainstorm:</b> <code>KR-16612-tree-url-generator.md</code>, <code>architecture-refresh-phase-1-2.md</code> · <b>Decisiones:</b> <code>DECISIONS-FASE-1.md</code></div>
+  </div>
+
+  <div class="epic-block" style="border-color:var(--prog)">
+    <h3>⚙️ Máquina de Estados — KT-17270 · <span class="tag t-prog">en progreso</span></h3>
+    <table>
+      <tr><th>Ticket</th><th>Componente</th><th>Estado</th></tr>
+      <tr><td><code>KT-17271</code></td><td>Monorepo classifier-state-backend + DDB</td><td><span class="tag t-prog">en curso</span></td></tr>
+      <tr><td><code>KT-17370</code></td><td>state-enterprise-init (alta ENTERPRISE + CYCLE al iniciar exploración)</td><td><span class="tag t-rfc">RFC</span></td></tr>
+      <tr><td><code>KT-17371</code></td><td>exploración-notifier (recorrido + finalización de joyas EMR)</td><td><span class="tag t-rfc">RFC</span></td></tr>
+      <tr><td><code>KT-17028</code></td><td>state-cycle-init</td><td><span class="tag t-done">Done</span></td></tr>
+      <tr><td><code>KT-17032</code></td><td>state-station-status</td><td><span class="tag t-rfc">RFC</span></td></tr>
+      <tr><td><code>KT-17033</code></td><td>state-enterprise-status</td><td><span class="tag t-rfc">RFC</span></td></tr>
+    </table>
+    <div class="refs"><b>Specs:</b> <code>KT-17028-state-cycle-init.md</code>, <code>KT-17032-state-station-status.md</code>, <code>KT-17033-state-enterprise-status.md</code> · <b>Brainstorm:</b> <code>architecture-refresh-phase-1-2.md</code> · <b>Decisiones:</b> <code>DECISIONS-FASE-2.md</code> (modelo DDB consolidado)</div>
+  </div>
+
+  <div class="epic-block">
+    <h3>📦 GSE — KT-16370 · <span class="tag t-rfc">specs listas</span></h3>
+    <table>
+      <tr><th>Ticket</th><th>Componente</th><th>Estado</th></tr>
+      <tr><td><code>KT-17134</code></td><td>Monorepo classifier-gse-backend</td><td><span class="tag t-rfc">RFC</span></td></tr>
+      <tr><td><code>KT-17029</code></td><td>gse-sample-reception-notifier</td><td><span class="tag t-rfc">RFC</span></td></tr>
+      <tr><td><code>KT-17030</code></td><td>gse-sample-anonymizer-notifier</td><td><span class="tag t-rfc">RFC</span></td></tr>
+      <tr><td><code>KT-17031</code></td><td>gse-request-complete</td><td><span class="tag t-rfc">RFC</span></td></tr>
+    </table>
+    <div class="refs"><b>Specs:</b> <code>KT-17029/30/31-gse-*.md</code> · <b>Brainstorm:</b> <code>architecture-refresh-phase-1-2.md</code> · <b>Decisiones:</b> <code>DECISIONS-FASE-2.md</code></div>
+  </div>
+
+  <div class="epic-block">
+    <h3>🧩 Validación — futura · <span class="tag t-future">BE 07 (sin crear)</span></h3>
+    <table>
+      <tr><th>Ticket</th><th>Componente</th><th>Estado</th></tr>
+      <tr><td><code>KT-17026</code></td><td>validation-handler (GraphQL)</td><td><span class="tag t-rfc">RFC parkeado</span></td></tr>
+      <tr><td><code>KT-17027</code></td><td>validation-confirm</td><td><span class="tag t-rfc">RFC parkeado</span></td></tr>
+      <tr><td><code>KT-17025</code></td><td>enterprise-barrier</td><td><span class="tag t-future">recrear</span></td></tr>
+    </table>
+    <div class="refs"><b>Specs:</b> <code>KT-17025/26/27-crown-*.md</code>, <code>graphql-schema-appsync.md</code> · <b>JDC:</b> KAIM-6315/6316 (Esteban) + KT-17247 area_id</div>
+  </div>
+
+  <!-- PENDIENTES -->
+  <h2>Pendientes / próximos pasos</h2>
+  <ul class="gaps">
+    <li><b>Máquina de Estados (ahora):</b> arrancar KT-17271 (monorepo + DDB) → luego state-cycle-init / station-status / enterprise-status.</li>
+    <li><b>Integración exploración → estados (nuevo):</b> KT-17370 (alta ENTERPRISE + CYCLE al iniciar exploración) y KT-17371 (notificación de recorrido + finalización de joyas del EMR). Cierra el gap agent-side. <b>Scope hasta el resultado del EMR.</b></li>
+    <li><b>GSE:</b> specs listas; arranca después del monorepo de estados.</li>
+    <li><b>Validación (BE 07):</b> crear la épica con KT-17026/27 + recrear el barrier (KT-17025).</li>
+    <li><b>JDC:</b> reportes Excel + loop de reprocesamiento — esperan insumos de Esteban (KAIM-6315/6316).</li>
+    <li><b>Gap restante:</b> signal-handler (canal de notificación al agente, Equipo IA) — sigue sin contrato cerrado.</li>
+  </ul>
+</main>
+
+<footer>
+  Fuente de verdad: <a href="STATUS.md">STATUS.md</a> · diagrama: <a href="architecture.html">architecture.html</a>.
+</footer>
+</body>
+</html>

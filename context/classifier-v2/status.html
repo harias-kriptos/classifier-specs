@@ -350,76 +350,71 @@ footer a {
 <div class="hero">
   <div class="breadcrumb">← <a href="dashboard.html">Dashboard</a> · <a href="devops-reunion.html">Vista DevOps</a></div>
   <h1>Implementation Status</h1>
-  <p>Source of truth — qué está listo, qué está en desarrollo, qué falta</p>
-  <div class="date">Última actualización: 2026-05-28</div>
+  <p>Source of truth — 3 épicas de backend (+1 futura) · qué está Done, qué está en RFC, qué falta</p>
+  <div class="date">Última actualización: 2026-06-02</div>
 </div>
 
 <!-- ============ SUMMARY ============ -->
 <section class="summary">
   <h2>Avance del proyecto</h2>
-  <div class="big-num">15<span>/28</span></div>
-  <div class="sub-num">tickets en marcha · 54% activo</div>
+  <div class="big-num">5<span>/13</span></div>
+  <div class="sub-num">entregables Done sobre 13 de implementación · Discovery con 4 lambdas + monorepo listos</div>
 
   <div class="progress">
-    <div class="seg-done" style="width:18%"></div>
-    <div class="seg-wip" style="width:36%"></div>
-    <div class="seg-pending" style="width:46%"></div>
+    <div class="seg-done" style="width:38%"></div>
+    <div class="seg-pending" style="width:62%"></div>
   </div>
 
   <div class="legend">
     <div class="legend-item">
       <span class="dot" style="background:var(--done)"></span>
-      <span class="num">5</span><span class="lbl">listas (18%)</span>
-    </div>
-    <div class="legend-item">
-      <span class="dot" style="background:var(--warning)"></span>
-      <span class="num">10</span><span class="lbl">en desarrollo (36%)</span>
+      <span class="num">5</span><span class="lbl">Done (38%)</span>
     </div>
     <div class="legend-item">
       <span class="dot" style="background:var(--pending)"></span>
-      <span class="num">13</span><span class="lbl">pendientes (46%)</span>
+      <span class="num">8</span><span class="lbl">RFC / pendientes (62%)</span>
     </div>
   </div>
 </section>
 
-<!-- ============ CATEGORIES ============ -->
+<!-- ============ CATEGORIES (épicas) ============ -->
 <div class="categories">
-
-  <div class="cat-card done">
-    <div class="header">
-      <div class="title">Dev — Listos</div>
-      <div class="count">5</div>
-    </div>
-    <div class="desc">4 Lambdas Fase 1 Scan (legacy, en producción) + Documentación maestra (KT-17135)</div>
-  </div>
 
   <div class="cat-card wip">
     <div class="header">
-      <div class="title">Dev + Infra — En desarrollo</div>
-      <div class="count">10</div>
+      <div class="title">🔍 Discovery — KT-16369</div>
+      <div class="count">In Progress</div>
     </div>
-    <div class="desc">4 Lambdas validación (finalizan mañana) + 6 ítems infra Fase 1 (DDB, ECR, S3, EMR, OpenSearch, EB Pipes)</div>
+    <div class="desc">Monorepo <code>classifier-v2-backend</code> (KT-17132 ✅). 4 lambdas Done (tree-url-generator, tree-uncompressor, emr-job-trigger, joyas-priorizer) + crown-candidates-indexer y area_id en RFC.</div>
   </div>
 
   <div class="cat-card pending">
     <div class="header">
-      <div class="title">Fase 2 — Pendiente</div>
-      <div class="count">13</div>
+      <div class="title">⚙️ Máquina de Estados — KT-17270</div>
+      <div class="count">RFC</div>
     </div>
-    <div class="desc">6 Lambdas GSE + 6 infra Fase 2 (gse-raw, SQS, SNS, etc.) + 1 cleanup repos legacy</div>
+    <div class="desc">Monorepo <code>classifier-state-backend</code> (KT-17271). 3 lambdas state-* en RFC. Aloja la DDB <code>classifier-cycles-state</code> + Stream.</div>
+  </div>
+
+  <div class="cat-card pending">
+    <div class="header">
+      <div class="title">📦 GSE — KT-16370</div>
+      <div class="count">RFC</div>
+    </div>
+    <div class="desc">Monorepo <code>classifier-gse-backend</code> (KT-17134). 3 lambdas notifier/complete en RFC. Validación (BE 07) queda como épica futura sin crear.</div>
   </div>
 
 </div>
 
-<!-- ============ DETAIL: SCAN-MATCH MONOREPO ============ -->
+<!-- ============ DETAIL: DISCOVERY ============ -->
 <section class="detail-section">
-  <h2><span class="tag">Monorepo 1</span> classifier-scan-match-backend</h2>
-  <div class="sub">KT-17034 · 8 Lambdas · 4 listas + 4 en desarrollo</div>
+  <h2><span class="tag">🔍 Discovery</span> KT-16369 · classifier-v2-backend</h2>
+  <div class="sub">Scan → match → candidatos · Monorepo KT-17132 ✅ · 4 lambdas Done + 2 en RFC</div>
 
   <table>
     <thead>
       <tr>
-        <th style="width:50%">Lambda</th>
+        <th style="width:50%">Componente</th>
         <th>Ticket</th>
         <th>Estado</th>
         <th>Detalle</th>
@@ -428,65 +423,65 @@ footer a {
     <tbody>
       <tr>
         <td><span class="lambda-name">tree-url-generator</span></td>
-        <td><span class="ticket-id">KT-17001</span></td>
-        <td><span class="status-badge done"><span class="dot"></span>Listo</span></td>
-        <td>Funcional en repo legacy</td>
+        <td><span class="ticket-id">KT-16612</span></td>
+        <td><span class="status-badge done"><span class="dot"></span>Done</span></td>
+        <td>Pre-signed URL del árbol</td>
       </tr>
       <tr>
         <td><span class="lambda-name">tree-uncompressor</span></td>
-        <td><span class="ticket-id">KT-17002</span></td>
-        <td><span class="status-badge done"><span class="dot"></span>Listo</span></td>
-        <td>Funcional en repo legacy</td>
+        <td><span class="ticket-id">KT-16613</span></td>
+        <td><span class="status-badge done"><span class="dot"></span>Done</span></td>
+        <td>Descompresión del árbol</td>
       </tr>
       <tr>
         <td><span class="lambda-name">emr-job-trigger</span></td>
-        <td><span class="ticket-id">KT-17003</span></td>
-        <td><span class="status-badge done"><span class="dot"></span>Listo</span></td>
-        <td>Funcional en repo legacy</td>
+        <td><span class="ticket-id">KT-16614</span></td>
+        <td><span class="status-badge done"><span class="dot"></span>Done</span></td>
+        <td>Disparo del job EMR</td>
       </tr>
       <tr>
         <td><span class="lambda-name">joyas-priorizer</span></td>
-        <td><span class="ticket-id">KT-17004</span></td>
-        <td><span class="status-badge done"><span class="dot"></span>Listo</span></td>
-        <td>EMR Spark script</td>
+        <td><span class="ticket-id">KT-16616</span></td>
+        <td><span class="status-badge done"><span class="dot"></span>Done</span></td>
+        <td>EMR · genera matches.jsonl</td>
       </tr>
       <tr>
         <td><span class="lambda-name">crown-candidates-indexer</span></td>
-        <td><span class="ticket-id">KT-17005</span></td>
-        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
-        <td>Finaliza 2026-05-29</td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">crown-enterprise-barrier</span></td>
-        <td><span class="ticket-id">KT-17006</span></td>
-        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
-        <td>Finaliza 2026-05-29</td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">crown-validation-handler</span></td>
         <td><span class="ticket-id">KT-17024</span></td>
-        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
-        <td>Finaliza 2026-05-29</td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>Incluye índice OpenSearch <code>crown_jewel_candidates</code></td>
       </tr>
       <tr>
-        <td><span class="lambda-name">crown-validation-confirm</span></td>
-        <td><span class="ticket-id">KT-17025</span></td>
-        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
-        <td>Finaliza 2026-05-29</td>
+        <td><span class="lambda-name">JDC — inclusión de area_id en metadata</span></td>
+        <td><span class="ticket-id">KT-17247</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>Backend</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">Monorepo classifier-v2-backend</span></td>
+        <td><span class="ticket-id">KT-17132</span></td>
+        <td><span class="status-badge done"><span class="dot"></span>Done</span></td>
+        <td>Estructura + CI/CD</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">validation-handler · validation-confirm (parkeados → Validación)</span></td>
+        <td><span class="ticket-id">KT-17026 · KT-17027</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>Migran a la épica futura de Validación (BE 07)</td>
       </tr>
     </tbody>
   </table>
 </section>
 
-<!-- ============ DETAIL: GSE MONOREPO ============ -->
+<!-- ============ DETAIL: MÁQUINA DE ESTADOS ============ -->
 <section class="detail-section">
-  <h2><span class="tag f2">Monorepo 2</span> classifier-gse-backend</h2>
-  <div class="sub">KT-17134 · 6 Lambdas · todas en spec</div>
+  <h2><span class="tag shared">⚙️ Máquina de Estados</span> KT-17270 · classifier-state-backend</h2>
+  <div class="sub">Ciclos / estaciones (CYCLE/STATION/REQUEST) sobre la DDB con Stream · Monorepo KT-17271 · todo en RFC</div>
 
   <table>
     <thead>
       <tr>
-        <th style="width:50%">Lambda</th>
+        <th style="width:50%">Componente</th>
         <th>Ticket</th>
         <th>Estado</th>
         <th>Detalle</th>
@@ -494,165 +489,225 @@ footer a {
     </thead>
     <tbody>
       <tr>
-        <td><span class="lambda-name">gse-cycle-init</span></td>
+        <td><span class="lambda-name">state-enterprise-init</span></td>
+        <td><span class="ticket-id">KT-17370</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>Alta ENTERPRISE + CYCLE al iniciar exploración (Fase 1)</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">exploración-notifier</span></td>
+        <td><span class="ticket-id">KT-17371</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>Recorrido por estación + finalización de joyas (EMR) · barrier → ready</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">state-cycle-init</span></td>
         <td><span class="ticket-id">KT-17028</span></td>
-        <td><span class="status-badge pending"><span class="dot"></span>Spec</span></td>
-        <td>Materialize STATIONs + notify Signal</td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>Crea CYCLE/STATION/REQUEST · multi-trigger</td>
       </tr>
       <tr>
-        <td><span class="lambda-name">gse-sample-reception-notifier</span></td>
-        <td><span class="ticket-id">KT-17029</span></td>
-        <td><span class="status-badge pending"><span class="dot"></span>Spec</span></td>
-        <td>Count samples_received</td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">gse-request-complete</span></td>
-        <td><span class="ticket-id">KT-17030</span></td>
-        <td><span class="status-badge pending"><span class="dot"></span>Spec</span></td>
-        <td>API endpoint Agent → I'm done</td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">gse-sample-anonymizer-notifier</span></td>
-        <td><span class="ticket-id">KT-17031</span></td>
-        <td><span class="status-badge pending"><span class="dot"></span>Spec</span></td>
-        <td>Count samples_anonymized</td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">gse-station-status</span></td>
+        <td><span class="lambda-name">state-station-status</span></td>
         <td><span class="ticket-id">KT-17032</span></td>
-        <td><span class="status-badge pending"><span class="dot"></span>Spec</span></td>
-        <td>Barrier per STATION</td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>Cierre STATION</td>
       </tr>
       <tr>
-        <td><span class="lambda-name">gse-enterprise-status</span></td>
+        <td><span class="lambda-name">state-enterprise-status</span></td>
         <td><span class="ticket-id">KT-17033</span></td>
-        <td><span class="status-badge pending"><span class="dot"></span>Spec</span></td>
-        <td>Close CYCLE → notify LLM</td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>Cierre CYCLE + notify LLM</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">Monorepo classifier-state-backend</span></td>
+        <td><span class="ticket-id">KT-17271</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>Aloja la DDB <code>classifier-cycles-state</code></td>
       </tr>
     </tbody>
   </table>
 </section>
 
-<!-- ============ INFRA ============ -->
+<!-- ============ DETAIL: GSE ============ -->
 <section class="detail-section">
-  <h2><span class="tag shared">Infra</span> CloudFormation por fase</h2>
-  <div class="sub">Sin Terraform · todo IaC en carpeta <code style="background:#f1f5f9;padding:1px 6px;border-radius:3px;font-family:'SF Mono',monospace;font-size:12px">cloudformation/</code> de cada monorepo</div>
+  <h2><span class="tag f2">📦 GSE</span> KT-16370 · classifier-gse-backend</h2>
+  <div class="sub">Sample collection · Monorepo KT-17134 · 3 lambdas en RFC</div>
 
   <table>
     <thead>
       <tr>
-        <th style="width:55%">Recurso</th>
-        <th>Fase</th>
+        <th style="width:50%">Componente</th>
+        <th>Ticket</th>
         <th>Estado</th>
+        <th>Detalle</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><span class="lambda-name">DynamoDB classifier-cycles-state + Stream</span></td>
-        <td>Compartido</td>
-        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+        <td><span class="lambda-name">gse-sample-reception-notifier</span></td>
+        <td><span class="ticket-id">KT-17029</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>samples_received++</td>
       </tr>
       <tr>
-        <td><span class="lambda-name">ECR + IAM Lambda execution role</span></td>
-        <td>Compartido</td>
-        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+        <td><span class="lambda-name">gse-sample-anonymizer-notifier</span></td>
+        <td><span class="ticket-id">KT-17030</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>samples_anonymized++</td>
       </tr>
       <tr>
-        <td><span class="lambda-name">S3 buckets Fase 1 (compressed, decompressed, crown_jewels, validated)</span></td>
-        <td>Fase 1</td>
-        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
+        <td><span class="lambda-name">gse-request-complete</span></td>
+        <td><span class="ticket-id">KT-17031</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>status: sent</td>
       </tr>
       <tr>
-        <td><span class="lambda-name">EMR Serverless app + IAM</span></td>
-        <td>Fase 1</td>
-        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">OpenSearch index crown_jewel_candidates</span></td>
-        <td>Fase 1</td>
-        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">EventBridge Pipes (DDB Stream filter)</span></td>
-        <td>Fase 1</td>
-        <td><span class="status-badge wip"><span class="dot"></span>En desarrollo</span></td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">S3 buckets Fase 2 (gse-raw, gse-anonymized)</span></td>
-        <td>Fase 2</td>
-        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">SQS queues + DLQs (reception, anonymizer)</span></td>
-        <td>Fase 2</td>
-        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">SNS Signal Handler integration</span></td>
-        <td>Fase 2</td>
-        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">EventBridge Pipes Fase 2</span></td>
-        <td>Fase 2</td>
-        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">API Gateway /v2/gse/request-complete</span></td>
-        <td>Fase 2</td>
-        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">CloudWatch + SNS kriptos-backend-alerts</span></td>
-        <td>Compartido</td>
-        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
-      </tr>
-      <tr>
-        <td><span class="lambda-name">VPC + Secrets Manager (KEM API key)</span></td>
-        <td>Compartido</td>
-        <td><span class="status-badge pending"><span class="dot"></span>Pendiente</span></td>
+        <td><span class="lambda-name">Monorepo classifier-gse-backend</span></td>
+        <td><span class="ticket-id">KT-17134</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>RFC</span></td>
+        <td>Estructura + CI/CD</td>
       </tr>
     </tbody>
   </table>
 </section>
 
+<!-- ============ DETAIL: VALIDACIÓN (futura) ============ -->
+<section class="detail-section">
+  <h2><span class="tag shared">🟣 Validación</span> futura · BE 07</h2>
+  <div class="sub">Validación humana, client-facing · épica todavía sin crear</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:50%">Componente</th>
+        <th>Ticket</th>
+        <th>Estado</th>
+        <th>Detalle</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="lambda-name">Épica de Validación (BE 07)</span></td>
+        <td><span class="ticket-id">sin crear</span></td>
+        <td><span class="status-badge pending"><span class="dot"></span>No creada</span></td>
+        <td>Recibirá KT-17026 (validation-handler) y KT-17027 (validation-confirm)</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ JDC ============ -->
+<section class="detail-section">
+  <h2><span class="tag">🟦 JDC</span> reunión 2026-06-02 · bajo KT-16369</h2>
+  <div class="sub">Reportes Excel + loop de reprocesamiento · esperan insumos de producto</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:55%">Item</th>
+        <th>Ticket</th>
+        <th>Dueño</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="lambda-name">Documento de casuísticas de cambios del cliente</span></td>
+        <td><span class="ticket-id">KAIM-6315</span></td>
+        <td>Esteban Trujillo</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">Formato estándar de Excel (tipo CESEM)</span></td>
+        <td><span class="ticket-id">KAIM-6316</span></td>
+        <td>Esteban Trujillo</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">Seguimiento de los anteriores</span></td>
+        <td><span class="ticket-id">KT-17245 · KT-17246</span></td>
+        <td>Sofia Murillo</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">Inclusión de area_id (ver Discovery)</span></td>
+        <td><span class="ticket-id">KT-17247</span></td>
+        <td>Backend</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ MODELO DE INFRA ============ -->
+<section class="detail-section">
+  <h2><span class="tag shared">🏗️ Modelo de infraestructura</span> decisión 2026-06-02</h2>
+  <div class="sub">CloudFormation · un monorepo por módulo · infra de cada lambda dentro de su ticket de implementación</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:55%">Decisión</th>
+        <th>Detalle</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="lambda-name">Un monorepo por módulo</span></td>
+        <td>CloudFormation + lambdas + pipeline en cada repo (classifier-v2 / state / gse-backend)</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">Infra dentro del entregable</span></td>
+        <td>Cada lambda lleva su SQS, EventBridge rule/pipe, IAM y buckets. No hay tickets DevOps de infra suelta.</td>
+      </tr>
+      <tr>
+        <td><span class="lambda-name">DDB classifier-cycles-state + Stream</span></td>
+        <td>Store compartido · vive en el monorepo de Máquina de Estados · grant IAM cross-stack al resto</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notes-box" style="margin-top:20px;margin-bottom:0">
+    <strong>Tickets de infra suelta cancelados</strong> (absorbidos en monorepos/implementaciones):
+    <code>KT-17009</code> (DDB → KT-17271 / estados),
+    <code>KT-17010</code> (OpenSearch index → KT-17024),
+    <code>KT-17017</code> (buckets GSE → KT-17134),
+    <code>KT-17011</code> y <code>KT-17016</code>.
+  </div>
+</section>
+
 <!-- ============ NOTES ============ -->
 <div class="notes-box">
-  <strong>Decisión de stack:</strong> Python 3.11 · Lambda Container Image · ECR · <code>CloudFormation</code> (no Terraform) · pytest · ruff · mypy. Cada monorepo tiene su propio ECR + IAM + CloudFormation templates en carpeta <code>cloudformation/</code>.
+  <strong>Decisión de stack:</strong> Python 3.11 · Lambda Container Image · ECR · <code>CloudFormation</code> · pytest · ruff · mypy · uv. Cada módulo es un monorepo con su propio ECR + IAM + templates de CloudFormation; la infra de cada lambda va dentro de su ticket de implementación.
 </div>
 
-<!-- ============ MILESTONES ============ -->
+<!-- ============ GAPS ABIERTOS ============ -->
 <section class="milestones-section">
-  <h2>📅 Hitos siguientes</h2>
-  <div class="sub">Orden sugerido · cada hito desbloquea al siguiente</div>
+  <h2>⚠️ Pendientes / gaps abiertos</h2>
+  <div class="sub">Lo que falta cerrar para llegar al end-to-end</div>
 
   <div class="milestones-grid">
     <div class="ms-card wip">
-      <div class="num">Hito 1 — En curso</div>
-      <div class="title">Foundation</div>
+      <div class="num">Gap 1</div>
+      <div class="title">Épica de Validación (BE 07)</div>
       <div class="items">
-        DDB + ECR + monorepo scan-match-backend. Migrar las 4 Lambdas legacy. Validar las 4 Lambdas en desarrollo.
+        Crear la épica futura con KT-17026 (validation-handler) y KT-17027 (validation-confirm).
       </div>
     </div>
-    <div class="ms-card">
-      <div class="num">Hito 2</div>
-      <div class="title">Fase 1 completa</div>
+    <div class="ms-card wip">
+      <div class="num">Gap 2</div>
+      <div class="title">signal-handler / url-generator</div>
       <div class="items">
-        OpenSearch + EMR + API GW + AppSync + EventBridge Pipes integrados. CYCLE puede llegar a 'confirmed'.
+        Pre-signed URL hacia el agente Windows · sin ticket asignado · Equipo Agente / IA.
       </div>
     </div>
-    <div class="ms-card">
-      <div class="num">Hito 3</div>
-      <div class="title">Fase 2 GSE</div>
+    <div class="ms-card wip">
+      <div class="num">Gap 3</div>
+      <div class="title">JDC — Excel + reprocesamiento</div>
       <div class="items">
-        Monorepo gse-backend + 6 Lambdas + Signal Handler + Anonymizer + LLM. End-to-end completo.
+        Reportes Excel + loop de reprocesamiento · esperan insumos de Esteban (KAIM-6315 / 6316).
       </div>
     </div>
-    <div class="ms-card">
-      <div class="num">Hito 4</div>
-      <div class="title">Cleanup final</div>
+    <div class="ms-card wip">
+      <div class="num">Gap 4</div>
+      <div class="title">Canales con Equipo IA</div>
       <div class="items">
-        Archivar 4 repos legacy (KT-17133). Monorepos como única source of truth.
+        Signal Handler, Anonymizer y LLM Process Queue siguen como stubs · definir canales finales.
       </div>
     </div>
   </div>
@@ -662,9 +717,9 @@ footer a {
   <a href="dashboard.html">← Dashboard</a>
   <a href="devops-reunion.html">Vista DevOps</a>
   <a href="STATUS.md">📄 STATUS.md (markdown)</a>
-  <a href="architecture-global.drawio" download>⬇ Diagrama</a>
+  <a href="STATUS.md">⬇ Diagrama (mermaid en STATUS.md)</a>
   <br><br>
-  classifier-specs · 2026-05-28
+  classifier-specs · 2026-06-02
 </footer>
 
 </div>

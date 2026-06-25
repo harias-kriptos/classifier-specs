@@ -106,7 +106,7 @@
       <p>Cada módulo del clasificador pensado y documentado · 10 docs.</p></div>
     <div class="step s3"><div class="num">3</div><h3>Aclarar la arquitectura</h3>
       <div class="phasetime t">2 sem</div>
-      <p>Diagramas, procesos, flujos · 15→2 monorepos · DDB única.</p></div>
+      <p>Diagramas, procesos, flujos · 3 épicas · 1 monorepo por módulo · DDB única.</p></div>
     <div class="step s5" style="border:2px solid var(--green)"><div class="num" style="background:var(--green)">4</div><h3>Desarrollar la etapa</h3>
       <div class="phasetime g">~1 día</div>
       <p><b style="color:var(--green)">El retorno</b>: etapa completa con specs, tests y review.</p></div>
@@ -181,13 +181,13 @@
   <span class="kicker">Lo que tenemos</span>
   <h2 style="max-width:none">Artefactos reales, no diapositivas</h2>
   <div class="grid g4">
-    <div class="card"><div class="stat g">14</div><div class="statlbl">Lambdas diseñadas<br>en 2 monorepos</div></div>
-    <div class="card"><div class="stat b">17</div><div class="statlbl">specs técnicas<br>con threat model</div></div>
+    <div class="card"><div class="stat g">11</div><div class="statlbl">Lambdas diseñadas<br>en 3 monorepos</div></div>
+    <div class="card"><div class="stat b">3</div><div class="statlbl">épicas de backend<br>+ 1 futura (Validación)</div></div>
     <div class="card"><div class="stat p">10</div><div class="statlbl">documentos<br>de arquitectura</div></div>
-    <div class="card"><div class="stat t">3</div><div class="statlbl">diagramas AWS<br>reproducibles</div></div>
-    <div class="card"><div class="stat i">28</div><div class="statlbl">tickets trazados<br>(dev · infra · cleanup)</div></div>
+    <div class="card"><div class="stat t">1</div><div class="statlbl">diagrama AWS<br>end-to-end reproducible</div></div>
+    <div class="card"><div class="stat i">4</div><div class="statlbl">Lambdas Scan + Match<br>desplegadas y probadas</div></div>
     <div class="card"><div class="stat t">≥80%</div><div class="statlbl">coverage obligatorio<br>en cada Lambda</div></div>
-    <div class="card"><div class="stat a">15→2</div><div class="statlbl">repos consolidados<br>(−87% complejidad)</div></div>
+    <div class="card"><div class="stat a">1 / módulo</div><div class="statlbl">monorepo con infra<br>dentro de cada ticket</div></div>
     <div class="card"><div class="stat g">100%</div><div class="statlbl">del diseño<br>completado</div></div>
   </div>
 </section>
@@ -199,15 +199,15 @@
   <div class="grid g2" style="margin-top:30px">
     <div class="card">
       <span class="ico">✅</span><h3>Ya entregado · desplegado y probado</h3>
-      <p style="margin-top:14px"><b style="color:#fff">Scan + Match</b> corriendo: tree-url-generator, uncompressor, EMR trigger, joyas-priorizer.</p>
+      <p style="margin-top:14px"><b style="color:#fff">Discovery · Scan + Match</b> corriendo: tree-url-generator, uncompressor, EMR trigger, joyas-priorizer.</p>
       <p>Calidad de fábrica: TDD + review + threat model antes de mergear.</p>
       <p>Trazabilidad total: de cada línea al ticket y la spec que la originó.</p>
     </div>
     <div class="card">
       <span class="ico">🔨</span><h3>En construcción · sobre specs cerradas</h3>
-      <p style="margin-top:14px"><b style="color:#fff">Validación humana</b> — 4 Lambdas, en implementación.</p>
-      <p><b style="color:#fff">Fase 2 · GSE</b> — 6 Lambdas, spec y contrato listos.</p>
-      <p><b style="color:#fff">Infra CloudFormation</b> — 15 tickets coordinados con DevOps.</p>
+      <p style="margin-top:14px"><b style="color:#fff">Discovery</b> — crown-candidates-indexer (+ índice OpenSearch) y <code>area_id</code> en metadata.</p>
+      <p><b style="color:#fff">Máquina de Estados</b> — 3 Lambdas sobre la DDB <code>classifier-cycles-state</code> + Stream.</p>
+      <p><b style="color:#fff">GSE</b> — 3 Lambdas, spec y contrato listos. <b style="color:#fff">Validación</b> queda como épica futura (BE 07).</p>
     </div>
   </div>
 </section>
@@ -220,7 +220,7 @@
   con cada decisión especificada y documentada. La misma máquina se reusa en el resto del producto — y en el próximo.</p>
   <div class="chips">
     <span class="chip">⚡ 1 día ≈ 3–4 sprints</span>
-    <span class="chip">14 Lambdas · 17 specs · 10 docs</span>
+    <span class="chip">3 épicas · 11 Lambdas · 10 docs</span>
     <span class="chip">Scan + Match en prod</span>
     <span class="chip">Diseño 100%</span>
   </div>

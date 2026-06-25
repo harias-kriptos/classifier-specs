@@ -1,163 +1,150 @@
-# Implementation Status — Classifier Backend v2
+# Estado Actual — Backend Classifier v2
 
-> **Última actualización:** 2026-05-28
-> **Source of truth para:** qué está implementado, qué está en spec, qué está en infra
-> **Stack confirmado:** Python 3.11 + Lambda Container + ECR + **CloudFormation** + pytest/ruff/mypy
-
----
-
-## Resumen
-
-| Categoría | Total | Implemented | In progress | Spec only | % avance |
-|---|---|---|---|---|---|
-| **Dev tickets** (Lambdas) | 11 | **4** | 0 | 7 | 36% |
-| **Infra tickets** | 15 | 0 | 0 | 15 | 0% |
-| **Cleanup** | 1 | 0 | 0 | 1 | 0% |
-| **Documentación** | 1 | 1 | 0 | 0 | 100% |
-| **TOTAL** | 28 | 5 | 0 | 23 | 18% |
+> **Última actualización:** 2026-06-02 (reorganización en 3 épicas + modelo infra-en-entregable)
+> **Source of truth** del estado del backend. Reemplaza la versión anterior (que usaba numeración de tickets ficticia).
+> **Stack:** Python 3.11 · Lambda Container (ECR) · CloudFormation · pytest/ruff/mypy · uv.
 
 ---
 
-## ✅ Implementadas (4 Lambdas)
+## 1. Modelo: 3 épicas de backend (+ 1 futura)
 
-> Estas 4 Lambdas tienen código funcional. **Pendiente:** migrar a `classifier-scan-match-backend` monorepo (cleanup KT-17133).
+Cada módulo = **una épica + un monorepo**. La infraestructura de cada lambda va **dentro de su ticket de implementación** (no hay tickets DevOps de infra suelta).
 
-| Ticket | Lambda | Repo actual | Estado | Pendiente |
+| # | Épica | Jira | Monorepo | Estado |
 |---|---|---|---|---|
-| **KT-17001** | `tree-url-generator` | `kriptos-io/s3-tree-uploader` (legacy) | ✅ Funcional | Migrar a monorepo + CloudFormation |
-| **KT-17002** | `tree-uncompressor` | `kriptos-io/tree-uncompressor` (legacy) | ✅ Funcional | Migrar a monorepo + CloudFormation |
-| **KT-17003** | `emr-job-trigger` | `kriptos-io/emr-job-trigger` (legacy) | ✅ Funcional | Migrar a monorepo + CloudFormation |
-| **KT-17004** | `joyas-priorizer` | (EMR Serverless, no Lambda) | ✅ Funcional | Migrar script + CloudFormation |
-
-**Próximo paso:** Crear `classifier-scan-match-backend` (KT-17034) → migrar estas 4 → desactivar repos legacy (KT-17133).
+| 1 | **Discovery** (scan → match → candidatos) | [KT-16369](https://kriptosteam.atlassian.net/browse/KT-16369) | `classifier-v2-backend` ([KT-17132](https://kriptosteam.atlassian.net/browse/KT-17132) ✅) | In Progress |
+| 2 | **Máquina de Estados** (ciclos/estaciones) | [KT-17270](https://kriptosteam.atlassian.net/browse/KT-17270) | `classifier-state-backend` ([KT-17271](https://kriptosteam.atlassian.net/browse/KT-17271)) | RFC |
+| 3 | **GSE** (sample collection) | [KT-16370](https://kriptosteam.atlassian.net/browse/KT-16370) | `classifier-gse-backend` ([KT-17134](https://kriptosteam.atlassian.net/browse/KT-17134)) | RFC |
+| 4 | **Validación** (humana, client-facing) | _futura — BE 07_ | TBD | No creada |
 
 ---
 
-## 📋 En Spec (sin código aún)
+## 2. Diagrama end-to-end
 
-### Monorepo 1: `classifier-scan-match-backend`
+```mermaid
+flowchart TB
+  subgraph DISC["🔍 Discovery · KT-16369 · classifier-v2-backend"]
+    direction LR
+    A1[tree-url-generator<br/>KT-16612 ✅] --> A2[tree-uncompressor<br/>KT-16613 ✅] --> A3[emr-job-trigger<br/>KT-16614 ✅] --> A4[joyas-priorizer<br/>KT-16616 ✅ · EMR]
+    A4 -->|matches.jsonl| A5[crown-candidates-indexer<br/>KT-17024]
+    A5 --> OS[(OpenSearch<br/>crown_jewel_candidates)]
+  end
 
-| Ticket | Lambda | Status |
+  subgraph STATE["⚙️ Máquina de Estados · KT-17270 · classifier-state-backend"]
+    DDB[(DynamoDB<br/>classifier-cycles-state<br/>+ Stream)]
+    S1[state-cycle-init<br/>KT-17028]
+    S2[state-station-status<br/>KT-17032]
+    S3[state-enterprise-status<br/>KT-17033]
+    S1 --> DDB
+    DDB -. stream .-> S2 --> DDB
+    DDB -. stream .-> S3
+  end
+
+  subgraph GSE["📦 GSE · KT-16370 · classifier-gse-backend"]
+    G1[gse-sample-reception-notifier<br/>KT-17029]
+    G2[gse-sample-anonymizer-notifier<br/>KT-17030]
+    G3[gse-request-complete<br/>KT-17031]
+  end
+
+  VAL{{"Validación humana<br/>futura · BE 07"}}
+
+  A5 --> DDB
+  OS --> VAL
+  VAL -->|manifest.json| S1
+  S1 -->|signal| AG([Agente Windows / Cloud])
+  AG --> G1 --> DDB
+  AG --> G3 --> DDB
+  G1 -.->|sample| ANON[[Anonymizer · Equipo IA]]
+  ANON --> G2 --> DDB
+  S3 -->|notify| LLM[[LLM Process Queue · Equipo IA]]
+
+  classDef done fill:#d3f9d8,stroke:#2b8a3e,color:#1b4332;
+  classDef rfc fill:#fff3bf,stroke:#e67700,color:#663c00;
+  classDef ext fill:#e7e7e7,stroke:#868e96,color:#212529,font-style:italic;
+  classDef future fill:#e5dbff,stroke:#7048e8,color:#3b2a6b;
+  class A1,A2,A3,A4 done;
+  class A5,S1,S2,S3,G1,G2,G3 rfc;
+  class AG,ANON,LLM ext;
+  class VAL future;
+```
+
+**Lectura:** Discovery escanea y matchea → registra candidatos (OpenSearch) y estado de estación (DDB). La **Máquina de Estados** orquesta el ciclo de vida (CYCLE/STATION/REQUEST) sobre la DDB con Stream. La **Validación humana** (futura) cierra el set y dispara, vía `manifest.json`, el `state-cycle-init`. **GSE** recolecta y anonimiza muestras; los notifiers actualizan contadores en la DDB; cuando el ciclo cierra, `state-enterprise-status` notifica al **LLM Process Queue**.
+
+---
+
+## 3. Tickets por épica
+
+### 🔍 Discovery — KT-16369
+
+| Ticket | Componente | Estado |
 |---|---|---|
-| KT-17005 | crown-candidates-indexer | 📋 Spec |
-| KT-17006 | crown-enterprise-barrier | 📋 Spec |
-| KT-17024 | crown-validation-handler | 📋 Spec |
-| KT-17025 | crown-validation-confirm | 📋 Spec |
+| KT-16612 | tree-url-generator | ✅ Done |
+| KT-16613 | tree-uncompressor | ✅ Done |
+| KT-16614 | emr-job-trigger | ✅ Done |
+| KT-16616 | joyas-priorizer (EMR) | ✅ Done |
+| KT-17024 | crown-candidates-indexer (incluye índice OpenSearch) | 📋 RFC |
+| KT-17247 | JDC — inclusión de `area_id` en metadata | 📋 RFC |
+| KT-17132 | Monorepo `classifier-v2-backend` | ✅ Done |
+| _parkeados (→ Validación)_ | KT-17026 validation-handler · KT-17027 validation-confirm | 📋 RFC |
 
-### Monorepo 2: `classifier-gse-backend`
+### ⚙️ Máquina de Estados — KT-17270
 
-| Ticket | Lambda | Status |
+| Ticket | Componente | Estado |
 |---|---|---|
-| KT-17028 | gse-cycle-init | 📋 Spec |
-| KT-17029 | gse-sample-reception-notifier | 📋 Spec |
-| KT-17030 | gse-request-complete | 📋 Spec |
-| KT-17031 | gse-sample-anonymizer-notifier | 📋 Spec |
-| KT-17032 | gse-station-status | 📋 Spec |
-| KT-17033 | gse-enterprise-status | 📋 Spec |
+| KT-17028 | **state-cycle-init** (crea CYCLE/STATION/REQUEST, multi-trigger) | 📋 RFC |
+| KT-17032 | **state-station-status** (cierre STATION) | 📋 RFC |
+| KT-17033 | **state-enterprise-status** (cierre CYCLE + notify LLM) | 📋 RFC |
+| KT-17271 | Monorepo `classifier-state-backend` (aloja la DDB `classifier-cycles-state`) | 📋 RFC |
 
----
+### 📦 GSE — KT-16370
 
-## 🏗️ Infra (CloudFormation pendiente)
-
-> Toda la infra de Fase 1 y Fase 2 está en spec. CloudFormation templates aún no creados.
-
-### Fase 1 (KT-17009 a KT-17019)
-
-| Ticket | Recurso | Status |
+| Ticket | Componente | Estado |
 |---|---|---|
-| KT-17009 | ECR + IAM Lambda execution role | 📋 Spec |
-| KT-17010 | **DDB `classifier-cycles-state`** (crítico — bloqueador) | 📋 Spec |
-| KT-17012 | OpenSearch cluster | 📋 Spec |
-| KT-17013 | S3 buckets (compressed/decompressed/crown_jewels/validated) | 📋 Spec |
-| KT-17014 | EMR Serverless app + IAM | 📋 Spec |
-| KT-17015 | EventBridge Pipes (Stream filtering) | 📋 Spec |
-| KT-17017 | GitLab CI/CD | 📋 Spec |
-| KT-17018 | VPC + networking | 📋 Spec |
-| KT-17019 | Secrets Manager (KEM API key) | 📋 Spec |
+| KT-17029 | gse-sample-reception-notifier (samples_received++) | 📋 RFC |
+| KT-17030 | gse-sample-anonymizer-notifier (samples_anonymized++) | 📋 RFC |
+| KT-17031 | gse-request-complete (status: sent) | 📋 RFC |
+| KT-17134 | Monorepo `classifier-gse-backend` | 📋 RFC |
 
-### Fase 2 (KT-17020 a KT-17023, KT-17082 a KT-17087)
+### 🟦 JDC (reunión 2026-06-02) — bajo KT-16369
 
-| Ticket | Recurso | Status |
+| Ticket | Componente | Dueño |
 |---|---|---|
-| KT-17020 | S3 buckets (gse-raw, gse-anonymized) | 📋 Spec |
-| KT-17021 | SQS queues (reception → Anonymizer) | 📋 Spec |
-| KT-17022 | EventBridge Pipes Fase 2 | 📋 Spec |
-| KT-17023 | SNS Signal Handler integration | 📋 Spec |
-| KT-17082 | S3 lifecycle policies (90d TTL) | 📋 Spec |
-| KT-17083 | CloudWatch monitoring + alarms | 📋 Spec |
-| KT-17084 | Lambda reserved concurrency | 📋 Spec |
-| KT-17085 | DDB autoscaling | 📋 Spec |
-| KT-17086 | VPC security groups Fase 2 | 📋 Spec |
-| KT-17087 | mTLS certs para servicios externos | 📋 Spec |
+| KAIM-6315 | Documento de casuísticas de cambios del cliente | Esteban Trujillo |
+| KAIM-6316 | Formato estándar de Excel (tipo CESEM) | Esteban Trujillo |
+| KT-17245 / KT-17246 | Seguimiento de los anteriores | Sofia Murillo |
+| KT-17247 | Inclusión de `area_id` (ver Discovery) | Backend |
 
 ---
 
-## 🧹 Cleanup (KT-17133)
+## 4. Modelo de infraestructura (decisión 2026-06-02)
 
-> **Bloqueado por:** migración de las 4 Lambdas funcionales al monorepo.
+- **Un monorepo por módulo** (CloudFormation + lambdas + pipeline).
+- **La infra de cada lambda va dentro de su ticket de implementación** (su SQS, EventBridge rule/pipe, IAM, buckets). Ya **no** hay tickets DevOps de infra suelta.
+- La **DDB `classifier-cycles-state`** (con Stream) es el store compartido — vive en el monorepo de Máquina de Estados; los demás módulos reciben grant IAM cross-stack.
 
-| Acción | Estado |
-|---|---|
-| Migrar código de `s3-tree-uploader` → monorepo | Pendiente |
-| Migrar código de `tree-uncompressor` → monorepo | Pendiente |
-| Migrar código de `emr-job-trigger` → monorepo | Pendiente |
-| Migrar `joyas-priorizer` (EMR script) → monorepo | Pendiente |
-| Archivar 4 repos legacy en GitLab | Pendiente |
-| Actualizar CI/CD para apuntar al monorepo | Pendiente |
-| Update referencias en specs viejas | Pendiente |
+**Tickets de infra suelta cancelados** (su contenido se absorbió en monorepos/implementaciones): KT-17009 (DDB→KT-17271), KT-17010 (OS index→KT-17024), KT-17017 (buckets GSE→KT-17134), KT-17011 y KT-17016 (ya estaban).
 
 ---
 
-## 📚 Documentación (KT-17135) — ✅ COMPLETA
+## 5. Limpieza realizada (2026-06-02)
 
-Documentos generados (2026-05-28):
+- **Épica legacy KT-16370** (versión pre-refresh de GSE) → sus 12 hijos cancelados (KT-16617–16622 lambdas + KT-16730–16735 devops), superseded por KT-17028–17033. La épica se **reabrió** y reusa como la GSE vigente.
+- **KT-17025** (phase1-enterprise-barrier) cancelado → pertenece a la futura épica de Validación; contexto preservado en `specs-staging/KT-17025-crown-enterprise-barrier.md`.
+- Renombrados `gse-cycle-init/station-status/enterprise-status` → `state-*` (son maquinaria genérica de estados, no exclusiva de GSE).
 
-| Documento | Path | Estado |
+---
+
+## 6. Pendientes / gaps abiertos
+
+| # | Pendiente | Owner |
 |---|---|---|
-| Architecture overview | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | ✅ |
-| State Machine detalle | [docs/architecture/STATE-MACHINE.md](docs/architecture/STATE-MACHINE.md) | ✅ |
-| Data Model DDB | [docs/architecture/DATA-MODEL.md](docs/architecture/DATA-MODEL.md) | ✅ |
-| Integraciones externas | [docs/architecture/INTEGRATIONS.md](docs/architecture/INTEGRATIONS.md) | ✅ |
-| Decisiones (ADR) | [docs/DECISIONS.md](docs/DECISIONS.md) | ✅ |
-| Mapa de tickets | [docs/TICKETS-MAP.md](docs/TICKETS-MAP.md) | ✅ |
-| Onboarding | [docs/ONBOARDING.md](docs/ONBOARDING.md) | ✅ |
-| Troubleshooting | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | ✅ |
-| Índice navegacional | [docs/README.md](docs/README.md) | ✅ |
-| Diagrama global | [architecture-global.drawio](architecture-global.drawio) | ✅ |
+| 1 | **Épica de Validación (BE 07)** — crear con KT-17026/27 + recrear KT-17025 | Producto + Backend |
+| 2 | Gap **`signal-handler`** / **`url-generator`** (pre-signed URL Windows) — sin ticket | Equipo Agente / IA |
+| 3 | **JDC — reportes Excel + loop de reprocesamiento** — esperan insumos de Esteban (KAIM-6315/6316) | Esteban → Backend |
+| 4 | Canales finales con Equipo IA: Signal Handler, Anonymizer, LLM Process Queue (hoy stubs) | Equipo IA |
 
 ---
 
-## 🎯 Próximos hitos sugeridos
+## 7. Diagrama
 
-### Hito 1 — Foundation (bloqueador de todo)
-
-**Objetivo:** crear infra mínima compartida + monorepo 1
-
-1. **KT-17009** — Crear DDB `classifier-cycles-state` (CloudFormation)
-2. **KT-17010** — Crear ECR + IAM execution role
-3. **KT-17034** — Inicializar monorepo `classifier-scan-match-backend`
-4. **Migrar las 4 Lambdas funcionales** al monorepo (cleanup KT-17133 parcial)
-
-### Hito 2 — Fase 1 completa
-
-5. KT-17005, KT-17006, KT-17024, KT-17025 → 4 Lambdas faltantes Fase 1
-6. KT-17012-15, KT-17017-19 → infra Fase 1
-
-### Hito 3 — Fase 2 completa
-
-7. KT-17134 → inicializar monorepo 2
-8. KT-17028-33 → 6 Lambdas Fase 2
-9. KT-17020-23, KT-17082-87 → infra Fase 2
-
-### Hito 4 — Cleanup final
-
-10. KT-17133 — Cerrar repos legacy
-
----
-
-## Notas
-
-- **CloudFormation, no Terraform.** Confirmado 2026-05-28.
-- **Python 3.11** confirmado para todas las Lambdas.
-- **Container Image** (no ZIP) — ECR centralizado por monorepo.
-- Las 4 Lambdas funcionales pueden seguir corriendo en producción mientras se migran; el cambio es transparente desde el punto de vista de S3/EventBridge.
+Ver [architecture.html](architecture.html) (render del diagrama de arriba). Los `.drawio` anteriores se eliminaron por estar desactualizados.

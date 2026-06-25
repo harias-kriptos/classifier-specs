@@ -390,121 +390,165 @@ footer a {
 <div class="hero">
   <div class="breadcrumb">← <a href="dashboard.html">Volver al dashboard</a> · <a href="status.html">Ver STATUS detallado</a></div>
   <h1>DevOps · Classifier v2</h1>
-  <p>Lo que se cancela · Los 2 monorepos reales · Qué hace falta</p>
+  <p>1 monorepo por módulo · infra dentro del entregable · sin tickets DevOps sueltos</p>
 </div>
 
-<!-- ============ LEGACY (lo que se cancela) ============ -->
+<!-- ============ MENSAJE CENTRAL ============ -->
+<div class="real-banner">
+  <h2>📦 El modelo: 1 monorepo por módulo</h2>
+  <p>La infra de cada lambda (SQS, EventBridge, IAM, buckets) va <strong>dentro de su ticket de implementación</strong>. Ya no hay tickets DevOps de infra suelta.</p>
+</div>
+
+<!-- ============ CANCELADOS (infra suelta) ============ -->
 <section class="legacy-section">
-  <h2>🗄️ Trabajo previo — se reemplaza por monorepos</h2>
-  <div class="sub">Estos repos/tickets ya no se usan en la arquitectura nueva. El código migra al monorepo.</div>
+  <h2>🗄️ Tickets de infra suelta — cancelados</h2>
+  <div class="sub">Su contenido se absorbió en los monorepos / implementaciones. Ya no se crean tickets DevOps de infra aparte.</div>
 
   <div class="legacy-grid">
     <div class="legacy-card">
-      <span class="ticket">KT-16725</span>
-      <span class="name">s3-tree-uploader</span>
-      <div class="desc">tree-url-generator + API GW (deployed)</div>
+      <span class="ticket">KT-17009</span>
+      <span class="name">DDB classifier-cycles-state</span>
+      <div class="desc">Absorbido → monorepo Estados (KT-17271)</div>
     </div>
     <div class="legacy-card">
-      <span class="ticket">KT-16726</span>
-      <span class="name">tree-uncompressor</span>
-      <div class="desc">Lambda standalone + buckets</div>
+      <span class="ticket">KT-17010</span>
+      <span class="name">OpenSearch index</span>
+      <div class="desc">Absorbido → KT-17024 crown-candidates-indexer</div>
     </div>
     <div class="legacy-card">
-      <span class="ticket">KT-16727</span>
-      <span class="name">emr-job-trigger standalone</span>
-      <div class="desc">Cancelled · consolidado en KT-16726</div>
+      <span class="ticket">KT-17017</span>
+      <span class="name">buckets GSE</span>
+      <div class="desc">Absorbido → monorepo GSE (KT-17134)</div>
     </div>
     <div class="legacy-card">
-      <span class="ticket">KT-16728</span>
-      <span class="name">jewels-priorizer EMR</span>
-      <div class="desc">EMR Serverless app + IAM (deployed)</div>
+      <span class="ticket">KT-17011</span>
+      <span class="name">infra suelta</span>
+      <div class="desc">Cancelado</div>
     </div>
     <div class="legacy-card">
       <span class="ticket">KT-17016</span>
-      <span class="name">gse-cycles-samples DDB</span>
-      <div class="desc">Cancelled · consolidado en classifier-cycles-state</div>
-    </div>
-    <div class="legacy-card">
-      <span class="ticket">KT-17076</span>
-      <span class="name">emr-job-trigger nuevo</span>
-      <div class="desc">Se incluye en monorepo scan-match</div>
+      <span class="name">infra suelta</span>
+      <div class="desc">Cancelado</div>
     </div>
   </div>
 
   <div class="legacy-note">
-    <strong>⚠️ Cleanup pendiente (KT-17133):</strong> archivar 4 repos legacy una vez migrado el código a los monorepos. El código funciona pero queda como referencia histórica.
+    <strong>🗑️ Legacy GSE cancelado:</strong> los hijos de la épica pre-refresh (KT-16617–16622 lambdas + KT-16730–16735 devops) quedaron superseded por KT-17028–17033. Renombrados <code style="background:#fff;padding:1px 5px;border-radius:3px">gse-cycle-init / station-status / enterprise-status</code> → <code style="background:#fff;padding:1px 5px;border-radius:3px">state-*</code> (maquinaria genérica de estados).
   </div>
 </section>
 
 <!-- ============ REAL ============ -->
 <div class="real-banner">
-  <h2>📦 La verdad real: 2 monorepos</h2>
-  <p>Todo el código nuevo vive aquí. Cada uno tiene su CloudFormation, ECR, CI/CD.</p>
+  <h2>📦 Los 3 monorepos (+1 futuro)</h2>
+  <p>Todo el código nuevo vive aquí. Cada uno tiene su CloudFormation, ECR y CI/CD; la infra se entrega junto con cada lambda.</p>
 </div>
 
 <div class="monorepos">
 
   <div class="monorepo">
-    <div class="ticket-header">KT-17034</div>
-    <div class="repo-name">classifier-scan-match-backend</div>
-    <div class="phase-name">Fase 1 · Scan + Match + Validación · 8 Lambdas totales</div>
+    <div class="ticket-header">KT-16369 · Épica</div>
+    <div class="repo-name">classifier-v2-backend</div>
+    <div class="phase-name">🔍 Discovery · scan → match → candidatos · Monorepo KT-17132 ✅</div>
 
     <div class="status-row">
       <div class="status-chip done">
         <div class="num">4</div>
-        <div class="lbl">Listas (legacy)</div>
+        <div class="lbl">Done</div>
       </div>
       <div class="status-chip wip">
-        <div class="num">4</div>
+        <div class="num">0</div>
         <div class="lbl">En desarrollo</div>
       </div>
       <div class="status-chip todo">
-        <div class="num">0</div>
-        <div class="lbl">Pendientes</div>
+        <div class="num">2</div>
+        <div class="lbl">RFC</div>
       </div>
     </div>
 
-    <div class="section-title">Lambdas del monorepo</div>
+    <div class="section-title">Componentes</div>
     <ul>
-      <li><span class="check done">✓</span>tree-url-generator</li>
-      <li><span class="check done">✓</span>tree-uncompressor</li>
-      <li><span class="check done">✓</span>emr-job-trigger</li>
-      <li><span class="check done">✓</span>joyas-priorizer <span style="color:var(--soft);font-size:11px">(EMR)</span></li>
-      <li><span class="check wip">◐</span>crown-candidates-indexer</li>
-      <li><span class="check wip">◐</span>crown-enterprise-barrier</li>
-      <li><span class="check wip">◐</span>crown-validation-handler</li>
-      <li><span class="check wip">◐</span>crown-validation-confirm</li>
+      <li><span class="check done">✓</span>tree-url-generator <span style="color:var(--soft);font-size:11px">(KT-16612)</span></li>
+      <li><span class="check done">✓</span>tree-uncompressor <span style="color:var(--soft);font-size:11px">(KT-16613)</span></li>
+      <li><span class="check done">✓</span>emr-job-trigger <span style="color:var(--soft);font-size:11px">(KT-16614)</span></li>
+      <li><span class="check done">✓</span>joyas-priorizer <span style="color:var(--soft);font-size:11px">(KT-16616 · EMR)</span></li>
+      <li><span class="check todo">○</span>crown-candidates-indexer <span style="color:var(--soft);font-size:11px">(KT-17024 · OpenSearch)</span></li>
+      <li><span class="check todo">○</span>area_id en metadata <span style="color:var(--soft);font-size:11px">(KT-17247)</span></li>
+    </ul>
+  </div>
+
+  <div class="monorepo">
+    <div class="ticket-header" style="background:var(--sm)">KT-17270 · Épica</div>
+    <div class="repo-name">classifier-state-backend</div>
+    <div class="phase-name">⚙️ Máquina de Estados · ciclos / estaciones · Monorepo KT-17271</div>
+
+    <div class="status-row">
+      <div class="status-chip done">
+        <div class="num">0</div>
+        <div class="lbl">Done</div>
+      </div>
+      <div class="status-chip wip">
+        <div class="num">0</div>
+        <div class="lbl">En desarrollo</div>
+      </div>
+      <div class="status-chip todo">
+        <div class="num">3</div>
+        <div class="lbl">RFC</div>
+      </div>
+    </div>
+
+    <div class="section-title">Componentes</div>
+    <ul>
+      <li><span class="check todo">○</span>state-cycle-init <span style="color:var(--soft);font-size:11px">(KT-17028)</span></li>
+      <li><span class="check todo">○</span>state-station-status <span style="color:var(--soft);font-size:11px">(KT-17032)</span></li>
+      <li><span class="check todo">○</span>state-enterprise-status <span style="color:var(--soft);font-size:11px">(KT-17033)</span></li>
+      <li style="border-top:1px dashed var(--border)"><span class="check todo">▣</span>DDB <code style="background:#f1f5f9;padding:1px 5px;border-radius:3px">classifier-cycles-state</code> + Stream</li>
     </ul>
   </div>
 
   <div class="monorepo f2">
-    <div class="ticket-header">KT-17134</div>
+    <div class="ticket-header">KT-16370 · Épica</div>
     <div class="repo-name">classifier-gse-backend</div>
-    <div class="phase-name">Fase 2 · Priority Sample Collection · 6 Lambdas totales</div>
+    <div class="phase-name">📦 GSE · sample collection · Monorepo KT-17134</div>
 
     <div class="status-row">
       <div class="status-chip done">
         <div class="num">0</div>
-        <div class="lbl">Listas</div>
+        <div class="lbl">Done</div>
       </div>
       <div class="status-chip wip">
         <div class="num">0</div>
         <div class="lbl">En desarrollo</div>
       </div>
       <div class="status-chip todo">
-        <div class="num">6</div>
-        <div class="lbl">Pendientes</div>
+        <div class="num">3</div>
+        <div class="lbl">RFC</div>
       </div>
     </div>
 
-    <div class="section-title">Lambdas del monorepo</div>
+    <div class="section-title">Componentes</div>
     <ul>
-      <li><span class="check todo">○</span>gse-cycle-init</li>
-      <li><span class="check todo">○</span>gse-sample-reception-notifier</li>
-      <li><span class="check todo">○</span>gse-request-complete</li>
-      <li><span class="check todo">○</span>gse-sample-anonymizer-notifier</li>
-      <li><span class="check todo">○</span>gse-station-status</li>
-      <li><span class="check todo">○</span>gse-enterprise-status</li>
+      <li><span class="check todo">○</span>gse-sample-reception-notifier <span style="color:var(--soft);font-size:11px">(KT-17029)</span></li>
+      <li><span class="check todo">○</span>gse-sample-anonymizer-notifier <span style="color:var(--soft);font-size:11px">(KT-17030)</span></li>
+      <li><span class="check todo">○</span>gse-request-complete <span style="color:var(--soft);font-size:11px">(KT-17031)</span></li>
+    </ul>
+  </div>
+
+  <div class="monorepo" style="border-top-color:var(--pending);opacity:0.92">
+    <div class="ticket-header" style="background:var(--pending)">Futura · BE 07</div>
+    <div class="repo-name">Validación</div>
+    <div class="phase-name">🟣 Validación humana, client-facing · épica todavía sin crear</div>
+
+    <div class="status-row">
+      <div class="status-chip todo">
+        <div class="num">—</div>
+        <div class="lbl">Sin crear</div>
+      </div>
+    </div>
+
+    <div class="section-title">Componentes previstos</div>
+    <ul>
+      <li><span class="check todo">○</span>validation-handler <span style="color:var(--soft);font-size:11px">(KT-17026 · parkeado)</span></li>
+      <li><span class="check todo">○</span>validation-confirm <span style="color:var(--soft);font-size:11px">(KT-17027 · parkeado)</span></li>
     </ul>
   </div>
 
@@ -519,42 +563,45 @@ footer a {
     <span class="stack-tag">ECR (1 por monorepo)</span>
     <span class="stack-tag highlight">CloudFormation</span>
     <span class="stack-tag">pytest · ruff · mypy</span>
-    <span class="stack-tag">SonarCloud + Snyk</span>
-    <span class="stack-tag">GitHub Actions (unlockstack pattern)</span>
+    <span class="stack-tag">uv</span>
   </div>
 </section>
 
-<!-- ============ NEEDED ============ -->
+<!-- ============ INFRA POR MÓDULO ============ -->
 <section class="needed-section">
-  <h2>🏗️ Qué necesitamos crear (CloudFormation)</h2>
-  <div class="sub">Agrupado por monorepo. Todo IaC en la carpeta <code>cloudformation/</code> del repo correspondiente.</div>
+  <h2>🏗️ Infra: dentro de cada entregable (CloudFormation)</h2>
+  <div class="sub">No hay tickets DevOps de infra suelta. La infra de cada lambda (SQS, EventBridge, IAM, buckets) se crea <strong>en su mismo ticket de implementación</strong>, en la carpeta <code>cloudformation/</code> del monorepo del módulo.</div>
 
   <div class="needed-grid">
 
     <div class="needed-col">
-      <h3>📦 Para scan-match-backend</h3>
+      <h3>🔍 Discovery · classifier-v2-backend</h3>
       <ul>
-        <li>DynamoDB <code>classifier-cycles-state</code> + Stream <strong>(prerrequisito)</strong></li>
-        <li>ECR + IAM Lambda execution role</li>
-        <li>S3 buckets: <code>compressed_trees</code>, <code>decompressed_trees</code>, <code>crown_jewels</code>, <code>validated_crown_jewels</code></li>
-        <li>EMR Serverless app + IAM role</li>
-        <li>OpenSearch index <code>crown_jewel_candidates</code></li>
-        <li>EventBridge Pipes (DDB Stream filter)</li>
-        <li>API Gateway routes <code>/v2/tree/init</code> + <code>/v2/validation/confirm</code></li>
-        <li>VPC + Secrets Manager (KEM API key)</li>
+        <li>ECR + IAM Lambda execution role (monorepo KT-17132)</li>
+        <li>S3 buckets del flujo de árbol (comprimido / descomprimido / crown jewels)</li>
+        <li>EMR Serverless app + IAM (joyas-priorizer)</li>
+        <li>Índice OpenSearch <code>crown_jewel_candidates</code> — dentro de KT-17024</li>
+        <li>API Gateway / EventBridge de cada lambda — en su propio ticket</li>
+      </ul>
+    </div>
+
+    <div class="needed-col" style="border-left-color:var(--sm)">
+      <h3 style="color:var(--sm)">⚙️ Estados · classifier-state-backend</h3>
+      <ul>
+        <li>DynamoDB <code>classifier-cycles-state</code> + Stream <strong>(store compartido)</strong></li>
+        <li>Grant IAM cross-stack hacia Discovery y GSE</li>
+        <li>EventBridge Pipes sobre el Stream (STATION / CYCLE) — por lambda</li>
+        <li>ECR + IAM del monorepo (KT-17271)</li>
       </ul>
     </div>
 
     <div class="needed-col f2">
-      <h3>📦 Para gse-backend</h3>
+      <h3>📦 GSE · classifier-gse-backend</h3>
       <ul>
-        <li>S3 buckets: <code>gse-raw</code>, <code>gse-anonymized</code> + lifecycle 90d</li>
-        <li>SQS queues: reception-queue + anonymizer-queue + DLQs</li>
-        <li>SNS Signal Handler (publish payload)</li>
-        <li>EventBridge Pipes Fase 2 (STATION + CYCLE filters)</li>
-        <li>API Gateway route <code>/v2/gse/request-complete</code></li>
-        <li>CloudWatch alarms + SNS <code>kriptos-backend-alerts</code></li>
-        <li>mTLS certs para servicios externos</li>
+        <li>S3 buckets de muestras (raw / anonymized) — dentro de KT-17134</li>
+        <li>SQS + DLQs de reception / anonymizer — por notifier</li>
+        <li>API Gateway de <code>gse-request-complete</code> (KT-17031)</li>
+        <li>ECR + IAM del monorepo</li>
       </ul>
     </div>
 
@@ -564,47 +611,47 @@ footer a {
 <!-- ============ TIMELINE ============ -->
 <section class="timeline-section">
   <h2>📅 Orden sugerido</h2>
-  <div class="sub">4 pasos · cada uno desbloquea al siguiente</div>
+  <div class="sub">Por épica · cada monorepo entrega lambda + infra junta</div>
 
   <div class="timeline">
     <div class="tl-step wip">
-      <div class="num">Hito 1 — En curso</div>
-      <div class="title">Foundation</div>
+      <div class="num">Épica 1 — In Progress</div>
+      <div class="title">Discovery</div>
       <div class="items">
-        • Inicializar scan-match-backend<br>
-        • Crear DDB + ECR<br>
-        • Migrar 4 Lambdas legacy<br>
-        • CloudFormation base
+        • Monorepo KT-17132 ✅<br>
+        • 4 lambdas Done<br>
+        • crown-candidates-indexer + OpenSearch (KT-17024)<br>
+        • area_id (KT-17247)
       </div>
     </div>
     <div class="tl-step">
-      <div class="num">Hito 2</div>
-      <div class="title">Fase 1 completa</div>
+      <div class="num">Épica 2 — RFC</div>
+      <div class="title">Máquina de Estados</div>
       <div class="items">
-        • OpenSearch + EMR<br>
-        • +4 Lambdas validación<br>
-        • API GW + AppSync<br>
+        • Monorepo KT-17271<br>
+        • DDB classifier-cycles-state + Stream<br>
+        • state-cycle-init / station / enterprise<br>
         • EventBridge Pipes
       </div>
     </div>
     <div class="tl-step">
-      <div class="num">Hito 3</div>
-      <div class="title">Fase 2 GSE</div>
+      <div class="num">Épica 3 — RFC</div>
+      <div class="title">GSE</div>
       <div class="items">
-        • Inicializar gse-backend<br>
-        • +6 Lambdas<br>
-        • SQS + SNS + S3 gse-*<br>
-        • Integración externals
+        • Monorepo KT-17134<br>
+        • reception / anonymizer notifiers<br>
+        • request-complete + API GW<br>
+        • Buckets de muestras
       </div>
     </div>
     <div class="tl-step">
-      <div class="num">Hito 4</div>
-      <div class="title">Cleanup</div>
+      <div class="num">Épica 4 — Futura</div>
+      <div class="title">Validación (BE 07)</div>
       <div class="items">
-        • Archivar 4 repos legacy<br>
-        • CloudWatch + alertas<br>
-        • mTLS production<br>
-        • Documentación final
+        • Crear la épica<br>
+        • validation-handler (KT-17026)<br>
+        • validation-confirm (KT-17027)<br>
+        • Cierra el set client-facing
       </div>
     </div>
   </div>
@@ -613,9 +660,9 @@ footer a {
 <footer>
   <a href="dashboard.html">← Dashboard</a>
   <a href="status.html">📊 STATUS detallado</a>
-  <a href="architecture-global.drawio" download>⬇ Diagrama arquitectura</a>
+  <a href="STATUS.md">⬇ Diagrama arquitectura (mermaid en STATUS.md)</a>
   <br><br>
-  Generado 2026-05-28 · classifier-specs
+  Generado 2026-06-02 · classifier-specs
 </footer>
 
 </div>
