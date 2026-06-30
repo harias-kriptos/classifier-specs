@@ -1,21 +1,23 @@
-Generá o actualizá un diagrama de arquitectura AWS en draw.io. Objetivo / producto: $ARGUMENTS
+Generá, editá, interpretá o reproducí un diagrama en draw.io. Objetivo / referencia: $ARGUMENTS
 
-> Skill **utilitaria**, fuera del flujo de 5 pasos. No reemplaza ningún paso del pipeline.
+Usá el skill **diagramador** (`.claude/skills/diagramador/`). Resumen del procedimiento:
 
-Pasos:
-1. Leé `skills/diagram-aws.md` y `roles/architect.md` desde classifier-specs.
-2. Leé la fuente de verdad de la arquitectura en `context/<producto>/` (ecosystem, tickets, decisiones).
-   El diagrama refleja eso — no inventes servicios que no estén ahí.
-3. Trabajá sobre el **spec declarativo**, nunca sobre el XML:
-   - Engine genérico: `context/classifier-v2/diagrams/aws_drawio.py` (catálogo aws4 + estilos).
-   - Spec del producto: `context/<producto>/diagrams/build_<producto>.py`.
-   - Servicio nuevo → agregá su entrada a `ICONS` en `aws_drawio.py` (`resIcon` exacto de aws4 + categoría).
-4. Reglas no negociables:
-   - Servicios = íconos `mxgraph.aws4.resourceIcon` con color por categoría (nunca rectángulos).
-   - Estado (deployed/WIP/blocked/RFC) = badge elipse, no color de relleno.
-   - Actores fuera del `aws_cloud`; IA / terceros = caja dashed gris.
-   - Edges: sólido gris = síncrono · dashed rosa = evento (EventBridge / DDB Stream / S3 / SQS).
-5. Generá: `python3 build_<producto>.py`. Respaldá los `.drawio` previos en `diagrams/_legacy/` antes de reemplazar.
-6. Validá: XML well-formed y `mxgraph.aws4.resourceIcon` > 0 en cada archivo.
+1. Leé `.claude/skills/diagramador/referencias/estilo-base.md` — fuente de verdad del estilo.
+2. Elegí la herramienta según el caso (**puente**):
+   - Diagrama AWS **oficial del producto, reproducible** (se versiona y se regenera de un spec) →
+     engine determinístico `context/<producto>/diagrams/aws_drawio.py` + `build_<producto>.py`
+     (editás el `build_*.py`, **nunca** el XML; regenerás con `python3 build_<producto>.py`).
+   - C4, flowchart, Step Function, tabla, base de datos, diagrama ad-hoc, o **interpretar/reproducir**
+     una imagen o `.drawio` → diagramador (XML mxGraph guiado por el estilo).
+3. Partí de un snippet de `referencias/snippets.md` — **no armes el XML desde cero**.
+4. Bases de datos / EKS → librería de íconos (`referencias/iconos/_uris.json`).
+   Motor nuevo → `python3 .claude/skills/diagramador/referencias/scripts/add_icon.py <motor> <imagen>`.
+5. Generá el `.drawio` y **validá**:
+   `python3 .claude/skills/diagramador/referencias/scripts/validate_drawio.py <archivo>.drawio`.
+   Corregí los errores (XML mal formado, data-URI rota) y revisá los avisos
+   (texto que desborda, solapamientos, `fontSize<7`).
+6. Si el usuario te enseñó un diagrama de referencia, extraé sus reglas a `estilo-base.md`
+   (sin duplicar) y guardá el ejemplo en `referencias/ejemplos/`.
 
-Salida: los `.drawio` regenerados en `context/<producto>/` + el spec versionado (diagrama reproducible).
+Salida: ruta del `.drawio` (abrible en app.diagrams.net o la extensión de draw.io para VSCode)
++ un resumen de las decisiones de estilo.

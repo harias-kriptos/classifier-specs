@@ -15,7 +15,8 @@ classifier-specs/
 ├── skills/                         las 5 skills del flujo (Brainstorm → Review)
 ├── roles/                          roles del pipeline (PM, Architect, Tech Lead, Dev, Reviewer)
 ├── .claude/
-│   └── commands/                   comandos invocables desde Claude Code (/brainstorm /spec ...)
+│   ├── commands/                   comandos invocables desde Claude Code (/brainstorm /spec /diagram ...)
+│   └── skills/                     skills ejecutables (diagramador: diagramas draw.io con auto-trigger)
 ├── templates/                      plantillas para outputs del pipeline
 │   ├── SPEC_TEMPLATE.md                spec técnica (Skill 02, va al repo del producto)
 │   ├── ADR_TEMPLATE.md                 decisión arquitectónica
@@ -62,7 +63,8 @@ El repo mezcla **4 funciones distintas**, cada una en su carpeta. Entender esto 
 | `roles/` | Define **cómo se comporta el agente** según el paso. Distintos mindsets: PM hace preguntas, Architect escribe contrato, Reviewer audita. | El agente IA al activar una skill. |
 | `templates/` | **Plantillas de outputs estándar** — SPEC, threat model, PR description, comentarios Jira. Asegura outputs comparables entre tickets. | El agente al producir un output que se persiste. |
 | `stacks/python-lambda/` | **Reglas duras (MUST/NEVER)** del stack tecnológico. Lo que NO cambia entre tickets pero SÍ entre stacks. Cuando agreguemos otro stack: `stacks/rust-emr/`, `stacks/typescript-react/`. | Skills 02-05 cuando el ticket toca código del stack. |
-| `.claude/commands/` | **Atajos invocables desde Claude Code (CLI).** `/plan`, `/implement`, `/review`. | Claude Code en el repo (no Web). |
+| `.claude/commands/` | **Atajos invocables desde Claude Code (CLI).** `/plan`, `/implement`, `/review`, `/diagram`. | Claude Code en el repo (no Web). |
+| `.claude/skills/` | **Skills ejecutables con auto-trigger.** Hoy: `diagramador` (diagramas draw.io: AWS/C4/flowchart/Step Function/BD, con scripts de íconos y validación). | Claude Code cuando se pide un diagrama (o vía `/diagram`). |
 
 ### 2. Conocimiento del producto
 
