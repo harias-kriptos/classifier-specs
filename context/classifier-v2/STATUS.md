@@ -1,6 +1,6 @@
 # Estado Actual — Backend Classifier v2
 
-> **Última actualización:** 2026-06-24 (sync con Jira real + cierre de Fase 1 por Excel manual)
+> **Última actualización:** 2026-06-30 (KT-17024 cancelado · KT-17026/17027 → RFC pending · spec KT-17370 creada)
 > **Source of truth** del estado del backend. Reemplaza la versión anterior (que usaba numeración de tickets ficticia).
 > **Stack:** Python 3.11 · Lambda Container (ECR) · CloudFormation · pytest/ruff/mypy · uv.
 >
@@ -99,8 +99,8 @@ flowchart TB
 | **KT-17588** | **EMR `rollup.json` por estación** (add-on a KT-16616) | 🆕 RFC |
 | **KT-17586** | **crown-report-consolidator** — Excel por enterprise (KAIM-6316) | 🆕 RFC |
 | **KT-17587** | **crown-excel-ingest-confirm** — Excel validado → manifest → Fase 2 | 🆕 RFC |
-| KT-17024 | crown-candidates-indexer (modelo web por-archivo) | ⛔ descopeado · recomendado cancelar |
-| _parkeados (→ BE 07)_ | KT-17026 validation-handler · KT-17027 validation-confirm | 📋 RFC |
+| KT-17024 | crown-candidates-indexer (modelo web por-archivo) | ⛔ **Closed - Cancelled** (alcance → KT-17371 + KT-17588) |
+| _parkeados (→ BE 07)_ | KT-17026 validation-handler · KT-17027 validation-confirm | 📋 RFC · comentados → BE 07 |
 
 ### ⚙️ Máquina de Estados — KT-17270
 
@@ -161,9 +161,10 @@ flowchart TB
 | 1 | **Épica de Validación web (BE 07)** — crear y mover KT-17026/17027 (+ recrear KT-17025) | Producto + Backend |
 | 2 | Gap **`signal-handler`** / **`url-generator`** (pre-signed URL Windows) — sin ticket | Equipo Agente / IA |
 | 3 | Canales finales con Equipo IA: Signal Handler, Anonymizer, LLM Process Queue (hoy stubs) | Equipo IA |
-| 4 | **Cancelar KT-17024** (sin alcance propio tras descope) | Backend |
+| 4 | ✅ ~~Cancelar KT-17024~~ — hecho 2026-06-30 (Closed - Cancelled) | Backend |
 | 5 | **OQ del Excel**: ¿emitimos `.xlsx` estilado o dataset para CO? · layout de la columna de decisión en el Excel respondido | Producto + CO |
 | 6 | **Re-scope KT-16859**: spec del harness agentic (output de categorías+keywords) — owner IA | Equipo IA + Backend |
+| 7 | **Canal de inicio de exploración** (OQ1 de KT-17370/17371): SQS/EventBridge/API | Equipo Agente |
 
 **Desbloqueado 2026-06-24:** insumos JDC de Esteban (KAIM-6316 **Done**, KAIM-6315 en **Review**) → el formato del Excel y las casuísticas ya están definidos; habilitan KT-17586/17587.
 

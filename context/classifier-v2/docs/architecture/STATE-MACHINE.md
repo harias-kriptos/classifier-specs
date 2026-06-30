@@ -1,151 +1,155 @@
 # State Machine — CYCLE, STATION, REQUEST
 
-## CYCLE State Transitions
-
-The CYCLE entity tracks the progress of an entire enterprise through Fase 1 and Fase 2.
-
-```
-scanning
-  ↓ (crown-enterprise-barrier when all STATIONs report scan_status="complete")
-stations_complete
-  ↓ (crown-validation-handler allows mutations here)
-confirmed
-  ↓ (crown-validation-confirm when client confirms the set)
-phase2_collecting
-  ↓ (gse-enterprise-status when all STATIONs close in Fase 2)
-complete
-  ↓
-[cycle archived, TTL triggers cleanup after 90d]
-
-Alternative path:
-confirmed → phase2_skipped
-  ↓ (if crown-validation-confirm finds 0 approved candidates)
-[Fase 2 does not trigger]
-```
-
-### Fields per CYCLE state
-
-| State | Field | Value | Who sets |
-|---|---|---|---|
-| `scanning` | `status` | "scanning" | crown-candidates-indexer (on create) |
-| | `stations_expected` | N (from KEM) | crown-candidates-indexer |
-| | `stations_completed` | 0 | (incremented by crown-enterprise-barrier) |
-| `stations_complete` | `status` | "stations_complete" | crown-enterprise-barrier |
-| | `stations_completed` | = stations_expected | crown-enterprise-barrier |
-| `confirmed` | `status` | "confirmed" | crown-validation-confirm |
-| | `confirmed_at` | now() | crown-validation-confirm |
-| | `approved_count` | N | (from OpenSearch) |
-| `phase2_collecting` | `status` | "phase2_collecting" | gse-cycle-init |
-| | `sampling_status` | "collecting" | (implicit) |
-| `complete` | `status` | "complete" | gse-enterprise-status |
-| | `completed_at` | now() | gse-enterprise-status |
-| | `ttl` | now() + 90d | gse-enterprise-status |
+> **Actualizado:** 2026-06-30 — flujo de cierre de Fase 1 por **Excel manual** (sin front) + estados `ready` / `awaiting_validation`.
+> Fuente de verdad de estados: spec [KT-17371](https://kriptosteam.atlassian.net/browse/KT-17371) (`specs-staging/KT-17371-state-exploration-barrier.md`).
+> Store: DDB `classifier-cycles-state` (monorepo `classifier-state-backend`, KT-17271). PK `enterprise_id`, SK `CYCLE# · STATION# · REQUEST#`, Stream `NEW_AND_OLD_IMAGES`.
 
 ---
 
-## STATION State Transitions
+## CYCLE — transiciones de estado
 
-Each STATION tracks the progress per enterprise+station pair across both phases.
+El CYCLE trackea el avance de un enterprise completo a través de Fase 1 (exploración + validación por Excel) y Fase 2 (GSE).
+
+```mermaid
+stateDiagram-v2
+    [*] --> initialized: state-enterprise-init (KT-17370)<br/>al iniciar exploración
+    initialized --> scanning: primera STATION in_progress
+    scanning --> ready: state-exploration-barrier (KT-17371)<br/>todas las STATION scan_complete
+    ready --> awaiting_validation: crown-report-consolidator (KT-17586)<br/>Excel enterprise escrito
+    awaiting_validation --> confirmed: crown-excel-ingest-confirm (KT-17587)<br/>cliente devuelve Excel · >0 categorías aprobadas
+    awaiting_validation --> phase2_skipped: crown-excel-ingest-confirm (KT-17587)<br/>0 aprobadas (rechazó todo)
+    confirmed --> phase2_collecting: state-cycle-init (KT-17028)<br/>manifest.json depositado
+    phase2_collecting --> complete: state-enterprise-status (KT-17033)<br/>todas las STATION cerradas en Fase 2
+    complete --> [*]: TTL cleanup +90d
+    phase2_skipped --> [*]: Fase 2 no se dispara
+```
+
+### Campos por estado del CYCLE
+
+| Estado | Campo | Valor | Quién lo setea |
+|---|---|---|---|
+| `initialized` | `status` | "initialized" | **state-enterprise-init** (KT-17370) |
+| | `stations_expected` | N (de KEM) | state-enterprise-init |
+| | `area_id` | (si viene en payload) | state-enterprise-init |
+| `scanning` | `status` | "scanning" | state-exploration-barrier (primera STATION `in_progress`) |
+| | `stations_scan_complete` | 0 → N | state-exploration-barrier (incrementa) |
+| `ready` | `status` | "ready" | **state-exploration-barrier** (KT-17371, barrier) |
+| | `stations_scan_complete` | = stations_expected | state-exploration-barrier |
+| `awaiting_validation` | `status` | "awaiting_validation" | **crown-report-consolidator** (KT-17586) |
+| | `report_s3_uri` | `s3://…/crown-reports-pending/{ent}/{cycle}/assessment.xlsx` | crown-report-consolidator |
+| `confirmed` | `status` | "confirmed" | **crown-excel-ingest-confirm** (KT-17587) |
+| | `confirmed_at` | now() | crown-excel-ingest-confirm |
+| | `approved_categories` / `total_files` | N | crown-excel-ingest-confirm |
+| `phase2_skipped` | `status` | "phase2_skipped" | crown-excel-ingest-confirm (0 aprobadas) |
+| `phase2_collecting` | `status` | "phase2_collecting" | **state-cycle-init** (KT-17028) |
+| `complete` | `status` | "complete" | **state-enterprise-status** (KT-17033) |
+| | `completed_at` / `ttl` | now() / now()+90d | state-enterprise-status |
+
+> **Nota:** `ready` reemplaza al antiguo `stations_complete`. `awaiting_validation` es un estado propio (no sub-estado de `ready`) porque la espera del cliente puede durar **semanas** — Banco de Chile opera con ciclo trimestral de revisión JDC (KAIM-6315).
+
+---
+
+## STATION — transiciones de estado
+
+Cada STATION trackea el avance de un par enterprise+station a través de ambas fases.
 
 ```
-Fase 1:
-  requested
-    ↓ (crown-candidates-indexer)
-  scan_status: complete
-    ↓ (implicit on creation)
-  candidates_count: N
+Fase 1 (exploración + scan&match):
+  requested                         ← state-enterprise-init (KT-17370) crea la STATION
+    ↓ (notificación de recorrido del agente)
+  scan_status: in_progress          ← state-exploration-barrier (KT-17371)
+    ↓ (EMR joyas-priorizer entrega crown_jewels.json + rollup.json de la estación)
+  scan_status: scan_complete        ← state-exploration-barrier (KT-17371)
+  joyas_count: N
 
-Fase 2:
-  sampling_status: requested
-    ↓ (gse-cycle-init)
+Fase 2 (GSE):
+  sampling_status: requested        ← state-cycle-init (KT-17028)
+    ↓ (gse-sample-reception-notifier en la 1ra muestra)
   sampling_status: uploading
-    ↓ (gse-sample-reception-notifier on first sample)
+    ↓ (todas las muestras recibidas)
   sampling_status: sample_collected
-    ↓ (implicit when all samples received)
+    ↓ (gse-sample-anonymizer-notifier cuando todas anonimizadas)
   sampling_status: sample_anonymized
-    ↓ (gse-sample-anonymizer-notifier when all anonymized)
-  [gse-station-status closes STATION]
+    ↓ (state-station-status cierra la STATION)
   status: complete
 ```
 
-### Barrier logic (STATION close condition)
+### Barrier de enterprise (Fase 1) — condición de `CYCLE → ready`
 
-STATION closes when: `(samples_anonymized + samples_skipped) >= samples_expected`
+CYCLE pasa a `ready` cuando: `count(STATION.scan_status == "scan_complete") >= stations_expected`.
 
-Dispatcher: `gse-station-status` (Lambda on DDB Stream filter `STATION#` + Fase 2 status)
+Dispatcher: **state-exploration-barrier** (KT-17371) — Lambda sobre DDB Stream (filter `STATION#` + Fase 1) y/o EventBridge del `rollup.json` del EMR. Conditional `SET status="ready" IF status="scanning" AND stations_scan_complete >= stations_expected`.
+
+### Barrier de STATION (Fase 2) — condición de cierre
+
+STATION cierra cuando: `(samples_anonymized + samples_skipped) >= samples_expected`.
+Dispatcher: **state-station-status** (KT-17032) — Lambda sobre DDB Stream (filter `STATION#` + Fase 2).
 
 ---
 
-## REQUEST State Transitions
+## REQUEST — transiciones de estado (Fase 2)
 
-Each REQUEST tracks sampling progress for a specific request type (e.g., "pii", "financial").
+Cada REQUEST trackea el muestreo de un tipo de request específico (ej. "pii", "financial").
 
 ```
-requested
-  ↓ (gse-cycle-init creates REQUEST per STATION)
+requested                ← state-cycle-init crea un REQUEST por STATION
+  ↓ (gse-request-complete cuando el agente termina de subir)
 sent
-  ↓ (gse-request-complete when agent finishes uploading)
 ```
 
-### Fields
-
-| State | Field | Value | Who sets |
+| Estado | Campo | Valor | Quién lo setea |
 |---|---|---|---|
-| `requested` | `status` | "requested" | gse-cycle-init |
-| | `samples_expected` | len(files_to_sample) | gse-cycle-init |
-| `sent` | `status` | "sent" | gse-request-complete |
-| | `total_samples_uploaded` | N (from body) | gse-request-complete |
-| | `samples_skipped` | N (from body) | gse-request-complete |
-| | `sent_at` | now() | gse-request-complete |
+| `requested` | `status` / `samples_expected` | "requested" / len(files_to_sample) | state-cycle-init (KT-17028) |
+| `sent` | `status` / `total_samples_uploaded` / `samples_skipped` / `sent_at` | "sent" / N / N / now() | gse-request-complete (KT-17031) |
 
 ---
 
-## Transition Triggers by Lambda
+## Triggers de transición por Lambda
 
-| Lambda | Trigger | Transition | New status |
+| Lambda | Trigger | Transición | Nuevo estado |
 |---|---|---|---|
-| **crown-candidates-indexer** | S3 PutObject `crown_jewels/{ent}/{sta}/matches.jsonl` | CYCLE created + STATION created (Fase 1) | scanning + scan_status=complete |
-| **crown-enterprise-barrier** | DDB Stream STATION record + scan_status=complete | CYCLE stations_completed += 1, check if ready | stations_complete |
-| **crown-validation-handler** | GraphQL mutation (client UI) | OpenSearch update + DDB counter update | (CYCLE stays confirmed) |
-| **crown-validation-confirm** | HTTP POST `/v2/validation/confirm` | Freeze validation, write manifest, CYCLE → confirmed | confirmed or phase2_skipped |
-| **gse-cycle-init** | S3 PutObject `validated_crown_jewels/{ent}/{cycle}/manifest.json` | CYCLE → phase2_collecting, create STATIONs (Fase 2) | phase2_collecting |
-| **gse-sample-reception-notifier** | S3 PutObject `gse-raw/{ent}/{sta}/{cycle}/{req}/sample.json` | STATION sampling_status=uploading, samples_received += 1 | uploading |
-| **gse-sample-anonymizer-notifier** | S3 PutObject `gse-anonymized/{ent}/{sta}/{cycle}/{req}/sample.json` | STATION samples_anonymized += 1 | (check barrier) |
-| **gse-station-status** | DDB Stream STATION record + barrier met | Increment CYCLE stations_completed | STATION.status=complete |
-| **gse-enterprise-status** | DDB Stream CYCLE record + all STATIONs complete | Notify LLM, set TTL, CYCLE → complete | complete |
+| **state-enterprise-init** (KT-17370) | Inicio de exploración (agente) | Crea ENTERPRISE + CYCLE + STATIONs | CYCLE `initialized` |
+| **state-exploration-barrier** (KT-17371) | Notificación de recorrido (SQS) | STATION `scan_status = in_progress` | CYCLE `scanning` |
+| **state-exploration-barrier** (KT-17371) | EMR result (`rollup.json` PutObject) | STATION `scan_complete` + `joyas_count`; barrier | CYCLE `ready` |
+| **crown-report-consolidator** (KT-17586) | DDB Stream CYCLE `status=ready` | Suma rollups → escribe Excel enterprise | CYCLE `awaiting_validation` |
+| **crown-excel-ingest-confirm** (KT-17587) | S3 PutObject `crown-reports-validated/…/assessment.xlsx` | Parsea Excel, escribe manifest + station files | CYCLE `confirmed` / `phase2_skipped` |
+| **state-cycle-init** (KT-17028) | S3 PutObject `validated_crown_jewels/{ent}/{cycle}/manifest.json` | Crea STATIONs Fase 2 | CYCLE `phase2_collecting` |
+| **gse-sample-reception-notifier** (KT-17029) | S3 PutObject `gse-raw/…/sample.json` | STATION `uploading`, `samples_received++` | (counter) |
+| **gse-sample-anonymizer-notifier** (KT-17030) | S3 PutObject `gse-anonymized/…/sample.json` | `samples_anonymized++` | (check barrier) |
+| **gse-request-complete** (KT-17031) | API GW / agente | REQUEST `sent` | REQUEST `sent` |
+| **state-station-status** (KT-17032) | DDB Stream STATION + barrier Fase 2 | Incrementa CYCLE `stations_completed` | STATION `complete` |
+| **state-enterprise-status** (KT-17033) | DDB Stream CYCLE + todas las STATION cerradas | Notifica LLM, setea TTL | CYCLE `complete` |
 
 ---
 
-## Idempotency & Exactly-Once Semantics
+## Idempotencia & exactly-once
 
-Each transition uses **conditional writes** to guarantee exactly-once:
+Cada transición usa **conditional writes** para garantizar exactly-once:
 
-- **crown-enterprise-barrier:** `SET barrier_counted=true IF barrier_counted<>true` (wins the race against duplicated Stream records)
-- **crown-enterprise-barrier → CYCLE update:** `ADD stations_completed=1 IF status="scanning"`
-- **gse-station-status:** `SET status="complete" IF (samples_anonymized + samples_skipped) >= expected`
-- **gse-enterprise-status:** `SET status="complete" IF status="phase2_collecting"`
+- **state-exploration-barrier:** notificación idempotente por `(station_id, event_type)`; status STATION monotónico (no retrocede de `scan_complete`); barrier `SET status="ready" IF status="scanning" AND stations_scan_complete >= stations_expected`.
+- **crown-report-consolidator:** reescribe el mismo objeto S3 por cycle; transición condicional `IF status="ready"`.
+- **crown-excel-ingest-confirm:** `IF status="awaiting_validation"`; re-depósito del mismo Excel no duplica el trigger de Fase 2.
+- **state-enterprise-status:** `SET status="complete" IF status="phase2_collecting"`.
 
 ---
 
-## Monitoring & Debugging
-
-Use these queries to diagnose hangs:
+## Monitoreo & debugging
 
 ```sql
--- CYCLE stuck in "scanning"
-SELECT * FROM classifier-cycles-state 
-WHERE pk = "ent-001" AND sk begins_with "CYCLE#" 
-AND #status = "scanning" 
-AND created_at < now() - 1 hour
+-- CYCLE colgado en "scanning" (alguna STATION no reportó scan_complete)
+SELECT * FROM classifier-cycles-state
+WHERE pk = "ent-001" AND sk begins_with "CYCLE#"
+AND #status = "scanning" AND created_at < now() - 1 hour
 
--- STATION not reporting scan_status=complete
-SELECT * FROM classifier-cycles-state 
-WHERE pk = "ent-001" AND sk begins_with "STATION#" 
-AND scan_status <> "complete"
+-- CYCLE en "awaiting_validation" (esperando al cliente — puede ser normal por semanas)
+SELECT * FROM classifier-cycles-state
+WHERE pk = "ent-001" AND sk begins_with "CYCLE#"
+AND #status = "awaiting_validation"
 
--- REQUEST not marked as "sent" (agent didn't call /v2/gse/request-complete)
-SELECT * FROM classifier-cycles-state 
-WHERE pk = "ent-001" AND sk begins_with "REQUEST#" 
-AND #status = "requested" 
-AND created_at < now() - 30 min
+-- STATION que no reportó scan_complete
+SELECT * FROM classifier-cycles-state
+WHERE pk = "ent-001" AND sk begins_with "STATION#"
+AND scan_status <> "scan_complete"
 ```
+
+> **OQ abiertas (KT-17371):** canal exacto de la notificación de recorrido (Equipo Agente) y reaper de CYCLEs colgados en `awaiting_validation` (Producto, sin reaper en MVP).

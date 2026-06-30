@@ -1,6 +1,6 @@
 # Specs staging — Classifier backend
 
-> **Última actualización:** 2026-06-02 (reorganización en 3 épicas + modelo infra-en-entregable).
+> **Última actualización:** 2026-06-30 (spec KT-17370 creada · KT-17024 cancelado en Jira).
 >
 > Especificaciones técnicas (output de Skill 02) de los tickets de código del backend. **Staging area** — cada spec se migra al monorepo del módulo: `kriptos-io/classifier-v2-backend` (Discovery), `classifier-state-backend` (Máquina de Estados) o `classifier-gse-backend` (GSE), en `<monorepo>/specs/001-<slug>.md`.
 >
@@ -35,7 +35,7 @@
 | [KT-17586](https://kriptosteam.atlassian.net/browse/KT-17586) | [`KT-17586-crown-report-consolidator.md`](KT-17586-crown-report-consolidator.md) | 🆕 draft | Excel consolidado por enterprise (KAIM-6316) |
 | [KT-17587](https://kriptosteam.atlassian.net/browse/KT-17587) | [`KT-17587-crown-excel-ingest-confirm.md`](KT-17587-crown-excel-ingest-confirm.md) | 🆕 draft | Excel validado → manifest → dispara Fase 2 |
 | [KT-16859](https://kriptosteam.atlassian.net/browse/KT-16859) | _(spec en IA)_ | In Progress | harness agentic: sugiere categorías + keywords (re-scope Fase 1) |
-| [KT-17024](https://kriptosteam.atlassian.net/browse/KT-17024) | [`KT-17024-crown-candidates-indexer.md`](KT-17024-crown-candidates-indexer.md) | ⛔ descopeado | superseded: STATION→KT-17371, rollup→KT-17588, OS→BE 07. **Recomendado cancelar** |
+| [KT-17024](https://kriptosteam.atlassian.net/browse/KT-17024) | [`KT-17024-crown-candidates-indexer.md`](KT-17024-crown-candidates-indexer.md) | ⛔ **Closed - Cancelled** (2026-06-30) | superseded: STATION→KT-17371, rollup→KT-17588, OS→BE 07. Spec conservada por trazabilidad |
 
 > **Cierre de Fase 1 (manual por Excel, sin front — confirmado KAIM-6315/6316):** EMR escribe `rollup.json` por estación → barrier (KT-17371) marca CYCLE `ready` → `crown-report-consolidator` (KT-17586) genera el Excel por enterprise → cliente responde Excel → `crown-excel-ingest-confirm` (KT-17587) lo procesa y dispara Fase 2. **Sin OpenSearch en el camino crítico.**
 
@@ -46,7 +46,7 @@
 | [KT-17028](https://kriptosteam.atlassian.net/browse/KT-17028) | [`KT-17028-state-cycle-init.md`](KT-17028-state-cycle-init.md) | ✅ Done | crea CYCLE/STATION/REQUEST · multi-trigger |
 | [KT-17032](https://kriptosteam.atlassian.net/browse/KT-17032) | [`KT-17032-state-station-status.md`](KT-17032-state-station-status.md) | ✅ Done | cierre STATION (state lambda) |
 | [KT-17033](https://kriptosteam.atlassian.net/browse/KT-17033) | [`KT-17033-state-enterprise-status.md`](KT-17033-state-enterprise-status.md) | ✅ Done | cierre CYCLE + notify LLM |
-| [KT-17370](https://kriptosteam.atlassian.net/browse/KT-17370) | _(pendiente)_ | RFC | state-enterprise-init: alta ENTERPRISE+CYCLE al iniciar exploración |
+| [KT-17370](https://kriptosteam.atlassian.net/browse/KT-17370) | [`KT-17370-state-enterprise-init.md`](KT-17370-state-enterprise-init.md) | 🆕 draft | state-enterprise-init: alta ENTERPRISE+CYCLE al iniciar exploración |
 | [KT-17371](https://kriptosteam.atlassian.net/browse/KT-17371) | [`KT-17371-state-exploration-barrier.md`](KT-17371-state-exploration-barrier.md) | 🆕 draft | notificación recorrido + barrier → CYCLE `ready` |
 
 > La DDB `classifier-cycles-state` (ex-KT-17009) vive en este monorepo. La infra de cada lambda va dentro de su entregable.
