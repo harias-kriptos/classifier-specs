@@ -243,5 +243,10 @@ Colores azules corporativos, texto blanco, descripción en gris claro dentro de 
 
 ## 8. Inventario de ejemplos (`referencias/ejemplos/`)
 
-_Vacío. Registrar aquí cada diagrama de referencia que el usuario enseñe, con un
-nombre descriptivo y una línea de qué patrón ilustra._
+- **Fase 1 Scan & Match** (Classifier, ref. del usuario 2026-06-30) — flujo AWS
+  horizontal por estación. Reglas que aporta (ya integradas arriba): **agentes como
+  "software system"** = caja gris opaca (`#8C8C8C`/`#6C6C6C`, texto blanco, descripción
+  multilínea, etiqueta arriba) §1.3; **notas JSON request/response** = caja `#F5F5F5`/`#9E9E9E`
+  font 9 align-left; **post-its** amarillos `#FFF8E1`/`#D9A406` para to-dos/aclaraciones;
+  EMR/lambda con su ticket en la etiqueta. Reproducido con el engine determinístico
+  (`context/classifier-v2/diagrams/build_phase1_scan_match.py` → `phase1-scan-match.drawio`).

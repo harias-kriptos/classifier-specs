@@ -14,6 +14,8 @@ Referencia de shapes: https://www.drawio.com/doc/faq/aws-icons
 """
 from __future__ import annotations
 
+import base64
+import os
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -82,8 +84,8 @@ ACTOR_ICONS = {
     "mobile": "mxgraph.aws4.mobile_client",
 }
 
-ICON_W = 78
-ICON_H = 78
+ICON_W = 96
+ICON_H = 96
 
 
 def esc(s: str) -> str:
@@ -105,14 +107,14 @@ class Diagram:
     # -- nodos ---------------------------------------------------------------
     def node(self, nid: str, icon: str, label: str, x: int, y: int,
              status: Optional[str] = None, parent: str = "1",
-             w: int = ICON_W, h: int = ICON_H) -> str:
+             w: int = ICON_W, h: int = ICON_H, font: int = 15) -> str:
         if icon not in ICONS:
             raise KeyError(f"icono AWS desconocido: {icon!r} (agregalo a ICONS)")
         res, color = ICONS[icon]
         style = (
             "sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;"
             f"fillColor={color};strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;"
-            "verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;"
+            f"verticalAlign=top;align=center;html=1;fontSize={font};fontStyle=0;aspect=fixed;"
             f"shape=mxgraph.aws4.resourceIcon;resIcon={res};labelPosition=center;"
         )
         self.cells.append(
@@ -144,7 +146,7 @@ class Diagram:
             style = (
                 "rounded=1;arcSize=3;whiteSpace=wrap;html=1;container=1;collapsible=0;"
                 f"fillColor={fill};strokeColor={stroke};dashed={dashed};dashPattern=8 6;"
-                "verticalAlign=top;align=left;spacingLeft=14;spacingTop=6;fontSize=13;"
+                "verticalAlign=top;align=left;spacingLeft=14;spacingTop=8;fontSize=16;"
                 f"fontStyle=1;fontColor={stroke};"
             )
         self.cells.append(
@@ -161,6 +163,23 @@ class Diagram:
             "fillColor=#232F3E;strokeColor=none;dashed=0;verticalLabelPosition=bottom;"
             "verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;"
             f"shape={shape};"
+        )
+        self.cells.append(
+            f'<mxCell id="{nid}" value="{esc(label)}" style="{style}" vertex="1" parent="{parent}">'
+            f'<mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/></mxCell>'
+        )
+        return nid
+
+    def image(self, nid: str, png_path: str, label: str, x: int, y: int,
+              w: int = ICON_W, h: int = ICON_H, parent: str = "1", font: int = 13) -> str:
+        """Embebe un PNG real como ícono (data:image/png,<b64> — formato que draw.io
+        sí renderiza; ver estilo-base §1.1c). Para servicios sin resIcon aws4 confiable."""
+        with open(png_path, "rb") as fh:
+            b64 = base64.b64encode(fh.read()).decode("ascii")
+        uri = f"data:image/png,{b64}"  # coma, SIN ;base64
+        style = (
+            "shape=image;verticalLabelPosition=bottom;verticalAlign=top;aspect=fixed;"
+            f"imageAspect=0;image={uri};html=1;fontSize={font};fontStyle=0;fontColor=#232F3E;"
         )
         self.cells.append(
             f'<mxCell id="{nid}" value="{esc(label)}" style="{style}" vertex="1" parent="{parent}">'
@@ -202,20 +221,31 @@ class Diagram:
     # -- edges ---------------------------------------------------------------
     def edge(self, src: str, tgt: str, label: str = "", kind: str = "sync",
              parent: str = "1", exit_xy: Optional[tuple] = None,
-             entry_xy: Optional[tuple] = None) -> str:
-        if kind == "async":  # eventos / DDB Stream / S3 PutObject
+             entry_xy: Optional[tuple] = None, points: Optional[list] = None,
+             font: int = 13) -> str:
+        if kind == "assoc":  # asociación nota↔componente (fina, gris, sin flechas)
+            base = ("edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;"
+                    "strokeColor=#9AA5B1;strokeWidth=1;dashed=1;dashPattern=2 3;"
+                    f"endArrow=none;startArrow=none;fontSize={font};fontColor=#6B7480;"
+                    "labelBackgroundColor=#FFFFFF;")
+        elif kind == "async":  # eventos / DDB Stream / S3 PutObject
             base = ("edgeStyle=orthogonalEdgeStyle;rounded=1;arcSize=6;"
                     "strokeColor=#E7157B;strokeWidth=2;dashed=1;dashPattern=6 4;"
-                    "endArrow=open;endFill=0;html=1;fontSize=10;fontColor=#A30D5B;")
+                    f"endArrow=open;endFill=0;html=1;fontSize={font};fontColor=#A30D5B;"
+                    "labelBackgroundColor=#FFFFFF;")
         else:  # invocación síncrona / directa
             base = ("edgeStyle=orthogonalEdgeStyle;rounded=1;arcSize=6;"
                     "strokeColor=#545B64;strokeWidth=2;endArrow=block;endFill=1;"
-                    "html=1;fontSize=10;fontColor=#3B4148;")
-        pts = ""
+                    f"html=1;fontSize={font};fontColor=#3B4148;"
+                    "labelBackgroundColor=#FFFFFF;")
         if exit_xy:
             base += f"exitX={exit_xy[0]};exitY={exit_xy[1]};exitDx=0;exitDy=0;"
         if entry_xy:
             base += f"entryX={entry_xy[0]};entryY={entry_xy[1]};entryDx=0;entryDy=0;"
+        pts = ""
+        if points:
+            inner = "".join(f'<mxPoint x="{px}" y="{py}"/>' for px, py in points)
+            pts = f'<Array as="points">{inner}</Array>'
         eid = f"e-{src}-{tgt}-{len(self.cells)}"
         self.cells.append(
             f'<mxCell id="{eid}" value="{esc(label)}" style="{base}" edge="1" '
